@@ -6,20 +6,28 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('doctor_specialties', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            // Doctor (User)
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
+
+            // Specialty
+            $table->foreignId('specialty_id')
+                  ->constrained('specialties')
+                  ->cascadeOnDelete();
+
+            
+
+            // Prevent duplicate entries
+            $table->unique(['user_id', 'specialty_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('doctor_specialties');

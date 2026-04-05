@@ -20,7 +20,7 @@ return new class extends Migration
                   ->constrained('permissions')
                   ->cascadeOnDelete();
 
-            $table->timestamps();
+            
 
         });
     }

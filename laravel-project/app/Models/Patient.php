@@ -50,12 +50,29 @@ class Patient extends Model
     // Decrypt SSN when retrieving
     public function getSsnAttribute($value)
     {
-        return Crypt::decryptString($value);
+       return $value ? Crypt::decryptString($value) : null;
     }
 
     // Computed Age
     public function getAgeAttribute()
     {
         return Carbon::parse($this->date_of_birth)->age;
+    }
+
+
+    // relation with cases table
+    public function cases()
+    {
+        return $this->hasMany(PatientCase::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(Visit::class);
     }
 }

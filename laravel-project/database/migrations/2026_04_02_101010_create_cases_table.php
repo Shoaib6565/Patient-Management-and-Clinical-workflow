@@ -16,27 +16,30 @@ return new class extends Migration
             $table->foreignId('patient_id')
                   ->constrained('patients')
                   ->cascadeOnDelete();
+            $table->foreignId('category_id')
+                    ->constrained('categories')
+                    ->restrictOnDelete();
 
             $table->foreignId('practice_location_id')
                   ->constrained('practice_locations');
 
-            $table->enum('category', [
-                'General Medicine',
-                'Surgery',
-                'Pediatrics',
-                'Cardiology',
-                'Orthopedics',
-                'Neurology',
-                'Dermatology',
-                'Gynecology',
-                'Ophthalmology',
-                'ENT',
-                'Dental',
-                'Psychiatry',
-                'Physical Therapy',
-                'Emergency',
-                'Other'
-            ]);
+            // $table->enum('category', [
+            //     'General Medicine',
+            //     'Surgery',
+            //     'Pediatrics',
+            //     'Cardiology',
+            //     'Orthopedics',
+            //     'Neurology',
+            //     'Dermatology',
+            //     'Gynecology',
+            //     'Ophthalmology',
+            //     'ENT',
+            //     'Dental',
+            //     'Psychiatry',
+            //     'Physical Therapy',
+            //     'Emergency',
+            //     'Other'
+            // ]);
 
             $table->text('purpose_of_visit');
 
@@ -87,6 +90,36 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
+
+
+            // Indexes for fast searching
+
+            // Filtering indexes
+            $table->index('case_type');
+            $table->index('case_status');
+
+            // Foreign keys (joins)
+            $table->index('patient_id');
+            $table->index('category_id');
+            $table->index('practice_location_id');
+            $table->index('insurance_id');
+
+            // Date filtering
+            $table->index('opening_date');
+
+            // Composite indexes
+
+            // Patient + Status (patient history)
+            $table->index(['patient_id', 'case_status']);
+
+            // Location + Status (dashboard filtering)
+            $table->index(['practice_location_id', 'case_status']);
+
+            // Status + Opening Date (reports)
+            $table->index(['case_status', 'opening_date']);
+
+            // Category + Case Type (advanced filters)
+            $table->index(['category_id', 'case_type']);
 
         });
     }

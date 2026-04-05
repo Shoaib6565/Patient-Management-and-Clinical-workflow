@@ -8,21 +8,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('specialties', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
 
-            $table->string('specialty_name')->unique();
+            $table->string('name');
             $table->text('description')->nullable();
-
             $table->boolean('is_active')->default(true);
 
-            // Index (for filtering active specialties)
-            $table->index('is_active');
+            
+
+            //  prevent duplicate category names
+            $table->unique('name');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('specialties');
+        Schema::dropIfExists('categories');
     }
 };

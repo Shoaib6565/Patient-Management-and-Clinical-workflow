@@ -6,20 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('user_roles', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            // User
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
+
+            // Role
+            $table->foreignId('role_id')
+                  ->constrained('roles')
+                  ->cascadeOnDelete();
+
+
+            // Prevent duplicate role assignment
+            $table->unique(['user_id', 'role_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('user_roles');

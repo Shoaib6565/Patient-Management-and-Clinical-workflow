@@ -9,6 +9,8 @@ class RolePermission extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'role_permissions';
 
     protected $fillable = [
@@ -16,7 +18,7 @@ class RolePermission extends Model
         'permission_id'
     ];
 
-  
+
     public function role()
     {
         return $this->belongsTo(Role::class);

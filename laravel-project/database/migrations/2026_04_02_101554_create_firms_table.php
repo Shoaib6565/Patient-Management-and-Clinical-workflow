@@ -6,20 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('firms', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            $table->string('firm_name');
+
+            // ENUM for firm type
+            $table->enum('firm_type', [
+                'Legal',
+                'Corporate',
+                'Government',
+                'Other'
+            ]);
+
+            $table->text('address')->nullable();
+
+            $table->string('phone', 20)->nullable();
+            $table->string('contact_person')->nullable();
+
+            $table->boolean('is_active')->default(true);
+
+            // Indexes for fast quires
+            $table->index('firm_type');
+            $table->index('is_active');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('firms');

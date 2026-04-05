@@ -60,6 +60,18 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            // Indexes
+
+            $table->index(['first_name', 'last_name', 'date_of_birth']);
+
+            $table->index('city');
+            $table->index('state');
+            $table->index('country');
+
+            $table->index('patient_status');
+
+            $table->index('registration_date');
+
         });
     }
 
