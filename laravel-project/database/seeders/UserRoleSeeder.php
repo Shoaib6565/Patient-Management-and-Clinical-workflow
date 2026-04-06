@@ -11,9 +11,9 @@ class UserRoleSeeder extends Seeder
     public function run(): void
     {
         // Get roles
-        $adminRole = Role::where('name', 'Muhammad Shoaib')->first();
-        $doctorRole = Role::where('name', 'Saleem Iqbal')->first();
-        $fdoRole = Role::where('name', 'Yasir Shah')->first();
+        $adminRole = Role::where('name', 'Admin')->first();
+        $doctorRole = Role::where('name', 'Doctor')->first();
+        $fdoRole = Role::where('name', 'FDO')->first();
 
         // Example Users (make sure these users exist in DB)
         $admin = User::where('email', 'shoaib@gmail.com')->first();
