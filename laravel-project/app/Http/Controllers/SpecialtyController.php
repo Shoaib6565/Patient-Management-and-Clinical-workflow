@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Specialty;
@@ -8,14 +7,28 @@ use Illuminate\Http\Request;
 class SpecialtyController extends Controller
 {
     // Get All Specialties
-    public function index()
-    {
-        $specialties = Specialty::get();
+    // public function index()
+    // {
+    //     $specialties = Specialty::get();
 
-        return response()->json([
-            'status' => true,
-            'data' => $specialties
-        ]);
+    //     return response()->json([
+    //         'status' => true,
+    //         'data'   => $specialties,
+    //     ]);
+    // }
+
+    public function index(Request $request)
+    {
+        $search = $request->search;
+
+        $specialties = Specialty::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where('specialty_name', 'like', "%$search%");
+            })
+            ->orderBy('specialty_name')
+            ->paginate(10);
+
+        return response()->json($specialties);
     }
 
     //  Store (Create)
@@ -23,19 +36,19 @@ class SpecialtyController extends Controller
     {
         $request->validate([
             'specialty_name' => 'required|unique:specialties,specialty_name',
-            'description' => 'nullable|string',
+            'description'    => 'nullable|string',
         ]);
 
         $specialty = Specialty::create([
             'specialty_name' => $request->specialty_name,
-            'description' => $request->description,
-            'is_active' => true
+            'description'    => $request->description,
+            'is_active'      => true,
         ]);
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Specialty created successfully',
-            'data' => $specialty
+            'data'    => $specialty,
         ]);
     }
 
@@ -44,19 +57,18 @@ class SpecialtyController extends Controller
     {
         $specialty = Specialty::find($id);
 
-        if (!$specialty) {
+        if (! $specialty) {
             return response()->json([
-                'status' => false,
-                'message' => 'Specialty not found'
+                'status'  => false,
+                'message' => 'Specialty not found',
             ], 404);
         }
 
         return response()->json([
             'status' => true,
-            'data' => $specialty
+            'data'   => $specialty,
         ]);
     }
-
 
     // filter active and de-active specialties
     //  Get Active Specialties
@@ -65,12 +77,11 @@ class SpecialtyController extends Controller
         $data = Specialty::where('is_active', true)->get();
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Active specialties fetched successfully',
-            'data' => $data
+            'data'    => $data,
         ]);
     }
-
 
     // Get Inactive Specialties
     public function inactive()
@@ -78,9 +89,9 @@ class SpecialtyController extends Controller
         $data = Specialty::where('is_active', false)->get();
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Inactive specialties fetched successfully',
-            'data' => $data
+            'data'    => $data,
         ]);
     }
 
@@ -89,27 +100,27 @@ class SpecialtyController extends Controller
     {
         $specialty = Specialty::find($id);
 
-        if (!$specialty) {
+        if (! $specialty) {
             return response()->json([
-                'status' => false,
-                'message' => 'Specialty not found'
+                'status'  => false,
+                'message' => 'Specialty not found',
             ], 404);
         }
 
         $request->validate([
             'specialty_name' => 'required|unique:specialties,specialty_name,' . $id,
-            'description' => 'nullable|string',
+            'description'    => 'nullable|string',
         ]);
 
         $specialty->update([
             'specialty_name' => $request->specialty_name,
-            'description' => $request->description,
+            'description'    => $request->description,
         ]);
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Specialty updated successfully',
-            'data' => $specialty
+            'data'    => $specialty,
         ]);
     }
 
@@ -118,18 +129,18 @@ class SpecialtyController extends Controller
     {
         $specialty = Specialty::find($id);
 
-        if (!$specialty) {
+        if (! $specialty) {
             return response()->json([
-                'status' => false,
-                'message' => 'Specialty not found'
+                'status'  => false,
+                'message' => 'Specialty not found',
             ], 404);
         }
 
         $specialty->delete();
 
         return response()->json([
-            'status' => true,
-            'message' => 'Specialty deleted successfully'
+            'status'  => true,
+            'message' => 'Specialty deleted successfully',
         ]);
     }
 
@@ -138,18 +149,18 @@ class SpecialtyController extends Controller
     {
         $specialty = Specialty::find($id);
 
-        if (!$specialty) {
+        if (! $specialty) {
             return response()->json([
-                'status' => false,
-                'message' => 'Specialty not found'
+                'status'  => false,
+                'message' => 'Specialty not found',
             ], 404);
         }
 
         $specialty->update(['is_active' => true]);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Specialty activated successfully'
+            'status'  => true,
+            'message' => 'Specialty activated successfully',
         ]);
     }
 
@@ -158,18 +169,18 @@ class SpecialtyController extends Controller
     {
         $specialty = Specialty::find($id);
 
-        if (!$specialty) {
+        if (! $specialty) {
             return response()->json([
-                'status' => false,
-                'message' => 'Specialty not found'
+                'status'  => false,
+                'message' => 'Specialty not found',
             ], 404);
         }
 
         $specialty->update(['is_active' => false]);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Specialty deactivated successfully'
+            'status'  => true,
+            'message' => 'Specialty deactivated successfully',
         ]);
     }
 }
