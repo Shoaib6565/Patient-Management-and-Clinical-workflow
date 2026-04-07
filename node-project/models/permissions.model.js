@@ -1,17 +1,28 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+// models/permission.js
+'use strict';
+const { Model } = require('sequelize');
 
-const permission = db.define('permission', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    permission_name: {
-        type: DataTypes.STRING,
-        allowNull: false
+module.exports = (sequelize, DataTypes) => {
+  class Permission extends Model {
+    static associate(models) {
+      this.belongsToMany(models.Role, {
+        through: models.RolePermission,
+        foreignKey: 'permission_id',
+      });
     }
-}, {
-    timestamps: false
-});
-export default permission;
+  }
+
+  Permission.init(
+    {
+      name: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: 'Permission',
+      tableName: 'permissions',
+      timestamps: false,
+    }
+  );
+
+  return Permission;
+};

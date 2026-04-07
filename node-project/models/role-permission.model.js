@@ -1,28 +1,28 @@
-// models/user_role.js
+// models/role_permission.js
 'use strict';
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class UserRole extends Model {
+  class RolePermission extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'user_id' });
       this.belongsTo(models.Role, { foreignKey: 'role_id' });
+      this.belongsTo(models.Permission, { foreignKey: 'permission_id' });
     }
   }
 
-  UserRole.init(
+  RolePermission.init(
     {
-      user_id: DataTypes.BIGINT,
       role_id: DataTypes.BIGINT,
+      permission_id: DataTypes.BIGINT,
     },
     {
       sequelize,
-      modelName: 'UserRole',
-      tableName: 'user_roles',
+      modelName: 'RolePermission',
+      tableName: 'role_permissions',
       timestamps: false,
       underscored: true,
     }
   );
 
-  return UserRole;
+  return RolePermission;
 };

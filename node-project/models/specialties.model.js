@@ -1,0 +1,33 @@
+// models/specialty.js
+'use strict';
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class Specialty extends Model {
+    static associate(models) {
+      this.hasMany(models.Appointment, { foreignKey: 'specialty_id' });
+
+      this.belongsToMany(models.User, {
+        through: models.DoctorSpecialty,
+        foreignKey: 'specialty_id',
+      });
+    }
+  }
+
+  Specialty.init(
+    {
+      specialty_name: { type: DataTypes.STRING, unique: true },
+      description: DataTypes.TEXT,
+      is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+    },
+    {
+      sequelize,
+      modelName: 'Specialty',
+      tableName: 'specialties',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+  return Specialty;
+};
