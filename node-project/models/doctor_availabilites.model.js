@@ -1,29 +1,34 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+// models/doctor_availability.js
+'use strict';
+const { Model } = require('sequelize');
 
-const doctor_availability = db.define('doctor_availability', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    day_of_week: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    start_time: {
-        type: DataTypes.TIME,
-        allowNull: false
-    },
-    end_time: {
-        type: DataTypes.TIME,
-        allowNull: false
-    },
-    is_available: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
+module.exports = (sequelize, DataTypes) => {
+  class DoctorAvailability extends Model {
+    static associate(models) {
+      this.belongsTo(models.User, { foreignKey: 'user_id' });
+      this.belongsTo(models.PracticeLocation, { foreignKey: 'practice_location_id' });
     }
-}, {
-    timestamps: false
-});
-export default doctor_availability;
+  }
+
+  DoctorAvailability.init(
+    {
+      user_id: DataTypes.BIGINT,
+      practice_location_id: DataTypes.BIGINT,
+      day_of_week: DataTypes.ENUM(
+        'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'
+      ),
+      start_time: DataTypes.TIME,
+      end_time: DataTypes.TIME,
+      is_available: { type: DataTypes.BOOLEAN, defaultValue: true },
+    },
+    {
+      sequelize,
+      modelName: 'DoctorAvailability',
+      tableName: 'doctor_availabilities',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+  return DoctorAvailability;
+};
