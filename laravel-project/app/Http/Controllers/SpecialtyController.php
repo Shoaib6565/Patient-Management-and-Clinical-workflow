@@ -6,16 +6,6 @@ use Illuminate\Http\Request;
 
 class SpecialtyController extends Controller
 {
-    // Get All Specialties
-    // public function index()
-    // {
-    //     $specialties = Specialty::get();
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'data'   => $specialties,
-    //     ]);
-    // }
 
     public function index(Request $request)
     {
