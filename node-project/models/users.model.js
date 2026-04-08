@@ -1,43 +1,35 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database'; // Your DB connection
+// models/user.js
+'use strict';
+const { Model } = require('sequelize');
 
-class User extends Model {}
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      this.hasMany(models.Appointment, { foreignKey: 'doctor_id', as: 'doctorAppointments' });
+      this.hasMany(models.Appointment, { foreignKey: 'created_by', as: 'createdAppointments' });
 
-const User = sequelize.define('User',{
-  // Attributes
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    validate: { isEmail: true }
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.ENUM('Admin', 'Doctor','FrontDesk'),
-    allowNull: false,
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+      this.belongsToMany(models.Role, {
+        through: models.UserRole,
+        foreignKey: 'user_id',
+      });
+    }
   }
-}, {
-  sequelize,
-  modelName: 'Users', // Table name will be 'Users' by default
-  timestamps: true   // Adds createdAt and updatedAt
-});
 
-export default User;
+  User.init(
+    {
+      name: DataTypes.STRING,
+      email: { type: DataTypes.STRING, unique: true },
+      password: DataTypes.STRING,
+      is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+    },
+    {
+      sequelize,
+      modelName: 'User',
+      tableName: 'users',
+      paranoid: true,
+      underscored: true,
+    }
+  );
+
+  return User;
+};

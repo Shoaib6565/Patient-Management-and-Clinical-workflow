@@ -1,12 +1,28 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+// models/doctor_specialty.js
+'use strict';
+const { Model } = require('sequelize');
 
-const doctor_specialty = db.define('doctor_specialty', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
+module.exports = (sequelize, DataTypes) => {
+  class DoctorSpecialty extends Model {
+    static associate(models) {
+      this.belongsTo(models.User, { foreignKey: 'user_id' });
+      this.belongsTo(models.Specialty, { foreignKey: 'specialty_id' });
     }
-}, {
-    timestamps: false
-});
-export default doctor_specialty;
+  }
+
+  DoctorSpecialty.init(
+    {
+      user_id: DataTypes.BIGINT,
+      specialty_id: DataTypes.BIGINT,
+    },
+    {
+      sequelize,
+      modelName: 'DoctorSpecialty',
+      tableName: 'doctor_specialties',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+  return DoctorSpecialty;
+};
