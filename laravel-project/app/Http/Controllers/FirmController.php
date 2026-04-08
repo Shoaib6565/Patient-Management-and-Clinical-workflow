@@ -21,7 +21,6 @@ class FirmController extends Controller
             ->when($status === 'active', function ($query) {
                 $query->where('is_active', true);
             })
-
             ->when($status === 'inactive', function ($query) {
                 $query->where('is_active', false);
             })

@@ -1,15 +1,12 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\SpecialtyController;
-use App\Http\Controllers\PracticeLocationController;
-use App\Http\Controllers\InsuranceController;
-use App\Http\Controllers\FirmController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AppointmentController;
-
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FirmController;
+use App\Http\Controllers\InsuranceController;
+use App\Http\Controllers\PracticeLocationController;
+use App\Http\Controllers\SpecialtyController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['node.jwt'])->group(function () {
 
@@ -29,8 +26,19 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::get('/history/{patient_id}', [AppointmentController::class, 'history']);
     });
 
+    // api route for visits (for all role)
 
+    Route::prefix('visits')->group(function () {
+        // All roles
+        Route::get('/', [VisitController::class, 'index']);
+        Route::get('/{id}', [VisitController::class, 'show']);
+        // Doctor actions
+        Route::put('/{id}', [VisitController::class, 'update']);
+        Route::patch('/complete/{id}', [VisitController::class, 'complete']);
+        // Admin only
+        Route::delete('/{id}', [VisitController::class, 'destroy']);
 
+    });
 
     // api route for specialties (crud)
     Route::prefix('specialties')->group(function () {
@@ -47,7 +55,6 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::get('/inactive', [SpecialtyController::class, 'inactive']);
     });
 
-
     // api route for practice locations (crud)
     Route::prefix('practice-locations')->group(function () {
         Route::get('/', [PracticeLocationController::class, 'index']);
@@ -60,7 +67,6 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::patch('/activate/{id}', [PracticeLocationController::class, 'activate']);
         Route::patch('/deactivate/{id}', [PracticeLocationController::class, 'deactivate']);
     });
-
 
     // api route for insurances (crud)
     Route::prefix('insurances')->group(function () {
@@ -75,7 +81,6 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::patch('/deactivate/{id}', [InsuranceController::class, 'deactivate']);
     });
 
-
     // api route for firms (crud)
     Route::prefix('firms')->group(function () {
         Route::get('/', [FirmController::class, 'index']);
@@ -86,7 +91,6 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::patch('/activate/{id}', [FirmController::class, 'activate']);
         Route::patch('/deactivate/{id}', [FirmController::class, 'deactivate']);
     });
-
 
     // api route for categories
     Route::prefix('categories')->group(function () {
