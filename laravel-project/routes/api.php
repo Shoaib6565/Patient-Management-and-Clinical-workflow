@@ -8,7 +8,7 @@ use App\Http\Controllers\PracticeLocationController;
 use App\Http\Controllers\SpecialtyController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['node.jwt'])->group(function () {
+// Route::middleware(['node.jwt'])->group(function () {
 
     // api for appointments (for all role)
     Route::prefix('appointments')->group(function () {
@@ -104,4 +104,4 @@ Route::middleware(['node.jwt'])->group(function () {
         Route::patch('/{id}/activate', [CategoryController::class, 'activate']);
         Route::patch('/{id}/deactivate', [CategoryController::class, 'deactivate']);
     });
-});
+// });
