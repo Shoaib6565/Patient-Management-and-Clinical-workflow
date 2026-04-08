@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   PracticeLocation.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       location_name: DataTypes.STRING,
       address: DataTypes.TEXT,
       city: DataTypes.STRING,

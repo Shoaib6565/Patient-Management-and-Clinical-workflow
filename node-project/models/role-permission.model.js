@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   RolePermission.init(
     {
+      id : {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       role_id: DataTypes.BIGINT,
       permission_id: DataTypes.BIGINT,
     },

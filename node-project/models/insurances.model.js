@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Insurance.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       insurance_name: DataTypes.STRING,
       insurance_code: { type: DataTypes.STRING, unique: true },
       address: DataTypes.TEXT,

@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   DoctorAvailability.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       user_id: DataTypes.BIGINT,
       practice_location_id: DataTypes.BIGINT,
       day_of_week: DataTypes.ENUM(

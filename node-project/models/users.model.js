@@ -1,16 +1,10 @@
-// models/user.js
-'use strict';
-const { Model } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class User extends Model {
     static associate(models) {
-      this.hasMany(models.Appointment, { foreignKey: 'doctor_id', as: 'doctorAppointments' });
-      this.hasMany(models.Appointment, { foreignKey: 'created_by', as: 'createdAppointments' });
-
-      this.belongsToMany(models.Role, {
-        through: models.UserRole,
-        foreignKey: 'user_id',
+      User.hasMany(models.Appointment, {
+        foreignKey: "userId",
       });
     }
   }
@@ -18,16 +12,12 @@ module.exports = (sequelize, DataTypes) => {
   User.init(
     {
       name: DataTypes.STRING,
-      email: { type: DataTypes.STRING, unique: true },
+      email: DataTypes.STRING,
       password: DataTypes.STRING,
-      is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
     },
     {
       sequelize,
-      modelName: 'User',
-      tableName: 'users',
-      paranoid: true,
-      underscored: true,
+      modelName: "User",
     }
   );
 

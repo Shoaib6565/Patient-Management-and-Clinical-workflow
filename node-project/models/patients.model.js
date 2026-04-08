@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Patient.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       first_name: DataTypes.STRING,
       middle_name: DataTypes.STRING,
       last_name: DataTypes.STRING,

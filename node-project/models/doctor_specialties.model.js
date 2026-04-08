@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   DoctorSpecialty.init(
     {
+      id : {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       user_id: DataTypes.BIGINT,
       specialty_id: DataTypes.BIGINT,
     },

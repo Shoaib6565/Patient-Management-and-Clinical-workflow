@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Specialty.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       specialty_name: { type: DataTypes.STRING, unique: true },
       description: DataTypes.TEXT,
       is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
