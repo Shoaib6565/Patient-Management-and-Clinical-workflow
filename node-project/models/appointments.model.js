@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -122,10 +123,38 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'appointments',
       timestamps: true,
       paranoid: true, // soft deletes
+=======
+// models/appointment.js
+'use strict';
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class Appointment extends Model {
+    static associate(models) {
+      this.belongsTo(models.User, { as: 'doctor', foreignKey: 'doctor_id' });
+      this.belongsTo(models.Patient, { foreignKey: 'patient_id' });
+      this.belongsTo(models.Case, { foreignKey: 'case_id' });
+    }
+  }
+
+  Appointment.init(
+    {
+      appointment_number: { type: DataTypes.STRING, unique: true },
+      appointment_date: DataTypes.DATEONLY,
+      appointment_time: DataTypes.TIME,
+      status: DataTypes.ENUM('Scheduled','Confirmed','Completed'),
+    },
+    {
+      sequelize,
+      modelName: 'Appointment',
+      tableName: 'appointments',
+      paranoid: true,
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
       underscored: true,
     }
   );
 
+<<<<<<< HEAD
   Appointment.associate = function (models) {
     Appointment.belongsTo(models.Case, {
       foreignKey: 'case_id',
@@ -160,5 +189,7 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+=======
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
   return Appointment;
 };

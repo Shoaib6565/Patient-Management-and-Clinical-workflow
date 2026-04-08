@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -45,5 +46,33 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+=======
+// models/doctor_specialty.js
+'use strict';
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class DoctorSpecialty extends Model {
+    static associate(models) {
+      this.belongsTo(models.User, { foreignKey: 'user_id' });
+      this.belongsTo(models.Specialty, { foreignKey: 'specialty_id' });
+    }
+  }
+
+  DoctorSpecialty.init(
+    {
+      user_id: DataTypes.BIGINT,
+      specialty_id: DataTypes.BIGINT,
+    },
+    {
+      sequelize,
+      modelName: 'DoctorSpecialty',
+      tableName: 'doctor_specialties',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
   return DoctorSpecialty;
 };

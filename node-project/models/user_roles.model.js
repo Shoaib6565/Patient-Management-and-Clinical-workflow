@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -45,5 +46,33 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+=======
+// models/user_role.js
+'use strict';
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class UserRole extends Model {
+    static associate(models) {
+      this.belongsTo(models.User, { foreignKey: 'user_id' });
+      this.belongsTo(models.Role, { foreignKey: 'role_id' });
+    }
+  }
+
+  UserRole.init(
+    {
+      user_id: DataTypes.BIGINT,
+      role_id: DataTypes.BIGINT,
+    },
+    {
+      sequelize,
+      modelName: 'UserRole',
+      tableName: 'user_roles',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
   return UserRole;
 };

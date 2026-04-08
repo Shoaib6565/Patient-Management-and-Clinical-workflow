@@ -10,6 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+<<<<<<< HEAD
+=======
+    "bcryptjs": "^3.0.3",
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
@@ -17,6 +21,7 @@
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
+    "nodemon": "^3.1.14",
     "sequelize-cli": "^6.6.5"
   },
   "description": ""

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -139,11 +140,55 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: 'patients',
       timestamps: true,
+=======
+// models/patient.js
+'use strict';
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class Patient extends Model {
+    static associate(models) {
+      this.hasMany(models.Case, { foreignKey: 'patient_id' });
+      this.hasMany(models.Appointment, { foreignKey: 'patient_id' });
+    }
+  }
+
+  Patient.init(
+    {
+      first_name: DataTypes.STRING,
+      middle_name: DataTypes.STRING,
+      last_name: DataTypes.STRING,
+      date_of_birth: DataTypes.DATEONLY,
+      gender: DataTypes.ENUM('Male','Female','Other','Prefer Not to Say'),
+      ssn: { type: DataTypes.TEXT, unique: true },
+      email: { type: DataTypes.STRING, unique: true },
+      phone: DataTypes.STRING,
+      mobile: DataTypes.STRING,
+      address: DataTypes.TEXT,
+      city: DataTypes.STRING,
+      state: DataTypes.STRING,
+      zip_code: DataTypes.STRING,
+      country: DataTypes.STRING,
+      emergency_contact_name: DataTypes.STRING,
+      emergency_contact_phone: DataTypes.STRING,
+      primary_physician: DataTypes.STRING,
+      insurance_provider: DataTypes.STRING,
+      insurance_policy_number: DataTypes.STRING,
+      preferred_language: { type: DataTypes.STRING, defaultValue: 'English' },
+      patient_status: DataTypes.ENUM('Active','Inactive','Deceased','Transferred'),
+      registration_date: DataTypes.DATE,
+    },
+    {
+      sequelize,
+      modelName: 'Patient',
+      tableName: 'patients',
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
       paranoid: true,
       underscored: true,
     }
   );
 
+<<<<<<< HEAD
   Patient.associate = function (models) {
     Patient.hasMany(models.Case, {
       foreignKey: 'patient_id',
@@ -154,5 +199,7 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+=======
+>>>>>>> b51cdb19601096eab18448278d5dbdcfa2a545b3
   return Patient;
 };
