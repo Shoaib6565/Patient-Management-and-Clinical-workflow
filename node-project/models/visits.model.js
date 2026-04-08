@@ -1,84 +1,170 @@
-import datatyepes from 'sequelize';
-import db from '../config/database.js';
+'use strict';
 
-const Visits = db.define('visit', {
-    id: {
-        type: datatyepes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    visit_number:
+module.exports = (sequelize, DataTypes) => {
+  const Visit = sequelize.define(
+    'Visit',
     {
-        type: datatyepes.STRING,
-        allowNull: false    
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+
+      visit_number: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+
+      appointment_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      case_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      patient_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      doctor_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      visit_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+
+      visit_time: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
+
+      visit_duration_minutes: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+
+      diagnosis: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      diagnosis_codes: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+
+      treatment: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      treatment_plan: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      prescription: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      prescription_documents: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      vital_signs: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+
+      symptoms: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      follow_up_required: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      follow_up_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+
+      referral_made: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      referral_to: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      visit_status: {
+        type: DataTypes.ENUM(
+          'Draft',
+          'Completed',
+          'Cancelled',
+          'Billed'
+        ),
+        defaultValue: 'Draft',
+      },
+
+      completed_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
     },
-    visit_date: {
-        type: datatyepes.DATE,
-        allowNull: false
-    },
-    visit_time: {
-        type: datatyepes.TIME,
-        allowNull: false
-    },
-    visit_duration_minutes: {
-        type: datatyepes.INTEGER,
-        allowNull: false
-    },
-    diagnosis: {
-        type: datatyepes.text
-    },
-    diagnosis_code: {
-        type: datatyepes.JSON,
-    },
-    treatment : {
-        type: datatyepes.text
-    },
-    treatment_plan: {
-        type: datatyepes.text
-    },
-    notes: {
-        type: datatyepes.text
-    },
-    vital_signs: {
-        type: datatyepes.JSON
-    },
-    symptoms: {
-        type: datatyepes.text
-    },
-    follow_up : {
-        type: datatyepes.BOOLEAN
-    },
-    follow_up_date: {
-        type: datatyepes.DATE
-    },
-    referral_made: {
-        type: datatyepes.BOOLEAN
-    },
-    referral_to: {
-        type: datatyepes.STRING
-    },
-    visit_status: {
-        type: datatyepes.ENUM('draft','scheduled', 'completed', 'cancelled'),
-        defaultValue: 'scheduled'
-    },
-    completed_at: {
-        type: datatyepes.DATE
-    },
-    created_at: {
-        type: datatyepes.DATE,
-        defaultValue: datatyepes.NOW
-    },
-    updated_at: {
-        type: datatyepes.DATE,
-        defaultValue: datatyepes.NOW
-    },
-    deleted_at: {
-        type: datatyepes.DATE
+    {
+      tableName: 'visits',
+      timestamps: true,
+      paranoid: true,
+      underscored: true,
     }
-}, {
-    tableName: 'visits',
-    timestamps: true,
-    paranoid: true
-});
+  );
 
+  Visit.associate = function (models) {
+    Visit.belongsTo(models.Appointment, {
+      foreignKey: 'appointment_id',
+      onDelete: 'CASCADE',
+    });
 
+    Visit.belongsTo(models.Case, {
+      foreignKey: 'case_id',
+      onDelete: 'CASCADE',
+    });
+
+    Visit.belongsTo(models.Patient, {
+      foreignKey: 'patient_id',
+      onDelete: 'CASCADE',
+    });
+
+    Visit.belongsTo(models.User, {
+      as: 'doctor',
+      foreignKey: 'doctor_id',
+      onDelete: 'CASCADE',
+    });
+  };
+
+  return Visit;
+};

@@ -1,39 +1,71 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+'use strict';
 
-const PracticeLocation = db.define('practice_location', {
-    id: {
-        type: DataTypes.INTEGER,
+module.exports = (sequelize, DataTypes) => {
+  const PracticeLocation = sequelize.define(
+    'PracticeLocation',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        autoIncrement: true
-    },
-    location_name: {
+      },
+
+      location_name: {
         type: DataTypes.STRING,
-        allowNull: false
-    },
-    address: {
-        type: DataTypes.TEXT
-    },
-    city: {
-        type: DataTypes.STRING
-    },
-    state: {
-        type: DataTypes.STRING
-    },
-    zip_code: {
-        type: DataTypes.STRING
-    },
-    phone: {
-        type: DataTypes.STRING
-    },
-    email: {
-        type: DataTypes.STRING
-    },
-    is_active: {
+        allowNull: false,
+      },
+
+      address: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+
+      city: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      state: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      zip: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+      },
+
+      phone: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
+
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      is_active: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
+      },
+    },
+    {
+      tableName: 'practice_locations',
+      timestamps: false,
+      underscored: true,
     }
-}, {
-    timestamps: true,
-    underscored: true
-});
+  );
+
+  PracticeLocation.associate = function (models) {
+    PracticeLocation.hasMany(models.Case, {
+      foreignKey: 'practice_location_id',
+    });
+
+    PracticeLocation.hasMany(models.Appointment, {
+      foreignKey: 'practice_location_id',
+    });
+  };
+
+  return PracticeLocation;
+};

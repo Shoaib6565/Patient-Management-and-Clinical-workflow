@@ -1,43 +1,66 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database'; // Your DB connection
+"use strict";
 
-class User extends Model {}
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define(
+    "User",
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-const User = sequelize.define('User',{
-  // Attributes
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    validate: { isEmail: true }
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.ENUM('Admin', 'Doctor','FrontDesk'),
-    allowNull: false,
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  }
-}, {
-  sequelize,
-  modelName: 'Users', // Table name will be 'Users' by default
-  timestamps: true   // Adds createdAt and updatedAt
-});
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
-export default User;
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
+    },
+    {
+      tableName: "users",
+      timestamps: true,
+      paranoid: true, // soft deletes
+      underscored: true,
+    },
+  );
+
+  User.associate = function (models) {
+    // Appointments where user is doctor
+    User.hasMany(models.Appointment, {
+      foreignKey: "doctor_id",
+      as: "doctorAppointments",
+    });
+
+    // Appointments created by user
+    User.hasMany(models.Appointment, {
+      foreignKey: "created_by",
+      as: "createdAppointments",
+    });
+
+    User.belongsToMany(models.Role, {
+      through: models.UserRole,
+      foreignKey: "user_id",
+    });
+  };
+
+  return User;
+};

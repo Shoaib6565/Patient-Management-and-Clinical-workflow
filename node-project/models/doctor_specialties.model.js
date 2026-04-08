@@ -1,12 +1,49 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+'use strict';
 
-const doctor_specialty = db.define('doctor_specialty', {
-    id: {
-        type: DataTypes.INTEGER,
+module.exports = (sequelize, DataTypes) => {
+  const DoctorSpecialty = sequelize.define(
+    'DoctorSpecialty',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
+      },
+
+      user_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      specialty_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+    },
+    {
+      tableName: 'doctor_specialties',
+      timestamps: false,
+      underscored: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ['user_id', 'specialty_id'],
+        },
+      ],
     }
-}, {
-    timestamps: false
-});
-export default doctor_specialty;
+  );
+
+  DoctorSpecialty.associate = function (models) {
+    DoctorSpecialty.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      onDelete: 'CASCADE',
+    });
+
+    DoctorSpecialty.belongsTo(models.Specialty, {
+      foreignKey: 'specialty_id',
+      onDelete: 'CASCADE',
+    });
+  };
+
+  return DoctorSpecialty;
+};

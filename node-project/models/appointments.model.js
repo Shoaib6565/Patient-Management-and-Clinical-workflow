@@ -1,74 +1,164 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database";
+'use strict';
 
-const Appointment = sequelize.define('appointment', {
-    id: {
-        type: DataTypes.INTEGER,
+module.exports = (sequelize, DataTypes) => {
+  const Appointment = sequelize.define(
+    'Appointment',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        autoIncrement: true
-    },
-    appointment_number: {
+      },
+
+      appointment_number: {
         type: DataTypes.STRING,
         unique: true,
-    },
-    appointment_date: {
+        allowNull: false,
+      },
+
+      case_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      patient_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      doctor_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      specialty_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      practice_location_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      created_by: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      appointment_date: {
         type: DataTypes.DATEONLY,
-        allowNull: false,   
-    },
-    appointment_time: {
+        allowNull: false,
+      },
+
+      appointment_time: {
         type: DataTypes.TIME,
         allowNull: false,
-    },
-    appointment_type: {
+      },
+
+      end_time: {
+        type: DataTypes.TIME,
+        allowNull: true,
+      },
+
+      appointment_type: {
         type: DataTypes.ENUM(
-            'New Patient', 'Follow-up', 'Consultation', 'Procedure',
-            'Telehealth', 'Emergency', 'Routine Checkup', 'Post-op Follow-up'
+          'New Patient',
+          'Follow-up',
+          'Consultation',
+          'Procedure',
+          'Telehealth',
+          'Emergency',
+          'Routine Checkup',
+          'Post-op Follow-up'
         ),
-    },
-    duration_minutes: { 
+        allowNull: false,
+      },
+
+      duration_minutes: {
         type: DataTypes.INTEGER,
         defaultValue: 30,
-    },
-    status: {
+      },
+
+      status: {
         type: DataTypes.ENUM(
-            'Scheduled', 'Completed', 'Cancelled', 'No Show', 'Rescheduled'
+          'Scheduled',
+          'Confirmed',
+          'Checked In',
+          'In Progress',
+          'Completed',
+          'Cancelled',
+          'No Show',
+          'Rescheduled'
         ),
         defaultValue: 'Scheduled',
-    },
-    reminder_sent: {
+      },
+
+      reminder_sent: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
-    },
-    reminder_method: {
-        type: DataTypes.ENUM('Email', 'SMS', 'Phone Call'),
-        defaultValue: 'Email',
-    },
-    notes: {
+      },
+
+      reminder_method: {
+        type: DataTypes.ENUM('SMS', 'Email', 'Phone', 'None'),
+        allowNull: true,
+      },
+
+      notes: {
         type: DataTypes.TEXT,
-    },
-    reason_for_visit: {
+        allowNull: true,
+      },
+
+      reason_for_visit: {
         type: DataTypes.TEXT,
-    },
-    created_by: {
-        type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'users', key: 'id' },
-    },
-    created_at: {
+      },
+
+      deletedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+      },
     },
-    updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
-    deleted_at: {
-        type: DataTypes.DATE,
-    },
-}, {
-    sequelize,
-    modelName: 'Appointment',
-    timestamps: true,
-    paranoid: true, // Enables soft deletes (deleted_at)
-});
-export default Appointment;
+    {
+      tableName: 'appointments',
+      timestamps: true,
+      paranoid: true, // soft deletes
+      underscored: true,
+    }
+  );
+
+  Appointment.associate = function (models) {
+    Appointment.belongsTo(models.Case, {
+      foreignKey: 'case_id',
+      onDelete: 'CASCADE',
+    });
+
+    Appointment.belongsTo(models.Patient, {
+      foreignKey: 'patient_id',
+      onDelete: 'CASCADE',
+    });
+
+    Appointment.belongsTo(models.User, {
+      as: 'doctor',
+      foreignKey: 'doctor_id',
+      onDelete: 'CASCADE',
+    });
+
+    Appointment.belongsTo(models.Specialty, {
+      foreignKey: 'specialty_id',
+      onDelete: 'CASCADE',
+    });
+
+    Appointment.belongsTo(models.PracticeLocation, {
+      foreignKey: 'practice_location_id',
+      onDelete: 'CASCADE',
+    });
+
+    Appointment.belongsTo(models.User, {
+      as: 'creator',
+      foreignKey: 'created_by',
+      onDelete: 'CASCADE',
+    });
+  };
+
+  return Appointment;
+};

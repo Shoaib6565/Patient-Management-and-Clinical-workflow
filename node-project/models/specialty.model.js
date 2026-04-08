@@ -1,24 +1,43 @@
-import datatyepes from 'sequelize';
-import db from '../config/database.config.js';
+'use strict';
 
-const Specialty = db.define('specialty', {
-    id: {
-        type: datatyepes.INTEGER,   
+module.exports = (sequelize, DataTypes) => {
+  const Specialty = sequelize.define(
+    'Specialty',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        autoIncrement: true
+      },
+
+      specialty_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
     },
-    specialty_name: {
-        type: datatyepes.STRING,
-        allowNull: false
-    },
-    description: {
-        type: datatyepes.STRING,
-       allowNull: true
-    },
-    is_active: {
-        type: datatyepes.BOOLEAN,
-        defaultValue: true
+    {
+      tableName: 'specialties',
+      timestamps: false,
+      underscored: true,
     }
-}, {
-    timestamps: false
-}); 
+  );
+
+  Specialty.associate = function (models) {
+    Specialty.hasMany(models.Appointment, {
+      foreignKey: 'specialty_id',
+    });
+  };
+
+  return Specialty;
+};

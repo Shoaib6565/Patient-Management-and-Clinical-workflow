@@ -1,30 +1,53 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+'use strict';
 
-const insurance = db.define('insurance', {
-    id: {
-        type: DataTypes.INTEGER,    
+module.exports = (sequelize, DataTypes) => {
+  const Insurance = sequelize.define(
+    'Insurance',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        autoIncrement: true
-    },
-    insurance_name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    insurance_code: {
+      },
+
+      insurance_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
-    },
-    address : {
-        type: DataTypes.TEXT
-    },
-    phone : {
-        type: DataTypes.STRING
-    },
-    is_active: {
+      },
+
+      insurance_code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      address: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      phone: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
+
+      is_active: {
         type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
     },
-}, {
-    timestamps: false
-});
+    {
+      tableName: 'insurances',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+  Insurance.associate = function (models) {
+    Insurance.hasMany(models.Case, {
+      foreignKey: 'insurance_id',
+    });
+  };
+
+  return Insurance;
+};

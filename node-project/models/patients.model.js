@@ -1,92 +1,158 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database";
+'use strict';
 
-const Patient = sequelize.define(
-    "Patient",
+module.exports = (sequelize, DataTypes) => {
+  const Patient = sequelize.define(
+    'Patient',
     {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-        },
-        first_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        middle_name: {
-            type: DataTypes.STRING,
-        },
-        last_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        date_of_birth: {
-            type: DataTypes.DATEONLY,
-            allowNull: false,
-        },
-        gender: {
-            type: DataTypes.ENUM("Male", "Female", "Other", "Prefer Not to Say"),
-        },
-        ssn: { type: DataTypes.STRING, unique: true },
-        email: {
-            type: DataTypes.STRING,
-            unique: true,
-            validate: { isEmail: true },
-        },
-        phone: {
-            type: DataTypes.STRING,
-        },
-        mobile: {
-            type: DataTypes.STRING,
-        },
-        address: {
-            type: DataTypes.STRING,
-        },
-        city: {
-            type: DataTypes.STRING,
-        },
-        state: {
-            type: DataTypes.STRING,
-        },
-        zip_code: {
-            type: DataTypes.STRING,
-        },
-        country: {
-            type: DataTypes.STRING,
-        },
-        emergency_contact_name: {
-            type: DataTypes.STRING,
-        },
-        emergency_contact_phone: {
-            type: DataTypes.STRING,
-        },
-        preferred_language: {
-            type: DataTypes.STRING,
-            defaultValue: "English",
-        },
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-        patient_status: {
-            type: DataTypes.ENUM("Active", "Inactive", "Deceased", "Transferred"),
-        },
+      first_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
-        created_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-        },
-        updated_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-        },
-        deleted_at: {
-            type: DataTypes.DATE
-        },
+      middle_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
 
-        registration_date: DataTypes.DATE,
+      last_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      date_of_birth: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+
+      gender: {
+        type: DataTypes.ENUM(
+          'Male',
+          'Female',
+          'Other',
+          'Prefer Not to Say'
+        ),
+        allowNull: false,
+      },
+
+      ssn: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        unique: true,
+      },
+
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      mobile: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      address: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+
+      city: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      state: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      zip_code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      country: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      emergency_contact_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      emergency_contact_phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      primary_physician: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      insurance_provider: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      insurance_policy_number: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      preferred_language: {
+        type: DataTypes.STRING,
+        defaultValue: 'English',
+      },
+
+      patient_status: {
+        type: DataTypes.ENUM(
+          'Active',
+          'Inactive',
+          'Deceased',
+          'Transferred'
+        ),
+        defaultValue: 'Active',
+      },
+
+      registration_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
     },
     {
-        paranoid: true, // Enables soft deletes (sets deleted_at instead of hard deleting)
-        timestamps: true, // Adds createdAt and updatedAt fields
-        underscored: true, // Use snake_case for automatically added fields
+      tableName: 'patients',
+      timestamps: true,
+      paranoid: true,
+      underscored: true,
     }
-);
+  );
 
-export default Patient;
+  Patient.associate = function (models) {
+    Patient.hasMany(models.Case, {
+      foreignKey: 'patient_id',
+    });
+
+    Patient.hasMany(models.Appointment, {
+      foreignKey: 'patient_id',
+    });
+  };
+
+  return Patient;
+};

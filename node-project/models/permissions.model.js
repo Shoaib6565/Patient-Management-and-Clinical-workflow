@@ -1,17 +1,17 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+const { checkPermission } = require('../utils/authUtils');
 
-const permission = db.define('permission', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    permission_name: {
-        type: DataTypes.STRING,
-        allowNull: false
+const requirePermission = (permission) => {
+  return async (req, res, next) => {
+    const userId = req.user.id;
+
+    const allowed = await checkPermission(userId, permission);
+
+    if (!allowed) {
+      return res.status(403).json({ message: 'Forbidden' });
     }
-}, {
-    timestamps: false
-});
-export default permission;
+
+    next();
+  };
+};
+
+module.exports = requirePermission;

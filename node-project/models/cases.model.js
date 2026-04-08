@@ -1,59 +1,147 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+'use strict';
 
-class Case extends Model { }
+module.exports = (sequelize, DataTypes) => {
+  const Case = sequelize.define(
+    'Case',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-const Case = sequelize.define('Case', {
-    case_number: {
+      case_number: {
         type: DataTypes.STRING,
         unique: true,
-    },
-    category: {
+        allowNull: false,
+      },
+
+      patient_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      category_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      practice_location_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+
+      purpose_of_visit: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+
+      case_type: {
         type: DataTypes.ENUM(
-            'General Medicine', 'Surgery', 'Pediatrics', 'Cardiology', 'Orthopedics',
-            'Neurology', 'Dermatology', 'Gynecology', 'Ophthalmology', 'ENT', 'Dental', 'Psychiatry',
-            'Physical Therapy', 'Emergency', 'Other'
+          'Initial Consultation',
+          'Follow-up',
+          'Emergency',
+          'Chronic Care',
+          'Preventive Care',
+          'Pre-surgical',
+          'Post-surgical'
         ),
-    },
-    purpose_of_visit: DataTypes.TEXT,
-    case_type: {
-        type: DataTypes.ENUM(
-            'Initial Consultation', 'Follow-up', 'Emergency', 'Chronic Care',
-            'Preventive Care', 'Pre-surgical', 'Post-surgical'
-        ),
-    },
-    priorty: {
+        allowNull: false,
+      },
+
+      priority: {
         type: DataTypes.ENUM('Low', 'Normal', 'High', 'Urgent'),
-    },
-    case_status: {
+        defaultValue: 'Normal',
+      },
+
+      case_status: {
         type: DataTypes.ENUM(
-            'Active', 'On Hold', 'Closed', 'Transferred', 'Cancelled'
+          'Active',
+          'On Hold',
+          'Closed',
+          'Transferred',
+          'Cancelled'
         ),
-    },
-    date_of_accident: DataTypes.DATE,
-    referred_by: DataTypes.STRING,
-    referred_doctor_name: DataTypes.STRING,
-    opening_date: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-    },
-    closing_date: DataTypes.DATE,
-    clinical_notes: DataTypes.TEXT,
-    created_at: {
-        type: DataTypes.DATE,
-    },
-    updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
-    deleted_at: {
-        type: DataTypes.DATE
-    }
+        defaultValue: 'Active',
+      },
 
+      date_of_accident: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
 
-},
+      insurance_id: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+
+      firm_id: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+
+      referred_by: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      referred_doctor_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+      opening_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+
+      closing_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+
+      clinical_notes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
+    },
     {
-        paranoid: true,
-        timestamps: true,
+      tableName: 'cases',
+      timestamps: true,
+      paranoid: true, // enables soft deletes (deletedAt)
+      underscored: true,
+    }
+  );
+
+  Case.associate = function (models) {
+    Case.belongsTo(models.Patient, {
+      foreignKey: 'patient_id',
+      onDelete: 'CASCADE',
     });
- export default Case;
+
+    Case.belongsTo(models.Category, {
+      foreignKey: 'category_id',
+      onDelete: 'RESTRICT',
+    });
+
+    Case.belongsTo(models.PracticeLocation, {
+      foreignKey: 'practice_location_id',
+    });
+
+    Case.belongsTo(models.Insurance, {
+      foreignKey: 'insurance_id',
+      onDelete: 'SET NULL',
+    });
+
+    Case.belongsTo(models.Firm, {
+      foreignKey: 'firm_id',
+      onDelete: 'SET NULL',
+    });
+  };
+
+  return Case;
+};

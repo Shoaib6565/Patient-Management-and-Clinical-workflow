@@ -1,18 +1,37 @@
-import { DataTypes } from "sequelize";
-import db from "../config/database.js";
+'use strict';
 
-const role = db.define('role', {
-    id: {
-        type: DataTypes.INTEGER,
+module.exports = (sequelize, DataTypes) => {
+  const Role = sequelize.define(
+    'Role',
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        autoIncrement: true
-    },
-    role_name: {
+      },
+
+      name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+      },
+    },
+    {
+      tableName: 'roles',
+      timestamps: false,
+      underscored: true,
     }
-}, {
-    timestamps: false
+  );
+
+  
+  Role.belongsToMany(models.User, {
+  through: models.UserRole,
+  foreignKey: 'role_id',
 });
 
-export default role;
+Role.belongsToMany(models.Permission, {
+  through: models.RolePermission,
+  foreignKey: 'role_id',
+});
+
+  return Role;
+};
