@@ -6,12 +6,15 @@ use App\Http\Controllers\FirmController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\PracticeLocationController;
 use App\Http\Controllers\SpecialtyController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['node.jwt'])->group(function () {
 
     // api for appointments (for all role)
     Route::prefix('appointments')->group(function () {
+        // total appointments for admin dashboard
+        Route::get('/total', [AppointmentController::class, 'total']);
         // Listing + filters
         Route::get('/', [AppointmentController::class, 'index']);
         // CRUD

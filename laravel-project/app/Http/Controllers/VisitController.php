@@ -30,10 +30,10 @@ class VisitController extends Controller
                 $query->where('visit_status', $status);
             })
 
-            // Doctor can see only his visits
-            ->when(Auth::user()->role == 'Doctor', function ($query) {
-                $query->where('doctor_id', Auth::id());
-            })
+            // // Doctor can see only his visits
+            // ->when(Auth::user()->role == 'Doctor', function ($query) {
+            //     $query->where('doctor_id', Auth::id());
+            // })
             ->with(['patient','doctor','appointment'])
             ->latest()
             ->paginate(10);

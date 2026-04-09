@@ -8,6 +8,20 @@ use Illuminate\Http\Request;
 class AppointmentController extends Controller
 {
 
+    // total appointments for admin dashboard
+    // Admin Dashboard Stats
+    public function total()
+    {
+        $totalAppointments = Appointment::count();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'total_appointments' => $totalAppointments
+            ]
+        ]);
+    }
+
     // 1. List + Filters (Admin & FDO)
     public function index(Request $request)
     {
