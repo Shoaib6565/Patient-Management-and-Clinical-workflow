@@ -1,8 +1,7 @@
 // models/specialty.js
 'use strict';
-const { Model } = require('sequelize');
-
-module.exports = (sequelize, DataTypes) => {
+import { Model } from 'sequelize'; 
+export default (sequelize, DataTypes) => {
   class Specialty extends Model {
     static associate(models) {
       this.hasMany(models.Appointment, { foreignKey: 'specialty_id' });

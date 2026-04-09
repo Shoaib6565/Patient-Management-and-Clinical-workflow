@@ -5,12 +5,14 @@ import authRoutes from "./routes/auth.route.js";
 
 dotenv.config();
 
+
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); // ✅ REQUIRED
+app.use(express.urlencoded({ extended: true })); // optional but good
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("API Running 🚀"));
 

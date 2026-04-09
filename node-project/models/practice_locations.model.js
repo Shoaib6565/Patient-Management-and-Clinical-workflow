@@ -1,8 +1,8 @@
 // models/practice_location.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class PracticeLocation extends Model {
     static associate(models) {
       this.hasMany(models.Case, { foreignKey: 'practice_location_id' });

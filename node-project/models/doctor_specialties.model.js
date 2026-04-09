@@ -1,8 +1,8 @@
 // models/doctor_specialty.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class DoctorSpecialty extends Model {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: 'user_id' });

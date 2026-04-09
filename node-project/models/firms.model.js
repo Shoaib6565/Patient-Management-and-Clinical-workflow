@@ -1,8 +1,8 @@
 // models/firm.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class Firm extends Model {
     static associate(models) {
       this.hasMany(models.Case, { foreignKey: 'firm_id' });
