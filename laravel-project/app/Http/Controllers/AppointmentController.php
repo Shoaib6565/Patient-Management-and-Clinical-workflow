@@ -8,22 +8,11 @@ use Illuminate\Http\Request;
 class AppointmentController extends Controller
 {
 
-    // total appointments for admin dashboard
-    // Admin Dashboard Stats
-    public function total()
-    {
-        $totalAppointments = Appointment::count();
 
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'total_appointments' => $totalAppointments
-            ]
-        ]);
-    }
 
-    // 1. List + Filters (Admin & FDO)
-    public function index(Request $request)
+
+    // function for share logic
+    private function getFilteredAppointments(Request $request)
     {
         $query = Appointment::with([
             'patient:id,first_name,last_name',
@@ -32,8 +21,6 @@ class AppointmentController extends Controller
             'practiceLocation:id,location_name',
             'createdBy:id,name'
         ]);
-
-        //  Filters
 
         // Patient Name
         if ($request->patient_name) {
@@ -50,8 +37,8 @@ class AppointmentController extends Controller
         }
 
         // Specialty
-        if ($request->specialty_id) {
-            $query->where('specialty_id', $request->specialty_id);
+        if ($request->specialty_name) {
+            $query->where('specialty_name', $request->specialty_name);
         }
 
         // Date Range
@@ -70,8 +57,8 @@ class AppointmentController extends Controller
         }
 
         // Practice Location
-        if ($request->practice_location_id) {
-            $query->where('practice_location_id', $request->practice_location_id);
+        if ($request->location_name) {
+            $query->where('location_name', $request->location_name);
         }
 
         // Created By (FDO)
@@ -79,11 +66,85 @@ class AppointmentController extends Controller
             $query->where('created_by', $request->created_by);
         }
 
+        return $query;
+    }
+
+    // total appointments for admin dashboard
+    // Admin Dashboard Stats
+    public function total()
+    {
+        $totalAppointments = Appointment::count();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'total_appointments' => $totalAppointments
+            ]
+        ]);
+    }
+
+    // 1. List + Filters (Admin & FDO)
+    public function index(Request $request)
+    {
+        $query = $this->getFilteredAppointments($request);
+
         $appointments = $query->latest()->paginate(10);
 
         return response()->json($appointments);
     }
 
+
+
+    // function for export to csv file
+    public function export(Request $request)
+    {
+        $query = $this->getFilteredAppointments($request);
+
+        $appointments = $query->get();
+
+        $fileName = "appointments_" . now()->format('Ymd_His') . ".csv";
+
+        $headers = [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+        ];
+
+        $callback = function () use ($appointments) {
+
+            $file = fopen('php://output', 'w');
+
+            // csv header
+            fputcsv($file, [
+                'Patient Name',
+                'Doctor Name',
+                'Specialty',
+                'Date',
+                'Time',
+                'Type',
+                'Status',
+                'Location',
+                'Created By'
+            ]);
+
+            foreach ($appointments as $a) {
+                fputcsv($file, [
+                    $a->patient->first_name . ' ' . $a->patient->last_name,
+                    $a->doctor->name,
+                    $a->specialty->specialty_name ?? '',
+                    $a->appointment_date,
+                    $a->appointment_time,
+                    $a->appointment_type,
+                    $a->status,
+                    $a->practiceLocation->location_name ?? '',
+                    $a->createdBy->name ?? ''
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
     //  2. Create Appointment (FDO)
     public function store(Request $request)
