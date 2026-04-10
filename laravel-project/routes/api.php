@@ -58,8 +58,8 @@ use Illuminate\Support\Facades\Route;
         Route::patch('/{id}/activate', [SpecialtyController::class, 'activate']);
         Route::patch('/{id}/deactivate', [SpecialtyController::class, 'deactivate']);
         // filter for active and de-active specialties
-        Route::get('/active', [SpecialtyController::class, 'active']);
-        Route::get('/inactive', [SpecialtyController::class, 'inactive']);
+        // Route::get('/active', [SpecialtyController::class, 'active']);
+        // Route::get('/inactive', [SpecialtyController::class, 'inactive']);
     });
 
     // api route for practice locations (crud)

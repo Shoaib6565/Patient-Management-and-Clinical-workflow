@@ -29,7 +29,7 @@ class VisitController extends Controller
             $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
         }
 
-        // Case Type (from appointment → case)
+        // Case Type (from appointment to case)
         if ($request->case_type) {
             $query->whereHas('appointment.case', function ($q) use ($request) {
                 $q->where('case_type', $request->case_type);

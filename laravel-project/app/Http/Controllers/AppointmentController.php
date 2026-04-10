@@ -61,7 +61,7 @@ class AppointmentController extends Controller
             $query->where('location_name', $request->location_name);
         }
 
-        // Created By (FDO)
+        // Created By FDO
         if ($request->created_by) {
             $query->where('created_by', $request->created_by);
         }
@@ -83,7 +83,7 @@ class AppointmentController extends Controller
         ]);
     }
 
-    // 1. List + Filters (Admin & FDO)
+    // 1. List + Filters (Admin and FDO)
     public function index(Request $request)
     {
         $query = $this->getFilteredAppointments($request);
@@ -276,7 +276,10 @@ class AppointmentController extends Controller
     }
 
 
-    //  History (Patient or Doctor based)
+    //  History Patient or Doctor based
+    //for doctor View reports of complete visits (filter by date, case type, diagnosis, or patient ) 
+    // inprogress
+
     public function history($patient_id)
     {
         $data = Appointment::where('patient_id', $patient_id)
