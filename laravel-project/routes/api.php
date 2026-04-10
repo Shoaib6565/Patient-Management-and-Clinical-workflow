@@ -6,14 +6,19 @@ use App\Http\Controllers\FirmController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\PracticeLocationController;
 use App\Http\Controllers\SpecialtyController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['node.jwt'])->group(function () {
 
     // api for appointments (for all role)
     Route::prefix('appointments')->group(function () {
+        // total appointments for admin dashboard
+        Route::get('/total', [AppointmentController::class, 'total']);
         // Listing + filters
         Route::get('/', [AppointmentController::class, 'index']);
+        // for export to csv
+        Route::get('/export', [AppointmentController::class, 'export']);
         // CRUD
         Route::post('/', [AppointmentController::class, 'store']);
         Route::get('/{id}', [AppointmentController::class, 'show']);
@@ -31,6 +36,8 @@ use Illuminate\Support\Facades\Route;
     Route::prefix('visits')->group(function () {
         // All roles
         Route::get('/', [VisitController::class, 'index']);
+        // export to csv
+        Route::get('/export', [VisitController::class, 'export']);
         Route::get('/{id}', [VisitController::class, 'show']);
         // Doctor actions
         Route::put('/{id}', [VisitController::class, 'update']);
