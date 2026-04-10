@@ -1,12 +1,15 @@
 const permissionMiddleware = (requiredPermission) => {
   return (req, res, next) => {
     try {
-      if (!req.user) {
+      if (!req.user || !req.user.roles) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
-      if (!req.user.permissions.includes(requiredPermission)) {
-        return res.status(403).json({ message: 'Forbidden' });
+
+      const allPermissions = req.user.roles.flatMap(role => role.permissions);
+
+      if (!allPermissions.includes(requiredPermission)) {
+        return res.status(403).json({ message: 'Forbidden: Missing permission ' + requiredPermission });
       }
 
       next();
@@ -15,5 +18,3 @@ const permissionMiddleware = (requiredPermission) => {
     }
   };
 };
-
-module.exports = permissionMiddleware;

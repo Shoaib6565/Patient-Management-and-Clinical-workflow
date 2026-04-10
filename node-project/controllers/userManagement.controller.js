@@ -37,7 +37,7 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const {name, email, password,is_active, role } = req.body;
+        const {name, email,is_active, role } = req.body;
  
         const user = await User.findByPk(id);
         if (!user) {
@@ -64,4 +64,22 @@ const deleteUser = async (req, res) => {
     }
 }
  
-export { getAllUsers, createUser, getUserById, updateUser, deleteUser };
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+    const user = await User.findByPk(id);
+    if (!user) {
+        return res.api.notFound("User not found");
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashedPassword });
+    return res.api.success("Password reset successfully");
+  }
+    catch (error) {
+        return res.api.error("Failed to reset password");
+    }
+};
+
+export { getAllUsers, createUser, getUserById, updateUser, deleteUser, resetPassword };

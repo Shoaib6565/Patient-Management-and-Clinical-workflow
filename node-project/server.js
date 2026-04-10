@@ -7,16 +7,14 @@ dotenv.config();
 
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 
-app.use(express.json()); // ✅ REQUIRED
-app.use(express.urlencoded({ extended: true })); // optional but good
-
-// Routes
 app.use("/auth", authRoutes);
 
-app.get("/", (req, res) => res.send("API Running 🚀"));
 
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT;
 
 sequelize
   .sync()

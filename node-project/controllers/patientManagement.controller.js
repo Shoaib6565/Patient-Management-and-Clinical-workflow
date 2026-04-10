@@ -1,7 +1,7 @@
 import { patients } from "../models/index.js";
 import { Parser } from "json2csv";
 import { Op } from "sequelize";
-
+//get api seacrh and filter functionality , pagination limit 10, view all patients
 const getAllPatients = async (req, res) => {
     try {
         const {
@@ -15,11 +15,13 @@ const getAllPatients = async (req, res) => {
             state,
             zip_code,
             reg_from,
-            reg_to
+            reg_to,
+            page = 1,
+            limit = 10,
         } = req.query;
 
         let where = {};
-
+        const offset = (page - 1) * limit;
         if (name) {
             where[Op.or] = [
                 { first_name: { [Op.like]: `%${name}%` } },
@@ -60,9 +62,23 @@ const getAllPatients = async (req, res) => {
             if (reg_to) where.registration_date[Op.lte] = reg_to;
         }
 
-        const allPatients = await patients.findAll({ where });
+        const { count, rows: allPatients } = await patients.findAll({
+            where,
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            order: [['createdAt', 'DESC']]
+        });
 
-        return res.api.success("Patients retrieved successfully", allPatients);
+        const totalPages = Math.ceil(count / limit);
+
+        return res.api.success("Patients retrieved successfully", {
+            patients: allPatients, pagination: {
+                totalItems: count,
+                totalPages,
+                currentPage: parseInt(page),
+                itemsPerPage: parseInt(limit)
+            }
+        });
 
     } catch (error) {
         return res.api.error("Failed to retrieve patients");
@@ -138,21 +154,30 @@ const exportPatientsCSV = async (req, res) => {
             return res.api.notFound("No patients found");
         }
         const fields = [
-            "id",
             "first_name",
             "middle_name",
             "last_name",
             "date_of_birth",
             "gender",
+            "ssn",
             "email",
             "phone",
             "mobile",
+            "address",
             "city",
             "state",
+            "zip_code",
             "country",
+            "emergency_contact_name",
+            "emergency_contact_phone",
+            "insurance_provider",
+            "insurance_policy_number",
+            "primary_physician",
+            "preferred_language",
             "patient_status",
             "registration_date"
         ];
+
 
         const parser = new Parser({ fields });
         const csv = parser.parse(allPatients);
