@@ -5,57 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use  App\Jobs\ExportVisitsCsvJob;
+use App\Services\VisitService;
+use App\Models\Export;
 
 class VisitController extends Controller
 {
 
-
-    private function getFilteredVisits(Request $request)
+    protected $visitService;
+    public function __construct(VisitService $visitService)
     {
-        $query = Visit::with(['patient', 'doctor', 'appointment']);
-
-        // Search (visit number)
-        if ($request->search) {
-            $query->where('visit_number', 'like', "%{$request->search}%");
-        }
-
-        // Status
-        if ($request->status) {
-            $query->where('visit_status', $request->status);
-        }
-
-        // Date Range
-        if ($request->start_date && $request->end_date) {
-            $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
-        }
-
-        // Case Type (from appointment to case)
-        if ($request->case_type) {
-            $query->whereHas('appointment.case', function ($q) use ($request) {
-                $q->where('case_type', $request->case_type);
-            });
-        }
-
-        // Diagnosis
-        if ($request->diagnosis) {
-            $query->where('diagnosis', 'like', "%{$request->diagnosis}%");
-        }
-
-        // Patient Name
-        if ($request->patient_name) {
-            $query->whereHas('patient', function ($q) use ($request) {
-                $q->whereRaw("CONCAT(first_name,' ',last_name) LIKE ?", ["%{$request->patient_name}%"]);
-            });
-        }
-
-        return $query;
+        $this->visitService = $visitService;
     }
+
+
 
 
     // Get Visits
     public function index(Request $request)
     {
-        $query = $this->getFilteredVisits($request);
+        $query = $this->visitService
+        ->getFilteredVisits($request->all());
 
         $visits = $query->latest()->paginate(10);
 
@@ -64,57 +34,76 @@ class VisitController extends Controller
 
 
     // export to csv
+    // public function export(Request $request)
+    // {
+    //     $query = $this->getFilteredVisits($request);
+
+    //     $visits = $query->get(); // no pagination
+
+    //     $fileName = "visits_" . now()->format('Ymd_His') . ".csv";
+
+    //     $headers = [
+    //         "Content-Type" => "text/csv",
+    //         "Content-Disposition" => "attachment; filename=$fileName",
+    //     ];
+
+    //     $callback = function () use ($visits) {
+
+    //         $file = fopen('php://output', 'w');
+
+    //         // CSV Header
+    //         fputcsv($file, [
+    //             'Visit Number',
+    //             'Patient Name',
+    //             'Doctor Name',
+    //             'Visit Date',
+    //             'Visit Time',
+    //             'Diagnosis',
+    //             'Treatment',
+    //             'Status',
+    //             'Follow Up Required',
+    //             'Follow Up Date'
+    //         ]);
+
+    //         foreach ($visits as $v) {
+    //             fputcsv($file, [
+    //                 $v->visit_number,
+    //                 $v->patient->first_name . ' ' . $v->patient->last_name,
+    //                 $v->doctor->name,
+    //                 $v->visit_date,
+    //                 $v->visit_time,
+    //                 $v->diagnosis,
+    //                 $v->treatment,
+    //                 $v->visit_status,
+    //                 $v->follow_up_required ? 'Yes' : 'No',
+    //                 $v->follow_up_date
+    //             ]);
+    //         }
+
+    //         fclose($file);
+    //     };
+
+    //     return response()->stream($callback, 200, $headers);
+    // }
+
     public function export(Request $request)
-    {
-        $query = $this->getFilteredVisits($request);
+{
+    $userId = $request->auth_user->id ?? null;
 
-        $visits = $query->get(); // no pagination
+    //  create export record
+    $export = Export::create([
+        'user_id' => $userId,
+        'type' => 'visit',
+        'status' => 'processing'
+    ]);
 
-        $fileName = "visits_" . now()->format('Ymd_His') . ".csv";
+    //  dispatch job
+    ExportVisitsCsvJob::dispatch($request->all(), $export->id);
 
-        $headers = [
-            "Content-Type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-        ];
-
-        $callback = function () use ($visits) {
-
-            $file = fopen('php://output', 'w');
-
-            // CSV Header
-            fputcsv($file, [
-                'Visit Number',
-                'Patient Name',
-                'Doctor Name',
-                'Visit Date',
-                'Visit Time',
-                'Diagnosis',
-                'Treatment',
-                'Status',
-                'Follow Up Required',
-                'Follow Up Date'
-            ]);
-
-            foreach ($visits as $v) {
-                fputcsv($file, [
-                    $v->visit_number,
-                    $v->patient->first_name . ' ' . $v->patient->last_name,
-                    $v->doctor->name,
-                    $v->visit_date,
-                    $v->visit_time,
-                    $v->diagnosis,
-                    $v->treatment,
-                    $v->visit_status,
-                    $v->follow_up_required ? 'Yes' : 'No',
-                    $v->follow_up_date
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
+    return response()->json([
+        'message' => 'Visit export started'
+    ]);
+}
 
     // show all list
 
@@ -247,56 +236,53 @@ class VisitController extends Controller
             'message' => 'Visit completed'
         ]);
     }
+
+
+
+    // // visit statics
+    // public function statistics(Request $request)
+    // {
+    //     $query = Visit::query();
+
+    //     // Optional: filter by doctor
+    //     if ($request->doctor_id) {
+    //         $query->where('doctor_id', $request->doctor_id);
+    //     }
+
+    //     // Optional: filter by date range
+    //     if ($request->start_date && $request->end_date) {
+    //         $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
+    //     }
+
+    //     $totalVisits = $query->count();
+
+    //     $completedVisits = (clone $query)->where('visit_status', 'Completed')->count();
+    //     $draftVisits     = (clone $query)->where('visit_status', 'Draft')->count();
+    //     $cancelledVisits = (clone $query)->where('visit_status', 'Cancelled')->count();
+    //     $billedVisits    = (clone $query)->where('visit_status', 'Billed')->count();
+
+    //     // Visits per doctor
+    //     $visitsPerDoctor = $query->select('doctor_id')
+    //         ->with('doctor:id,name')
+    //         ->selectRaw('doctor_id, COUNT(*) as total')
+    //         ->groupBy('doctor_id')
+    //         ->get();
+
+    //     // Visits per specialty
+    //     $visitsPerSpecialty = $query->select('specialty_id')
+    //         ->with('specialty:id,specialty_name')
+    //         ->selectRaw('specialty_id, COUNT(*) as total')
+    //         ->groupBy('specialty_id')
+    //         ->get();
+
+    //     return response()->json([
+    //         'total_visits' => $totalVisits,
+    //         'completed_visits' => $completedVisits,
+    //         'draft_visits' => $draftVisits,
+    //         'cancelled_visits' => $cancelledVisits,
+    //         'billed_visits' => $billedVisits,
+    //         'visits_per_doctor' => $visitsPerDoctor,
+    //         'visits_per_specialty' => $visitsPerSpecialty,
+    //     ]);
+    // }
 }
-
-
-
-
-
-
-// // visit statics
-// public function statistics(Request $request)
-// {
-//     $query = Visit::query();
-
-//     // Optional: filter by doctor
-//     if ($request->doctor_id) {
-//         $query->where('doctor_id', $request->doctor_id);
-//     }
-
-//     // Optional: filter by date range
-//     if ($request->start_date && $request->end_date) {
-//         $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
-//     }
-
-//     $totalVisits = $query->count();
-
-//     $completedVisits = (clone $query)->where('visit_status', 'Completed')->count();
-//     $draftVisits     = (clone $query)->where('visit_status', 'Draft')->count();
-//     $cancelledVisits = (clone $query)->where('visit_status', 'Cancelled')->count();
-//     $billedVisits    = (clone $query)->where('visit_status', 'Billed')->count();
-
-//     // Visits per doctor
-//     $visitsPerDoctor = $query->select('doctor_id')
-//         ->with('doctor:id,name')
-//         ->selectRaw('doctor_id, COUNT(*) as total')
-//         ->groupBy('doctor_id')
-//         ->get();
-
-//     // Visits per specialty
-//     $visitsPerSpecialty = $query->select('specialty_id')
-//         ->with('specialty:id,specialty_name')
-//         ->selectRaw('specialty_id, COUNT(*) as total')
-//         ->groupBy('specialty_id')
-//         ->get();
-
-//     return response()->json([
-//         'total_visits' => $totalVisits,
-//         'completed_visits' => $completedVisits,
-//         'draft_visits' => $draftVisits,
-//         'cancelled_visits' => $cancelledVisits,
-//         'billed_visits' => $billedVisits,
-//         'visits_per_doctor' => $visitsPerDoctor,
-//         'visits_per_specialty' => $visitsPerSpecialty,
-//     ]);
-// }

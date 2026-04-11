@@ -7,6 +7,7 @@ use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\PracticeLocationController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\VisitController;
+use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['node.jwt'])->group(function () {
@@ -46,6 +47,9 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/{id}', [VisitController::class, 'destroy']);
 
     });
+
+    // for download csv report (visit and appointment)
+    Route::get('/exports/{id}/download', [ExportController::class, 'download']);
 
     // api route for specialties (crud)
     Route::prefix('specialties')->group(function () {
