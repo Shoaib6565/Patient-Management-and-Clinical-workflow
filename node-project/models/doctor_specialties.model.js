@@ -1,8 +1,8 @@
 // models/doctor_specialty.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class DoctorSpecialty extends Model {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: 'user_id' });
@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   DoctorSpecialty.init(
     {
+      id : {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       user_id: DataTypes.BIGINT,
       specialty_id: DataTypes.BIGINT,
     },

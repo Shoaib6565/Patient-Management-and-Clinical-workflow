@@ -1,8 +1,8 @@
 // models/category.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class Category extends Model {
     static associate(models) {
       this.hasMany(models.Case, { foreignKey: 'category_id' });
@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Category.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       name: { type: DataTypes.STRING, unique: true },
       description: DataTypes.TEXT,
       is_active: { type: DataTypes.BOOLEAN, defaultValue: true },

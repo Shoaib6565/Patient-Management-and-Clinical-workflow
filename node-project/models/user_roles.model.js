@@ -1,25 +1,33 @@
-// models/user_role.js
-'use strict';
-const { Model } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class UserRole extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'user_id' });
-      this.belongsTo(models.Role, { foreignKey: 'role_id' });
+      UserRole.belongsTo(models.User, {
+        foreignKey: "user_id",
+      });
+
+      UserRole.belongsTo(models.Role, {
+        foreignKey: "role_id",
+      });
     }
   }
 
   UserRole.init(
     {
-      user_id: DataTypes.BIGINT,
-      role_id: DataTypes.BIGINT,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      user_id: DataTypes.INTEGER,
+      role_id: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: 'UserRole',
-      tableName: 'user_roles',
-      timestamps: false,
+      modelName: "UserRole",
+      tableName: "user_roles",
+      timestamps: true,
       underscored: true,
     }
   );

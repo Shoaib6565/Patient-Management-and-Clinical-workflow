@@ -1,25 +1,30 @@
-// models/permission.js
-'use strict';
-const { Model } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class Permission extends Model {
     static associate(models) {
-      this.belongsToMany(models.Role, {
+      Permission.belongsToMany(models.Role, {
         through: models.RolePermission,
-        foreignKey: 'permission_id',
+        foreignKey: "permission_id",
+        otherKey: "role_id",
+        as: "roles",
       });
     }
   }
 
   Permission.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       name: DataTypes.STRING,
     },
     {
       sequelize,
-      modelName: 'Permission',
-      tableName: 'permissions',
+      modelName: "Permission",
+      tableName: "permissions",
       timestamps: false,
     }
   );

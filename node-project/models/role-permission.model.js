@@ -1,24 +1,32 @@
-// models/role_permission.js
-'use strict';
-const { Model } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class RolePermission extends Model {
     static associate(models) {
-      this.belongsTo(models.Role, { foreignKey: 'role_id' });
-      this.belongsTo(models.Permission, { foreignKey: 'permission_id' });
+      RolePermission.belongsTo(models.Role, {
+        foreignKey: "role_id",
+      });
+
+      RolePermission.belongsTo(models.Permission, {
+        foreignKey: "permission_id",
+      });
     }
   }
 
   RolePermission.init(
     {
-      role_id: DataTypes.BIGINT,
-      permission_id: DataTypes.BIGINT,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      role_id: DataTypes.INTEGER,
+      permission_id: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: 'RolePermission',
-      tableName: 'role_permissions',
+      modelName: "RolePermission",
+      tableName: "role_permissions",
       timestamps: false,
       underscored: true,
     }

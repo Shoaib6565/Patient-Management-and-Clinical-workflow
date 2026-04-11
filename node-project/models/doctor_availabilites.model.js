@@ -1,8 +1,8 @@
 // models/doctor_availability.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class DoctorAvailability extends Model {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: 'user_id' });
@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
 
   DoctorAvailability.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       user_id: DataTypes.BIGINT,
       practice_location_id: DataTypes.BIGINT,
       day_of_week: DataTypes.ENUM(
