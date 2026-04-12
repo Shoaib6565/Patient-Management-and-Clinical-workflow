@@ -1,3 +1,25 @@
 import { Routes } from '@angular/router';
+import { AppComponent } from './app.component';
+import { SigninComponent } from './features/authComponents/signin.component'
+import { authGuard } from './core/guards/auth-guard.guard';
+import { guestGuard } from './core/guards/guest.guard';
+import { Page404Component } from './features/page404/page404.component';
+import { HomeComponent } from './features/home/home.component';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+    {path: '', component: HomeComponent, canActivate: [guestGuard]},
+    { path: 'signin', component: SigninComponent, canActivate: [guestGuard] },
+    // grouping for all protected routes
+    {
+        path: '',
+        canActivate: [authGuard],
+        children: [
+
+        ]
+    },
+    // {path: '', redirectTo: ''},
+
+    // if does not math any routes
+    { path: '**', component: Page404Component }
+
+];

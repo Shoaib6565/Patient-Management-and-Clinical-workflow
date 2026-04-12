@@ -14,17 +14,30 @@ app.use("/auth", authRoutes);
 
 
 
+// for handle notification through socket.io
+app.post("/send", (req, res) => {
+  const { userId, data } = req.body;
+  const socketId = users[userId];
+  if (socketId) {
+    io.to(socketId).emit("new_notification", data);
+  }
+  res.send({ success: true });
+});
+
+
+
+
 const PORT = process.env.PORT;
 
 sequelize
   .sync()
   .then(() => {
-    console.log("✅ Database synced successfully");
+    console.log("Database synced successfully");
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(` Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("❌ Error setting up database:", err);
+    console.error(" Error setting up database:", err);
     process.exit(1);
   });

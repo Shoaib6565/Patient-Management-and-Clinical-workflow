@@ -6,7 +6,9 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use  App\Jobs\ExportAppointmentsCsvJob;
 use App\Services\AppointmentService;
+use App\Services\NotificationService;
 use App\Models\Export;
+use App\Models\Notification;
 
 class AppointmentController extends Controller
 {
@@ -95,7 +97,7 @@ class AppointmentController extends Controller
     // 1. List + Filters (Admin and FDO)
     public function index(Request $request)
     {
-            $query = $this->appointmentService->getFilteredAppointments($request->all()); // array pass
+        $query = $this->appointmentService->getFilteredAppointments($request->all()); // array pass
 
         $appointments = $query->latest()->paginate(10);
 
@@ -156,18 +158,18 @@ class AppointmentController extends Controller
     // }
     public function export(Request $request)
     {
-    $userId = $request->auth_user->user_id; // because not logged in currently
-    $export = Export::create([
-    'user_id' => $userId,
-    'type' => 'appointment',
-    'status' => 'processing'
-]);
-    ExportAppointmentsCsvJob::dispatch($request->all(), $export->id);
+        $user = $request->attributes->get('auth_user'); // because not logged in currently
+        $export = Export::create([
+            'user_id' => $user->id,
+            'type' => 'appointment',
+            'status' => 'processing'
+        ]);
+        ExportAppointmentsCsvJob::dispatch($request->all(), $export->id);
 
-    return response()->json([
-        'message' => 'Export started. You will be notified when ready.'
-    ]);
-}
+        return response()->json([
+            'message' => 'Export started. You will be notified when ready.'
+        ]);
+    }
 
     //  2. Create Appointment (FDO)
     public function store(Request $request)
@@ -191,6 +193,27 @@ class AppointmentController extends Controller
             ...$request->all(),
             'created_by' => $user->id // FDO ID
         ]);
+
+
+        // notification store in db
+        Notification::create([
+            'user_id' =>  $request->doctor_id,
+            'type' => 'appointment',
+            'message' => 'New appointment assigned',
+            'data' => [
+                'appointment_id' => $appointment->id
+            ]
+        ]);
+
+        $notificationService = app(NotificationService::class);
+
+        $notificationService->sendToUser(
+            $request->doctor_id,
+            [
+                'message' => 'New appointment assigned',
+                'appointment_id' => $appointment->id
+            ]
+        );
 
         return response()->json([
             'status' => true,

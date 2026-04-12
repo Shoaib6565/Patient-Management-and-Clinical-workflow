@@ -88,11 +88,11 @@ class VisitController extends Controller
 
     public function export(Request $request)
 {
-    $userId = $request->auth_user->id ?? null;
+    $user = $request->attributes->get('auth_user') ?? null;
 
     //  create export record
     $export = Export::create([
-        'user_id' => $userId,
+        'user_id' => $user->id,
         'type' => 'visit',
         'status' => 'processing'
     ]);
@@ -144,7 +144,9 @@ class VisitController extends Controller
         }
 
         // Only doctor allowed
-        if (Auth::user()->role !== 'Doctor') {
+        $user = $request->attributes->get('auth_user');
+
+        if ($user->role !== 'Doctor') {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
@@ -186,9 +188,10 @@ class VisitController extends Controller
 
     // //  Admin Delete (Soft Delete)
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if (Auth::user()->role !== 'Admin') {
+        $user = $request->attributes->get('auth_user');
+        if ($user->role !== 'Admin') {  // check after, error can occur (Auth::user()->role)
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
