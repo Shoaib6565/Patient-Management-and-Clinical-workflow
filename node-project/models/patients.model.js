@@ -1,6 +1,6 @@
 // models/patient.js
 'use strict';
-import { Model } from 'sequelize'; 
+import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class Patient extends Model {
@@ -21,7 +21,7 @@ export default (sequelize, DataTypes) => {
       middle_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
       date_of_birth: DataTypes.DATEONLY,
-      gender: DataTypes.ENUM('Male','Female','Other','Prefer Not to Say'),
+      gender: DataTypes.ENUM('Male', 'Female', 'Other', 'Prefer Not to Say'),
       ssn: { type: DataTypes.TEXT, unique: true },
       email: { type: DataTypes.STRING, unique: true },
       phone: DataTypes.STRING,
@@ -37,7 +37,7 @@ export default (sequelize, DataTypes) => {
       insurance_provider: DataTypes.STRING,
       insurance_policy_number: DataTypes.STRING,
       preferred_language: { type: DataTypes.STRING, defaultValue: 'English' },
-      patient_status: DataTypes.ENUM('Active','Inactive','Deceased','Transferred'),
+      patient_status: DataTypes.ENUM('Active', 'Inactive', 'Deceased', 'Transferred'),
       registration_date: DataTypes.DATE,
     },
     {

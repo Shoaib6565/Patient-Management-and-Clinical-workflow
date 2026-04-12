@@ -1,13 +1,13 @@
 // models/appointment.js
 'use strict';
-import { Model } from 'sequelize'; 
+import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class Appointment extends Model {
     static associate(models) {
       this.belongsTo(models.Case, { foreignKey: 'case_id' });
 
-        Appointment.belongsTo(models.User, {
+      Appointment.belongsTo(models.User, {
         foreignKey: "userId",
       });
 
