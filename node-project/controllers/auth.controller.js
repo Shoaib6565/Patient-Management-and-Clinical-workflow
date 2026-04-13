@@ -27,20 +27,22 @@ export const login = async (req, res) => {
         message: "User not found",
       });
     }
+    console.log(user.is_active);
+    console.log(typeof user.is_active);
 
     if (!user.is_active) {
       return res.status(403).json({
-        message: "User account is inactive",
+        message: "Account disabled"
       });
     }
 
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   return res.status(401).json({
-    //     message: "Invalid password",
-    //   });
-    // }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid password",
+      });
+    }
 
 
     const token = jwt.sign(

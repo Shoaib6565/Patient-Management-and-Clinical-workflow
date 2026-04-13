@@ -2,17 +2,22 @@ import express from "express";
 import dotenv from "dotenv";
 import { sequelize } from "./models/index.js";
 import authRoutes from "./routes/auth.route.js";
+import userRoutes from "./routes/user.route.js";
+import patientsRoutes from "./routes/patients.route.js";
+import caseRoutes from "./routes/case.route.js";
+
 
 dotenv.config();
 
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
-
-
+app.use("/users", userRoutes);
+app.use("/patients", patientsRoutes);
+app.use("/cases", caseRoutes);
 
 const PORT = process.env.PORT;
 

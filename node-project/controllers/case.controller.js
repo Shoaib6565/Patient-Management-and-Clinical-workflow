@@ -1,9 +1,9 @@
-import { Case, Patient } from "../models/index.js";
+import db from "../models/index.js";
 import { Parser } from "json2csv";
 import { Op } from "sequelize";
-//get api seacrh and filter functionality , pagination limit 10, view all patients
+const { Case, Patient } = db;
 
-const getAll = async (req, res) => {
+export const getAll = async (req, res) => {
     try {
         const {
             patientName,
@@ -74,7 +74,7 @@ const getAll = async (req, res) => {
                 {
                     model: Patient,
                     where: Object.keys(patientWhere).length ? patientWhere : undefined,
-                    required: !!patientName // inner join only if filtering
+                    required: !!patientName
                 }
             ],
             limit: Number(limit),
@@ -82,12 +82,15 @@ const getAll = async (req, res) => {
             order: [["created_at", "DESC"]]
         });
 
+
+        const absoluteTotal = await Case.count({ where, include: [{ model: Patient, where: patientWhere }] });
         return res.status(200).json({
             success: true,
             total: cases.count,
             page: Number(page),
             pages: Math.ceil(cases.count / limit),
-            data: cases.rows
+            data: cases.rows,
+            totalcases: absoluteTotal
         });
 
     } catch (error) {
@@ -96,7 +99,7 @@ const getAll = async (req, res) => {
 };
 
 
-const getById = async (req, res) => {
+export const getById = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -121,7 +124,7 @@ const getById = async (req, res) => {
     }
 };
 
-const create = async (req, res) => {
+export const create = async (req, res) => {
     try {
         const {
             case_number,
@@ -170,7 +173,7 @@ const create = async (req, res) => {
     }
 };
 
-const update = async (req, res) => {
+export const update = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -196,11 +199,29 @@ const update = async (req, res) => {
     }
 };
 
-const softDelete = async (req, res) => {
+export const Delete = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const caseData = await Case.findByPk(id);
+        if (!caseData) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found"
+            });
+        }
+        await caseData.destroy();
+        return res.status(200).json({
+            success: true,
+            message: "Case deleted successfully"
+        });
+    }
+    catch (error) {
+        return res.api.error(error);
+    }
 };
 
 
-const exportCasesCSV = async (req, res) => {
+export const exportCasesCSV = async (req, res) => {
     try {
         const allCases = await Case.findAll({ raw: true });
 
@@ -244,11 +265,3 @@ const exportCasesCSV = async (req, res) => {
     }
 };
 
-export default {
-    getAll,
-    getById,
-    create,
-    update,
-    softDelete,
-    exportCasesCSV
-};
