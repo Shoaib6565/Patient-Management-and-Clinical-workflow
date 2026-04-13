@@ -1,0 +1,41 @@
+.sidebar {
+  width: 240px;
+  background: #1a1a2e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s;
+}
+
+.sidebar.closed {
+  width: 70px;
+}
+
+ul {
+  list-style: none;
+  padding: 20px;
+}
+
+li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+li:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.settings {
+  padding: 20px;
+}
+
+.settings-header {
+  cursor: pointer;
+}
+
+.sub-menu li {
+  padding-left: 20px;
+  font-size: 14px;
+}

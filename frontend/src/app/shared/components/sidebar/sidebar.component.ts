@@ -1,11 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css'
+  styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
 
+  @Input() isOpen = true;
+
+  // Dummy role (later API se aayega)
+  role = 'admin';
+
+  isSettingsOpen = false;
+
+  toggleSettings() {
+    this.isSettingsOpen = !this.isSettingsOpen;
+  }
 }

@@ -1,1 +1,37 @@
-<p>sidebar works!</p>
+<div class="sidebar" [class.closed]="!isOpen">
+
+  <ul>
+
+    <li routerLink="/dashboard">Dashboard</li>
+
+    <!-- Admin Only -->
+    <ng-container *ngIf="role === 'admin'">
+      <li>Doctor List</li>
+      <li>FDO List</li>
+    </ng-container>
+
+    <li>Patient</li>
+    <li>Case</li>
+    <li>Appointment</li>
+    <li>Visit List</li>
+
+  </ul>
+
+  <!-- Bottom Settings -->
+  <div class="settings" *ngIf="role === 'admin'">
+
+    <div class="settings-header" (click)="toggleSettings()">
+      ⚙ Settings
+    </div>
+
+    <ul *ngIf="isSettingsOpen" class="sub-menu">
+      <li>Specialties Manage</li>
+      <li>Practice Location</li>
+      <li>Firm</li>
+      <li>Insurance</li>
+      <li>Categories Manage</li>
+    </ul>
+
+  </div>
+
+</div>

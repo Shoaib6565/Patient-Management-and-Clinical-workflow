@@ -1,1 +1,40 @@
-<p>navbar works!</p>
+<div class="header">
+
+  <!-- LEFT -->
+  <div class="left">
+
+    <!-- Hamburger -->
+    <button class="btn btn-ghost" (click)="onToggle()">
+      ☰
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">
+      <span class="logo-icon">+</span>
+      <span class="logo-text">Patient Management</span>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <!-- Notification -->
+    <button class="btn btn-ghost btn-circle">
+      🔔
+    </button>
+
+    <!-- User -->
+    <div class="user">
+      <img [src]="user.avatar" class="avatar" alt="avatar">
+      <span>{{user.name}}</span>
+    </div>
+
+    <!-- Logout -->
+    <button class="btn btn-ghost" (click)="logout()">
+      ⎋
+    </button>
+
+  </div>
+
+</div>
