@@ -8,6 +8,6 @@ export const guestGuard: CanActivateFn = () => {
 
   // if already logged in go to dashboard
   return user
-    ? router.navigate(['/dashboard'])
+    ? router.navigate(['/']) 
     : true;
 };

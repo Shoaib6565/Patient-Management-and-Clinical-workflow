@@ -191,6 +191,42 @@ const exportPatientsCSV = async (req, res) => {
     }
 };
 
+const getPatientByAppointmentId = async (req, res) => {
+    try {
+        const { appointmentId } = req.params;
+
+        const patientData = await patients.findOne({
+            include: [
+                {
+                    model: Case,
+                    include: [
+                        {
+                            model: Appointment,
+                            where: { id: appointmentId },
+
+                            attributes: [
+                                'status'
+                            ],
+                            required: true, // ensures filtering by appointmentId
+                            include: [
+                                {
+                                    model: Visit,
+                                    attributes: ['diagnosis', 'treatment', 'prescription', 'notes', 'vital_signs']
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            attributes: { exclude: [] }
+        });
+
+        res.api.success(patientData);
+    } catch (error) {
+        return res.api.error("Failed to retrieve patient by appointment ID");
+    }
+};
+
 
 export default {
     getAllPatients,
@@ -198,5 +234,6 @@ export default {
     getPatientById,
     updatePatient,
     deletePatient,
-    exportPatientsCSV
+    exportPatientsCSV,
+    getPatientByAppointmentId
 };

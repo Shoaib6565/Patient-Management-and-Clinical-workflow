@@ -18,7 +18,7 @@ export class SigninComponent {
   isLoading: boolean = false;
 
 
-    loginFail : string|null = null;
+  loginFail : string|null = null;
   userDetail: any;
   onLogin(value: NgForm){
     console.log(value);
@@ -49,6 +49,7 @@ export class SigninComponent {
       },
       error: (err) => {
         console.error('Login Error:', err);
+        this.loginFail
         alert(err.error?.message || 'Login Failed');
       }
     });
