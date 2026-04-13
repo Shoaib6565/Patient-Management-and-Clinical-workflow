@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 import { SigninComponent } from './features/authComponents/signin.component'
 import { authGuard } from './core/guards/auth-guard.guard';
 import { guestGuard } from './core/guards/guest.guard';
-import { Page404Component } from './features/page404/page404.component';
+import { NotFoundComponent } from './features/not-found/not-found.component';
 import { HomeComponent } from './features/home/home.component';
 
 export const routes: Routes = [
@@ -20,6 +20,6 @@ export const routes: Routes = [
     // {path: '', redirectTo: ''},
 
     // if does not math any routes
-    { path: '**', component: Page404Component }
+    { path: '**', component: NotFoundComponent }
 
 ];
