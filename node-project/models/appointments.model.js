@@ -31,7 +31,6 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
 
       appointment_number: {

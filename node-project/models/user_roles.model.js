@@ -18,7 +18,6 @@ export default (sequelize) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
       user_id: DataTypes.INTEGER,
       role_id: DataTypes.INTEGER,
@@ -27,7 +26,7 @@ export default (sequelize) => {
       sequelize,
       modelName: "UserRole",
       tableName: "user_roles",
-      timestamps: true,
+      timestamps: false,
       underscored: true,
     }
   );

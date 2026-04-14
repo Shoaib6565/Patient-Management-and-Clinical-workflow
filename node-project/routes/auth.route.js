@@ -11,6 +11,6 @@ import { auth } from "../middlewares/auth.middleware.js";
 
 router.post("/login", login);
 router.post("/logout", auth, logout);
-router.get("/me",  getMe);
+router.get("/me", auth, getMe);
 
 export default router;

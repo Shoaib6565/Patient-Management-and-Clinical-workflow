@@ -20,7 +20,6 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
 
       case_number: {

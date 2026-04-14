@@ -31,11 +31,11 @@ export const sequelize = new Sequelize(
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log("✅ MySQL connection successful!");
+    console.log(" MySQL connection successful!");
     await sequelize.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    console.log(`✅ Database "${process.env.DB_NAME}" ensured.`);
+    console.log(` Database "${process.env.DB_NAME}" ensured.`);
   } catch (error) {
-    console.error("❌ Unable to connect to the database:", error);
+    console.error(" Unable to connect to the database:", error);
   }
 })();
 

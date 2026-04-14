@@ -1,6 +1,6 @@
 // models/visit.js
 'use strict';
-import { Model } from 'sequelize'; 
+import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class Visit extends Model {
@@ -16,7 +16,6 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
 
       visit_number: {
