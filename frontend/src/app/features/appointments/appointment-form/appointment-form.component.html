@@ -1,1 +1,38 @@
-<p>appointment-form works!</p>
+<div class="card bg-base-100 shadow-xl p-6 w-full max-w-xl mx-auto">
+
+  <h2 class="text-xl font-bold mb-4">
+    {{ editMode ? 'Edit Appointment' : 'New Appointment' }}
+  </h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <input class="input input-bordered w-full mb-3"
+           placeholder="Patient ID"
+           formControlName="patient_id">
+
+    <input class="input input-bordered w-full mb-3"
+           placeholder="Doctor ID"
+           formControlName="doctor_id">
+
+    <input type="date" class="input input-bordered w-full mb-3"
+           formControlName="appointment_date">
+
+    <input type="time" class="input input-bordered w-full mb-3"
+           formControlName="appointment_time">
+
+    <select class="select select-bordered w-full mb-3"
+            formControlName="appointment_type">
+      <option>Checkup</option>
+      <option>Follow-up</option>
+    </select>
+
+    <textarea class="textarea textarea-bordered w-full mb-3"
+              formControlName="reason_for_visit"
+              placeholder="Reason"></textarea>
+
+    <button class="btn btn-primary w-full">
+      {{ editMode ? 'Update' : 'Create' }}
+    </button>
+
+  </form>
+</div>

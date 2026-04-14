@@ -29,13 +29,13 @@ export const routes: Routes = [
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
     ],
   },
-  {path: 'cases', 
+  {path: 'cases',
     component: CaseListComponent,
     children: [
         {path: 'case-form', component: CaseFormComponent},
         {path: 'case-detail', component: CaseDetailComponent},
     ]},
-      {path: 'appointments', 
+      {path: 'appointments',
     component: AppointmentListComponent,
     children: [
         {path: 'appointment-form', component: AppointmentFormComponent},

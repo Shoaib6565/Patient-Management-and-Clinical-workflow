@@ -108,7 +108,7 @@
 /*
    HERO
  */
-.hero {
+.landing-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -248,7 +248,7 @@
 }
 
 /* ── Hero Visual ── */
-.hero-visual {
+.hero-vis {
   position: relative;
   flex-shrink: 0;
   z-index: 2;
@@ -641,7 +641,7 @@
   }
   .nav-links { display: none; }
 
-  .hero {
+  .landing-hero {
     flex-direction: column;
     padding: 48px 24px 40px;
     text-align: center;
@@ -652,7 +652,7 @@
   .hero-badge { font-size: 0.72rem; }
   .hero-subtitle { font-size: 0.9rem; }
 
-  .hero-visual { width: 100%; }
+  .hero-vis { width: 100%; }
   .visual-card { width: 100%; }
 
   .float-badge--top { right: 0; }

@@ -1,1 +1,87 @@
-<p>appointment-list works!</p>
+<div class="p-4">
+
+  <!-- FILTER COMPONENT -->
+  <app-data-filter
+    (filterChange)="onFilterChange($event)">
+  </app-data-filter>
+
+  <!-- ACTION BAR -->
+  <div class="flex justify-between my-3">
+
+    <h2 class="text-xl font-bold">Appointments</h2>
+
+    <button
+      *ngIf="role === 'admin'"
+      class="btn btn-primary"
+      (click)="exportCSV()">
+      Export CSV
+    </button>
+
+  </div>
+
+  <!-- TABLE -->
+  <ngx-datatable
+    class="material"
+    [rows]="appointments"
+    [columnMode]="'force'"
+    [headerHeight]="50"
+    [rowHeight]="'auto'">
+
+    <ngx-datatable-column name="Patient">
+      <ng-template let-row="row">
+        {{ row.patient_name }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Doctor">
+      <ng-template let-row="row">
+        {{ row.doctor_name }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Date">
+      <ng-template let-row="row">
+        {{ row.appointment_date }} {{ row.appointment_time }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Status">
+      <ng-template let-row="row">
+        <span class="badge badge-info">{{ row.status }}</span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- ACTIONS -->
+    <ngx-datatable-column name="Actions">
+      <ng-template let-row="row">
+
+        <!-- FDO + Doctor -->
+        <button
+          *ngIf="canEdit()"
+          class="btn btn-sm btn-warning"
+          [routerLink]="['/appointments/edit', row.id]">
+          Edit
+        </button>
+
+        <!-- Doctor only -->
+        <button
+          *ngIf="role === 'doctor'"
+          class="btn btn-sm btn-success"
+          (click)="service.updateStatus(row.id, {status:'Completed'})">
+          Complete
+        </button>
+
+        <!-- Admin only -->
+        <button
+          *ngIf="canDelete()"
+          class="btn btn-sm btn-error"
+          (click)="delete(row.id)">
+          Delete
+        </button>
+
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+
+</div>
