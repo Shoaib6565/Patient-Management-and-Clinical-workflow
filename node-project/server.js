@@ -6,12 +6,17 @@ import userRoutes from "./routes/user.route.js";
 import patientsRoutes from "./routes/patients.route.js";
 import caseRoutes from "./routes/case.route.js";
 
+import userRoutes from "./routes/user.route.js";
+import patientsRoutes from "./routes/patients.route.js";
+import caseRoutes from "./routes/case.route.js";
+
 
 dotenv.config();
 
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
