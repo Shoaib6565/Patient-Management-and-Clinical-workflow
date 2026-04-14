@@ -15,7 +15,6 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
       first_name: DataTypes.STRING,
       middle_name: DataTypes.STRING,

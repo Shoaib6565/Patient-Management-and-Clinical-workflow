@@ -1,7 +1,7 @@
 import db from "../models/index.js";
 import { Parser } from "json2csv";
 import { Op } from "sequelize";
-const { Case, Patient } = db;
+const { Case, Patient, PracticeLocation, Category, Insurance, Firm } = db;
 
 export const getAll = async (req, res) => {
     try {
@@ -144,13 +144,71 @@ export const create = async (req, res) => {
             clinical_notes
         } = req.body;
 
+        // 🔹 Validate required fields
+        if (!case_number || !patient_id || !practice_location_id) {
+            return res.status(400).json({
+                success: false,
+                message: "case_number, patient_id, and practice_location_id are required"
+            });
+        }
+
+        // 🔹 Validate FK: Patient
+        const patient = await Patient.findByPk(patient_id);
+        if (!patient) {
+            return res.status(404).json({
+                success: false,
+                message: "Invalid patient id"
+            });
+        }
+
+        // 🔹 Validate FK: Practice Location
+        const location = await PracticeLocation.findByPk(practice_location_id);
+        if (!location) {
+            return res.status(404).json({
+                success: false,
+                message: "Invalid location"
+            });
+        }
+
+        // 🔹 Optional FK validations
+        if (category_id) {
+            const category = await Category.findByPk(category_id);
+            if (!category) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid category"
+                });
+            }
+        }
+
+        if (insurance_id) {
+            const insurance = await Insurance.findByPk(insurance_id);
+            if (!insurance) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid insurance_id"
+                });
+            }
+        }
+
+        if (firm_id) {
+            const firm = await Firm.findByPk(firm_id);
+            if (!firm) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid firm_id"
+                });
+            }
+        }
+
+        // 🔹 Create case
         const newCase = await Case.create({
             case_number,
             patient_id,
             practice_location_id,
-            category_id,
-            insurance_id,
-            firm_id,
+            category_id: category_id || null,
+            insurance_id: insurance_id || null,
+            firm_id: firm_id || null,
             case_type,
             case_status,
             priority,
@@ -169,7 +227,12 @@ export const create = async (req, res) => {
         });
 
     } catch (error) {
-        return res.api.error(error);
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong",
+            error: error.message
+        });
     }
 };
 

@@ -18,7 +18,6 @@ export default (sequelize) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
       },
       user_id: DataTypes.INTEGER,
       role_id: DataTypes.INTEGER,
