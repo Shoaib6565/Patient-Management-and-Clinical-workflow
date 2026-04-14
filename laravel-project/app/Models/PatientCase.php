@@ -14,7 +14,7 @@ class PatientCase extends Model
         'case_number',
         'patient_id',
         'practice_location_id',
-        'category',
+        'category_id',
         'purpose_of_visit',
         'case_type',
         'priority',
@@ -35,7 +35,32 @@ class PatientCase extends Model
         'closing_date'
     ];
 
- 
+
+
+    // for auto generated visit number
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($case) {
+
+            $year = date('Y');
+
+            // safer approach using ID (after save)
+            $latestId = DB::table('cases')->max('id') + 1;
+
+            $case->case_number = 'CASE-' . $year . '-' . str_pad($latestId, 5, '0', STR_PAD_LEFT);
+        });
+    }
+
+
+        // Relation (Case to Category)
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+
     // Each case belongs to one patient
     public function patient()
     {
@@ -58,5 +83,17 @@ class PatientCase extends Model
     public function firm()
     {
         return $this->belongsTo(Firm::class);
+    }
+
+    // appointment
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'case_id');
+    }
+
+    // visit
+    public function visits()
+    {
+        return $this->hasMany(Visit::class, 'case_id');
     }
 }

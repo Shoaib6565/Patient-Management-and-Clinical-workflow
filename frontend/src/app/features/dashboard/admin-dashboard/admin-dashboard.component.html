@@ -1,0 +1,53 @@
+
+<div class="container">
+  <h1>Clinic Overview</h1>
+  <p class="subtitle">Real-time clinical metrics and patient flow</p>
+
+  <div class="cards">
+    <div class="card">
+      <p>Total Patients</p>
+      <h2>{{ stats.totalPatients}}</h2>
+    </div>
+
+    <div class="card">
+      <p>Active Cases</p>
+      <h2>{{ stats.activeCases}}</h2>
+    </div>
+
+    <div class="card">
+      <p>Appointments</p>
+      <h2>{{ stats.appointments }}</h2>
+    </div>
+
+    <div class="card highlight">
+      <p>Available Doctors</p>
+      <h2>{{ stats.doctors }}</h2>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="chart">
+      <h3>Appointment Trends</h3>
+      <canvas id="barChart"></canvas>
+    </div>
+
+    @if (showVisitTypes) {
+      <div class="visit">
+        <h3>Visit Type</h3>
+
+        @for (v of visitTypes; track v.label) {
+          <div class="visit-item">
+            <span>{{ v.label }}</span>
+            <div class="bar">
+              <div class="fill" [style.width.%]="v.value"></div>
+            </div>
+            <span>{{ v.value }}%</span>
+          </div>
+        }
+
+      </div>
+    } @else {
+      <p>No visit data available</p>
+    }
+  </div>
+</div>

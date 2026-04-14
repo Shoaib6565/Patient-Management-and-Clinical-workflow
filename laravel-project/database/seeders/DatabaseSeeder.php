@@ -14,12 +14,54 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-    }
+        {
+            $this->call([
+            UserSeeder::class,
+            ]);
+            $this->call([
+            RoleSeeder::class,
+            ]);
+            $this->call([
+            PermissionSeeder::class,
+            ]);
+            $this->call([
+            UserRoleSeeder::class,
+            ]);
+            $this->call([
+            RolePermissionSeeder::class,
+            ]);
+            $this->call([
+            PatientSeeder::class,
+            ]);
+            $this->call([
+            SpecialtySeeder::class,
+            ]);
+            $this->call([
+            InsuranceSeeder::class,
+            ]);
+            $this->call([
+            FirmSeeder::class,
+            ]);
+            $this->call([
+            PracticeLocationSeeder::class,
+            ]);
+            $this->call([
+            DoctorSpecialtySeeder::class,
+            ]);
+            $this->call([
+            DoctorAvailabilitiesSeeder::class,
+            ]);
+            $this->call([
+            CategorySeeder::class,
+            ]);
+            $this->call([
+            CasesSeeder::class,
+            ]);
+            $this->call([
+            AppointmentSeeder::class,
+            ]);
+            $this->call([
+            VisitSeeder::class,
+            ]);
+        }
 }
