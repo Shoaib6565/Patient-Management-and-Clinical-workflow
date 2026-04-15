@@ -29,6 +29,8 @@ Route::prefix('appointments')->group(function () {
     // Actions
     Route::patch('/{id}/cancel', [AppointmentController::class, 'cancel']);
     Route::patch('/{id}/reschedule', [AppointmentController::class, 'reschedule']);
+    // doctor can  change status to completed 
+    Route::patch('/{id}/updateStatus', [AppointmentController::class, 'updateStatus']);
     // History
     Route::get('/history/{patient_id}', [AppointmentController::class, 'history']);
 });
@@ -62,9 +64,6 @@ Route::prefix('specialties')->group(function () {
     Route::delete('/{id}', [SpecialtyController::class, 'destroy']);
     Route::patch('/{id}/activate', [SpecialtyController::class, 'activate']);
     Route::patch('/{id}/deactivate', [SpecialtyController::class, 'deactivate']);
-    // filter for active and de-active specialties
-    // Route::get('/active', [SpecialtyController::class, 'active']);
-    // Route::get('/inactive', [SpecialtyController::class, 'inactive']);
 });
 
 // api route for practice locations (crud)
