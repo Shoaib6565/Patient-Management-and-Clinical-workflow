@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service'; 
+import { AuthService } from '../../../core/services/auth-service.service'; 
 import { Router } from '@angular/router';
 
 // export type UserRole = 'admin' | 'doctor' | 'frontdesk';

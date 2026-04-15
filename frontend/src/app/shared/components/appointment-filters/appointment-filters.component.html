@@ -1,0 +1,80 @@
+<div class="card bg-base-100 shadow mb-4">
+    <div class="card-body">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-lg">Appointment Filters</h2>
+
+            <button class="btn btn-sm btn-primary" (click)="toggle()">
+                {{ isExpanded ? '−' : '+' }}
+            </button>
+        </div>
+
+        <!-- ALWAYS VISIBLE FIELDS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+            <input class="input input-bordered" placeholder="Patient Name" [(ngModel)]="filters.patientName">
+
+            <input class="input input-bordered" placeholder="Doctor Name" [(ngModel)]="filters.doctorName">
+            <input class="input input-bordered" placeholder="Specialty Name" [(ngModel)]="filters.specialty">
+
+            <!-- Specialty dropdown -->
+            <!-- <select class="select select-bordered" [(ngModel)]="filters.specialty">
+
+                <option value="" disabled>Select a Specialty</option>
+
+                <option *ngFor="let item of specialties" [value]="item.id">
+                    {{ item.specialty_name }}
+                </option>
+
+            </select> -->
+
+        </div>
+
+        <!-- EXPANDED FIELDS -->
+        <div *ngIf="isExpanded" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+
+            <input type="date" class="input input-bordered" [(ngModel)]="filters.startDate">
+
+            <input type="date" class="input input-bordered" [(ngModel)]="filters.endDate">
+
+            <select class="select select-bordered" [(ngModel)]="filters.appointmentType">
+                <option value="">Appointment Type</option>
+                <option *ngFor="let type of appointmentTypes" [value]="type">
+                    {{ type }}
+                </option>
+            </select>
+
+            <select class="select select-bordered" [(ngModel)]="filters.status">
+                <option value="">Select Status</option>
+                <option *ngFor="let status of appointmentStatuses" [value]="status">
+                    {{ status }}
+                </option>
+            </select>
+
+            <select class="select select-bordered" [(ngModel)]="filters.practiceLocation">
+                <option value="">Practice Location</option>
+                <option value="Central Medical Clinic">Central Medical Clinic</option>
+                <option value="Northside Medical Center">Northside Medical Center</option>
+                <option value="East End Health Center">East End Health Center</option>
+            </select>
+
+            <input class="input input-bordered" placeholder="Created By" [(ngModel)]="filters.createdBy">
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex justify-end gap-2 mt-4">
+
+            <button class="btn btn-success btn-sm" (click)="apply()">
+                Apply
+            </button>
+
+            <button class="btn btn-outline btn-sm" (click)="reset()">
+                Reset
+            </button>
+
+        </div>
+
+    </div>
+</div>

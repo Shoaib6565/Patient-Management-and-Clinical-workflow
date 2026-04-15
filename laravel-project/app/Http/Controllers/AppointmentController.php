@@ -21,65 +21,6 @@ class AppointmentController extends Controller
         $this->appointmentService = $appointmentService;
     }
 
-
-    // function for share logic
-    // public function getFilteredAppointments(Request $request)
-    // {
-    //     $query = Appointment::with([
-    //         'patient:id,first_name,last_name',
-    //         'doctor:id,name',
-    //         'specialty:id,specialty_name',
-    //         'practiceLocation:id,location_name',
-    //         'createdBy:id,name'
-    //     ]);
-
-    //     // Patient Name
-    //     if ($request->patient_name) {
-    //         $query->whereHas('patient', function ($q) use ($request) {
-    //             $q->whereRaw("CONCAT(first_name,' ',last_name) LIKE ?", ["%{$request->patient_name}%"]);
-    //         });
-    //     }
-
-    //     // Doctor Name
-    //     if ($request->doctor_name) {
-    //         $query->whereHas('doctor', function ($q) use ($request) {
-    //             $q->where('name', 'like', "%{$request->doctor_name}%");
-    //         });
-    //     }
-
-    //     // Specialty
-    //     if ($request->specialty_name) {
-    //         $query->where('specialty_name', $request->specialty_name);
-    //     }
-
-    //     // Date Range
-    //     if ($request->start_date && $request->end_date) {
-    //         $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
-    //     }
-
-    //     // Appointment Type
-    //     if ($request->appointment_type) {
-    //         $query->where('appointment_type', $request->appointment_type);
-    //     }
-
-    //     // Status
-    //     if ($request->status) {
-    //         $query->where('status', $request->status);
-    //     }
-
-    //     // Practice Location
-    //     if ($request->location_name) {
-    //         $query->where('location_name', $request->location_name);
-    //     }
-
-    //     // Created By FDO
-    //     if ($request->created_by) {
-    //         $query->where('created_by', $request->created_by);
-    //     }
-
-    //     return $query;
-    // }
-
     // total appointments for admin dashboard
     // Admin Dashboard Stats
     public function total()
@@ -106,56 +47,7 @@ class AppointmentController extends Controller
 
 
 
-    // function for export to csv file
-    // public function export(Request $request)
-    // {
-    //     $query = $this->getFilteredAppointments($request);
-
-    //     $appointments = $query->get();
-
-    //     $fileName = "appointments_" . now()->format('Ymd_His') . ".csv";
-
-    //     $headers = [
-    //         "Content-Type" => "text/csv",
-    //         "Content-Disposition" => "attachment; filename=$fileName",
-    //     ];
-
-    //     $callback = function () use ($appointments) {
-
-    //         $file = fopen('php://output', 'w');
-
-    //         // csv header
-    //         fputcsv($file, [
-    //             'Patient Name',
-    //             'Doctor Name',
-    //             'Specialty',
-    //             'Date',
-    //             'Time',
-    //             'Type',
-    //             'Status',
-    //             'Location',
-    //             'Created By'
-    //         ]);
-
-    //         foreach ($appointments as $a) {
-    //             fputcsv($file, [
-    //                 $a->patient->first_name . ' ' . $a->patient->last_name,
-    //                 $a->doctor->name,
-    //                 $a->specialty->specialty_name ?? '',
-    //                 $a->appointment_date,
-    //                 $a->appointment_time,
-    //                 $a->appointment_type,
-    //                 $a->status,
-    //                 $a->practiceLocation->location_name ?? '',
-    //                 $a->createdBy->name ?? ''
-    //             ]);
-    //         }
-
-    //         fclose($file);
-    //     };
-
-    //     return response()->stream($callback, 200, $headers);
-    // }
+    /// export to csv (Admin )
     public function export(Request $request)
     {
         $user = $request->attributes->get('auth_user'); // because not logged in currently
@@ -301,6 +193,29 @@ class AppointmentController extends Controller
             'status' => true,
             'message' => 'Appointment rescheduled'
         ]);
+    }
+
+
+    // Doctor can change status to completed
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Scheduled,In Progress,Completed,Cancelled'
+        ]);
+
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            return response()->json(['status' => false], 404);
+        }
+
+        $appointment->update(['status' => $request->status]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Status updated successfully'
+        ]);
+
     }
 
 

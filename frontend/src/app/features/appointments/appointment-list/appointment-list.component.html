@@ -1,17 +1,24 @@
 <div class="p-4">
+  <h1 class="text-2xl font-bold text-center">Appointment List</h1>
 
   <!-- FILTER COMPONENT -->
-  <app-data-filter
-    (filterChange)="onFilterChange($event)">
-  </app-data-filter>
+   <!-- filters specific to appointments -->
+    <app-appointment-filter
+    (applyFilter)="onApplyFilter($event)"
+    (resetFilter)="onResetFilter()">
+  </app-appointment-filter>
+
 
   <!-- ACTION BAR -->
   <div class="flex justify-between my-3">
 
-    <h2 class="text-xl font-bold">Appointments</h2>
+
+
+
+
 
     <button
-      *ngIf="role === 'admin'"
+      *ngIf="role === 'Admin'"
       class="btn btn-primary"
       (click)="exportCSV()">
       Export CSV
@@ -20,28 +27,35 @@
   </div>
 
   <!-- TABLE -->
+  <div *ngIf="loading" class="text-center py-4">
+    <span class="loading loading-spinner loading-lg"></span>
+    Loading appointments...
+  </div>
+
   <ngx-datatable
+    *ngIf="!loading"
     class="material"
     [rows]="appointments"
     [columnMode]="'force'"
     [headerHeight]="50"
-    [rowHeight]="'auto'">
+    [rowHeight]="'auto'"
+    [loadingIndicator]="loading">
 
     <ngx-datatable-column name="Patient">
       <ng-template let-row="row">
-        {{ row.patient_name }}
+       {{ row.patient?.first_name }} {{ row.patient?.last_name }}
       </ng-template>
     </ngx-datatable-column>
 
     <ngx-datatable-column name="Doctor">
       <ng-template let-row="row">
-        {{ row.doctor_name }}
+        {{ row.doctor?.name }}
       </ng-template>
     </ngx-datatable-column>
 
     <ngx-datatable-column name="Date">
       <ng-template let-row="row">
-        {{ row.appointment_date }} {{ row.appointment_time }}
+         {{ row.appointment_date | date:'dd-MM-yyyy' }} {{ row.appointment_time }}
       </ng-template>
     </ngx-datatable-column>
 
@@ -83,5 +97,16 @@
     </ngx-datatable-column>
 
   </ngx-datatable>
+
+  <div *ngIf="!loading && appointments.length === 0" class="text-center py-8">
+    <p class="text-gray-500">No appointments found.</p>
+  </div>
+
+  <!-- <div class="join">
+  <button class="join-item btn">1</button>
+  <button class="join-item btn btn-active">2</button>
+  <button class="join-item btn">3</button>
+  <button class="join-item btn">4</button>
+</div> -->
 
 </div>

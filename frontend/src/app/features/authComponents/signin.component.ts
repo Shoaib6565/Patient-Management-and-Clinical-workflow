@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule,NgForm, NgModel } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth-service.service';
 
 @Component({
   selector: 'signin-com',
@@ -31,20 +31,21 @@ export class SigninComponent {
         console.log('Login Response:', res);
 
         // store JWT token in localStorage
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.role);
-        const role = res.role;
+        // this.authServices.setToken(res.token);
+         const role =   this.authServices.getRole();;
+
+
 
         alert('Login Successful');
 
         if(role == 'Admin'){
-          this.router.navigate(['/admin-dashboard']);
+          this.router.navigate(['/admin']);
         }
         if(role == 'FDO'){
-          this.router.navigate(['/fdo-dashboard']);
+          this.router.navigate(['/fdo']);
         }
         if(role == 'Doctor'){
-          this.router.navigate(['/doctor-dashboard']);
+          this.router.navigate(['/doctor']);
         }
       },
       error: (err) => {
@@ -63,19 +64,6 @@ export class SigninComponent {
 
 
 
-
-
-
-  // onLogin(): void {
-  //   if (!this.email || !this.password) return;
-  //   this.isLoading = true;
-  //   setTimeout(() => {
-  //     this.isLoading = false;
-  //     console.log('Login attempted', {
-  //       email: this.email,
-  //     });
-  //   }, 5000);
-  // }
 
 
 }
