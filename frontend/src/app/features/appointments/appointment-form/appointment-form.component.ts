@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AppointmentService } from '../appointment.service';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AppointmentService } from '../../../core/services/appointment.service';
 
 @Component({
   selector: 'app-appointment-form',
+  imports: [ReactiveFormsModule],
   templateUrl: './appointment-form.component.html'
 })
 export class AppointmentFormComponent implements OnInit {
@@ -31,7 +33,7 @@ export class AppointmentFormComponent implements OnInit {
     if (this.editMode) {
       // update API
     } else {
-      this.service.create(this.form.value).subscribe();
+      // this.service.create(this.form.value).subscribe();
     }
   }
 }

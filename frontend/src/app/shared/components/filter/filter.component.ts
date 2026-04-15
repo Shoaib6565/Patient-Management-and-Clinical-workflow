@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export type FilterType = 'text' | 'select' | 'dateRange';
 
@@ -11,6 +13,8 @@ export interface FilterField {
 
 @Component({
   selector: 'app-data-filter',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.css']
 })
