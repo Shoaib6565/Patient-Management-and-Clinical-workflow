@@ -18,6 +18,7 @@ export default (sequelize) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       role_id: DataTypes.INTEGER,
       permission_id: DataTypes.INTEGER,

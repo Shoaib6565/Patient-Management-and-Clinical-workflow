@@ -18,6 +18,7 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       specialty_name: { type: DataTypes.STRING, unique: true },
       description: DataTypes.TEXT,

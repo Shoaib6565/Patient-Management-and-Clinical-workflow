@@ -15,6 +15,7 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       user_id: DataTypes.BIGINT,
       practice_location_id: DataTypes.BIGINT,

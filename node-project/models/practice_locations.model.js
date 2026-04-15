@@ -15,6 +15,7 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       location_name: DataTypes.STRING,
       address: DataTypes.TEXT,

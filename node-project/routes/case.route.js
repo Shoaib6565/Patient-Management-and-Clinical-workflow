@@ -6,7 +6,8 @@ import {
     create,
     update,
     Delete,
-    exportCasesCSV
+    exportCasesCSV,
+    getCaseCount
 } from "../controllers/case.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 export default router;
@@ -17,3 +18,4 @@ router.get("/:id", auth, getById);
 router.put("/:id", auth, update);
 router.delete("/:id", auth, Delete);
 router.get("/export", auth, exportCasesCSV);
+router.get("/count", auth, getCaseCount);

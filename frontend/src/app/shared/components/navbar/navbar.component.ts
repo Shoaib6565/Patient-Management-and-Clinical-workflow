@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service'; 
+import { AuthService } from '../../../core/services/auth-service.service'; 
 import { Router } from '@angular/router';
 
 // export type UserRole = 'admin' | 'doctor' | 'frontdesk';
@@ -18,8 +18,8 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent {
 
-  router = inject(Router);
-  authService = inject(AuthService);
+  private readonly authService : AuthService = inject(AuthService);
+  private readonly router : Router = inject(Router);
 
   @Output() toggleSidebar = new EventEmitter<void>();
 
@@ -86,8 +86,14 @@ closeDropdown(): void {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/signin']);
+
+    this.authService.logout().subscribe({
+      next: () => {
+
+        this.router.navigate(['/signin']);
+        console.log('Logout successful');
+      }
+    });
     console.log('Logout clicked');
   }
 }

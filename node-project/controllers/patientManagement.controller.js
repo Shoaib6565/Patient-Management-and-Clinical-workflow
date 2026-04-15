@@ -204,13 +204,13 @@ export const exportPatientsCSV = async (req, res) => {
 
 export const getPatientByAppointmentId = async (req, res) => {
     try {
-        const { appointmentId } = req.params;
+        const { DoctorId } = req.params;
 
         const patientData = await Patient.findOne({
             include: [
                 {
                     model: Appointment,
-                    where: { id: appointmentId },
+                    where: { id: DoctorId },
                     attributes: ['status'],
                     required: true,
                     include: [
@@ -244,32 +244,20 @@ export const getPatientByAppointmentId = async (req, res) => {
 };
 
 
-export const recoverDeletedPatient = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const patient = await Patient.findOne({
-            where: { id },
-            paranoid: false
-        });
-        if (!patient) {
-            return res.api.notFound("Patient not found");
-        }
-        if (!patient.deletedAt) {
-            return res.status(400).json({
-                message: "Patient is not deleted"
-            });
-        }
-        await patient.restore();
-        return res.status(200).json({
-            message: "Patient recovered successfully", 
-            data: patient
+export const getTotalAppointmentCount = async (req, res) => {
+   try{
+    const count = await Appointment.count();
+    return res.status(200).json({
+        message: "Total appointment count retrieved successfully",
+        data: { totalAppointments: count }
+    });
+    }catch(error){
+        return res.status(500).json({
+            message: "Failed to retrieve appointment count",
+            error: error.message
         });
     }
-    catch (error) {
-        return res.api.error("Failed to recover patient");
-    }
-};
-
+   }
 
 
 

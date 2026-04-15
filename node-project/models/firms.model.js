@@ -14,6 +14,7 @@ export default (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       firm_name: DataTypes.STRING,
       firm_type: DataTypes.ENUM('Legal','Corporate','Government','Other'),

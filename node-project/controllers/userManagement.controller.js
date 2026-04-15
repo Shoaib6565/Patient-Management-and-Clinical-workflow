@@ -2,7 +2,7 @@ import db from "../models/index.js";
 const { User, UserRole } = db;
 import bcrypt from 'bcryptjs';
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const users = await User.findAll();
 
@@ -20,7 +20,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
     try {
         const { name, email, password, is_active, role_id } = req.body;
 
@@ -52,7 +52,7 @@ const createUser = async (req, res) => {
 };
 
 
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findByPk(id);
@@ -69,7 +69,7 @@ const getUserById = async (req, res) => {
 
     }
 };
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, is_active, role } = req.body;
@@ -98,7 +98,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -120,7 +120,7 @@ const deleteUser = async (req, res) => {
     }
 };
 
-const restoreUser = async (req, res) => {
+export const restoreUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findByPk(id, { paranoid: false });
@@ -137,19 +137,20 @@ const restoreUser = async (req, res) => {
         return res.api.error("Failed to restore user");
     }
 };
-const resetPassword = async (req, res) => {
+
+export const resetPassword = async (req, res) => {
     try {
         const { id } = req.params;
-        const { newPassword } = req.body;
+        const { new_password } = req.body;
         const user = await User.findByPk(id);
         if (!user) {
             return res.api.notFound("User not found");
         }
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(new_password, 10);
         await user.update({ password: hashedPassword });
         return res.status(200).json({
             success: true,
-            message: "Password reset successfully",
+            message: "Password reset successfully"
         });
     }
     catch (error) {
@@ -157,4 +158,31 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { getAllUsers, createUser, getUserById, updateUser, deleteUser, resetPassword, restoreUser };
+
+export const getActiveDoctorCount = async (req, res) => {
+    try {
+        const count = await UserRole.count({
+            where: {
+                role_id: 2
+            },
+            include: [
+                {
+                    model: User,
+                    where: {
+                        is_active: true
+                    }
+                }
+            ]
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Active doctor count retrieved successfully",
+            data: { count }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.api.error("Failed to get active doctor count");
+    }
+};

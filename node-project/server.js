@@ -1,17 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { sequelize } from "./models/index.js";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import patientsRoutes from "./routes/patients.route.js";
 import caseRoutes from "./routes/case.route.js";
 
-
-
 dotenv.config();
 
-
 const app = express();
+
+app.use(cors({
+  origin: "http://localhost:4200",
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -20,7 +24,7 @@ app.use("/users", userRoutes);
 app.use("/patients", patientsRoutes);
 app.use("/cases", caseRoutes);
 
-// for handle notification through socket.io
+// socket route (keep as is)
 app.post("/send", (req, res) => {
   const { userId, data } = req.body;
   const socketId = users[userId];
@@ -29,9 +33,6 @@ app.post("/send", (req, res) => {
   }
   res.send({ success: true });
 });
-
-
-
 
 const PORT = process.env.PORT;
 

@@ -15,6 +15,7 @@ import { CaseDetailComponent } from './features/cases/case-detail/case-detail.co
 import { AppointmentListComponent } from './features/appointments/appointment-list/appointment-list.component';
 import { AppointmentFormComponent } from './features/appointments/appointment-form/appointment-form.component';
 import { CalendarViewComponent } from './features/appointments/calendar-view/calendar-view.component';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
@@ -23,9 +24,13 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashboardLayoutComponent,
     children: [
-      { path: 'admin', component: AdminDashboardComponent },
-      { path: 'doctor', component: DoctorDashboardComponent },
-      { path: 'fdo', component: FrontdeskDashboardComponent },
+      { path: 'admin', component: AdminDashboardComponent,
+         canActivate: [authGuard,roleGuard ],data: { role: 'Admin' } 
+         },
+      { path: 'doctor', component: DoctorDashboardComponent,
+         canActivate: [authGuard],data: { role: 'Doctor' }
+         },
+      { path: 'fdo', component: FrontdeskDashboardComponent, canActivate: [authGuard, roleGuard],data: { role: 'FDO' } },
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
     ],
   },

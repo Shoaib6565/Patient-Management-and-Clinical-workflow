@@ -144,7 +144,7 @@ export const create = async (req, res) => {
             clinical_notes
         } = req.body;
 
-        // 🔹 Validate required fields
+
         if (!case_number || !patient_id || !practice_location_id) {
             return res.status(400).json({
                 success: false,
@@ -152,7 +152,7 @@ export const create = async (req, res) => {
             });
         }
 
-        // 🔹 Validate FK: Patient
+
         const patient = await Patient.findByPk(patient_id);
         if (!patient) {
             return res.status(404).json({
@@ -161,7 +161,7 @@ export const create = async (req, res) => {
             });
         }
 
-        // 🔹 Validate FK: Practice Location
+
         const location = await PracticeLocation.findByPk(practice_location_id);
         if (!location) {
             return res.status(404).json({
@@ -170,7 +170,7 @@ export const create = async (req, res) => {
             });
         }
 
-        // 🔹 Optional FK validations
+
         if (category_id) {
             const category = await Category.findByPk(category_id);
             if (!category) {
@@ -201,7 +201,6 @@ export const create = async (req, res) => {
             }
         }
 
-        // 🔹 Create case
         const newCase = await Case.create({
             case_number,
             patient_id,
@@ -328,3 +327,15 @@ export const exportCasesCSV = async (req, res) => {
     }
 };
 
+export const getCaseCount = async (req, res) => {
+    try {
+        const count = await Case.count();
+        return res.status(200).json({
+            success: true,
+            totalCases: count
+        });
+    }
+    catch (error) {
+        return res.api.error(error);
+    }
+};
