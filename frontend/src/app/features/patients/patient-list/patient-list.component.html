@@ -1,1 +1,166 @@
-<p>patient-list works!</p>
+<div class="p-4 space-y-4">
+
+  <!-- Filters -->
+  <div class="card bg-base-100 shadow-md p-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+      <input type="text" placeholder="Search Name" class="input input-bordered w-full" [(ngModel)]="filters.name" />
+
+      <select class="select select-bordered w-full" [(ngModel)]="filters.gender">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+
+      <input type="date" class="input input-bordered w-full" [(ngModel)]="filters.dob_from" />
+
+      <input type="date" class="input input-bordered w-full" [(ngModel)]="filters.dob_to" />
+
+    </div>
+
+    <div class="flex gap-3 mt-4 justify-end">
+      <button class="btn btn-primary" (click)="applyFilters()">
+        Apply Filters
+      </button>
+
+      <button class="btn btn-outline" (click)="resetFilters()">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card bg-base-100 shadow-md">
+    <div class="overflow-x-auto">
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>DOB</th>
+            <th>Gender</th>
+            <th>Contact</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @if (patients.length === 0) {
+          <tr>
+            <td colspan="5" class="text-center py-6 text-gray-400">
+              No patients found
+            </td>
+          </tr>
+          }
+
+          @for (patient of patients; track patient.id) {
+          <tr class="cursor-pointer hover:bg-base-200 transition"
+            [class.bg-base-300]="selectedPatient?.id === patient.id" (click)="selectPatient(patient)">
+
+            <td class="flex items-center gap-3">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-white rounded-full w-10">
+                  <span>
+                    {{ patient.first_name?.charAt(0) || 'P' }}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-bold">
+                  {{ patient.first_name }} {{ patient.middle_name }} {{ patient.last_name }}
+                </div>
+                <div class="text-sm opacity-50">
+                  {{ patient.email }}
+                </div>
+              </div>
+            </td>
+
+            <td>{{ patient.date_of_birth | date:'mediumDate' }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.phone }}</td>
+
+            <td>
+              <span class="badge" [ngClass]="{
+                  'badge-success': patient.patient_status === 'Active',
+                  'badge-error': patient.patient_status === 'Inactive'
+                }">
+                {{ patient.patient_status }}
+              </span>
+            </td>
+
+          </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-between items-center">
+
+    <div class="text-sm text-gray-500">
+      Showing {{ pagination?.currentPage || 1 }}
+      of {{ pagination?.totalPages || 1 }}
+    </div>
+
+    <div class="join">
+      @for (page of pages; track page) {
+      <button class="join-item btn" [class.btn-active]="filters.page === page" (click)="changePage(page)">
+        {{ page }}
+      </button>
+      }
+    </div>
+
+  </div>
+
+  <!-- Patient Details Panel -->
+  @if (selectedPatient) {
+  <div class="card bg-base-100 shadow-md p-6 mt-4">
+    <h2 class="text-lg font-bold mb-4">Patient Details</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div><b>Name:</b> {{ selectedPatient.first_name }} {{ selectedPatient.middle_name }} {{ selectedPatient.last_name
+        }}</div>
+      <div><b>Email:</b> {{ selectedPatient.email }}</div>
+
+      <div><b>Phone:</b> {{ selectedPatient.phone }}</div>
+      <div><b>Mobile:</b> {{ selectedPatient.mobile }}</div>
+
+      <div><b>Gender:</b> {{ selectedPatient.gender }}</div>
+      <div><b>DOB:</b> {{ selectedPatient.date_of_birth | date:'mediumDate' }}</div>
+
+      <div><b>Address:</b> {{ selectedPatient.address }}</div>
+      <div><b>City:</b> {{ selectedPatient.city }}</div>
+
+      <div><b>State:</b> {{ selectedPatient.state }}</div>
+      <div><b>Zip:</b> {{ selectedPatient.zip_code }}</div>
+
+      <div><b>Country:</b> {{ selectedPatient.country }}</div>
+      <div><b>Language:</b> {{ selectedPatient.preferred_language }}</div>
+
+      <div><b>Physician:</b> {{ selectedPatient.primary_physician }}</div>
+      <div><b>Status:</b> {{ selectedPatient.patient_status }}</div>
+
+      <div><b>Insurance:</b> {{ selectedPatient.insurance_provider }}</div>
+      <div><b>Policy #:</b> {{ selectedPatient.insurance_policy_number }}</div>
+
+      <div><b>Emergency Contact:</b> {{ selectedPatient.emergency_contact_name }}</div>
+      <div><b>Emergency Phone:</b> {{ selectedPatient.emergency_contact_phone }}</div>
+
+      <div><b>Registered:</b> {{ selectedPatient.registration_date | date:'medium' }}</div>
+
+    </div>
+
+    <div class="mt-4 text-right">
+      <button class="btn btn-sm btn-outline" (click)="closeDetails()">
+        Close
+      </button>
+    </div>
+  </div>
+  }
+
+</div>

@@ -22,8 +22,11 @@ export const getAllPatients = async (req, res) => {
             limit = 10,
         } = req.query;
 
-        let where = {};
-        const offset = (page - 1) * limit;
+        const pageNumber = Number(page);
+        const pageSize = Number(limit);
+        const offset = (pageNumber - 1) * pageSize;
+
+        let where = { deleted_at: null };
 
         if (name) {
             where[Op.or] = [
@@ -52,22 +55,25 @@ export const getAllPatients = async (req, res) => {
             if (reg_to) where.registration_date[Op.lte] = reg_to;
         }
 
-        const { count, rows: allPatients } = await Patient.findAndCountAll({
+        const patients = await Patient.findAll({
             where,
-            limit: parseInt(limit),
-            offset: parseInt(offset),
+            limit: pageSize,
+            offset,
             order: [['createdAt', 'DESC']],
         });
+
+        const hasNextPage = patients.length === pageSize;
+        const hasPrevPage = pageNumber > 1;
 
         return res.status(200).json({
             message: "Patients retrieved successfully",
             data: {
-                Patient: allPatients,
+                patients,
                 pagination: {
-                    totalItems: count,
-                    totalPages: Math.ceil(count / limit),
-                    currentPage: parseInt(page),
-                    itemsPerPage: parseInt(limit),
+                    currentPage: pageNumber,
+                    itemsPerPage: pageSize,
+                    hasNextPage,
+                    hasPrevPage
                 }
             }
         });
@@ -100,7 +106,9 @@ export const createPatient = async (req, res) => {
 export const getPatientById = async (req, res) => {
     try {
         const { id } = req.params;
-        const patient = await Patient.findByPk(id);
+        const patient = await Patient.findByPk({
+            where: { id, deleted_at: null }
+        });
         if (!patient) {
             return res.api.notFound("Patient not found");
         }
@@ -118,7 +126,9 @@ export const updatePatient = async (req, res) => {
     try {
         const { id } = req.params;
         const { first_name, middle_name, last_name, date_of_birth, gender, ssn, email, phone, mobile, address, city, state, zip_code, country, emergency_contact_name, emergency_contact_phone, insurance_provider, insurance_policy_number, primary_physician, preferred_language, patient_status, registration_date, } = req.body;
-        const patient = await Patient.findByPk(id);
+        const patient = await Patient.findByPk({
+            where: { id, deleted_at: null }
+        });
         if (!patient) {
             return res.api.notFound("Patient not found");
         }
@@ -159,7 +169,9 @@ export const deletePatient = async (req, res) => {
 
 export const exportPatientsCSV = async (req, res) => {
     try {
-        const allPatients = await Patient.findAll({ raw: true });
+        const allPatients = await Patient.findAll({ raw: true,
+            where: { deleted_at: null }
+         });
 
         if (!allPatients.length) {
             return res.api.notFound("No patients found");
@@ -245,20 +257,44 @@ export const getPatientByAppointmentId = async (req, res) => {
 
 
 export const getTotalAppointmentCount = async (req, res) => {
-   try{
-    const count = await Appointment.count();
-    return res.status(200).json({
-        message: "Total appointment count retrieved successfully",
-        data: { totalAppointments: count }
-    });
-    }catch(error){
+    try {
+        const count = await Appointment.count(
+            {
+                where: { deleted_at: null }
+            }
+        );
+        return res.status(200).json({
+            message: "Total appointment count retrieved successfully",
+            data: { totalAppointments: count }
+        });
+    } catch (error) {
         return res.status(500).json({
             message: "Failed to retrieve appointment count",
             error: error.message
         });
     }
-   }
+}
 
+export const getTotalPatientCount = async (req, res) => {
+    try {
+        const count = await Patient.count(
+            {
+                where: { deleted_at: null }
+            }
+        );
+        return res.status(200).json({
+            message: "Total patient count retrieved successfully",
+            data: { totalPatients: count }
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Failed to retrieve patient count",
+            error: error.message
+        });
+    }
+
+}
 
 
 

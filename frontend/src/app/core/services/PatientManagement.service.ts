@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient  ,HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { API_URL } from "../constants/apiUrl.constant";
 
@@ -11,9 +11,21 @@ export class PatientManagementService {
 
     constructor() {}
 
-    getAllPatients() {
-        return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.patients}`);
-    }
+  getAllPatients(filters: any = {}) {
+    let params = new HttpParams();
+
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) {
+        params = params.set(key, filters[key]);
+      }
+    });
+
+    return this.http.get<any>(
+      `${this.apiUrl.baseUrl}${this.apiUrl.patients}`,
+      { params }
+    );
+  }
+
     getPatientById(patientId: string) {
         return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.patients}/${patientId}`);
     }
@@ -32,5 +44,9 @@ export class PatientManagementService {
     }
     totalAppointmentCount() {
         return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.patients}/appointmentCount/total`);
+    }
+
+    totalPatientCount() {
+        return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.patients}/patientCount/total`);
     }
 }

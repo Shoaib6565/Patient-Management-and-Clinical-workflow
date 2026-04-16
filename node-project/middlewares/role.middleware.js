@@ -1,10 +1,34 @@
+import db from "../models/index.js";
+
+const { User, Role, Permission } = db;
+
 export const roleMiddleware = (...allowedRoles) => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     try {
-      if (!req.user || !req.user.roles) {
+      const user = await User.findByPk(req.user.id, {
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: Role,
+            as: "roles",
+            attributes: ["id", "name"],
+            through: { attributes: [] },
+            include: [
+              {
+                model: Permission,
+                as: "permissions",
+                attributes: ["name"],
+                through: { attributes: [] },
+              },
+            ],
+          },
+        ],
+      });
+      if (!user || !user.roles) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const userRoles = req.user.roles.map(r => r.name);
+
+      const userRoles = user.roles.map(r => r.name);
       const hasRole = userRoles.some(role =>
         allowedRoles.includes(role)
       );

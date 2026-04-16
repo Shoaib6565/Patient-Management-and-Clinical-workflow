@@ -4,7 +4,16 @@ import bcrypt from 'bcryptjs';
 
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({
+            attributes: { exclude: ['password'] },
+            where: { deleted_at: null },
+            include: [
+                {
+                    model: UserRole,
+                    attributes: ['role_id']
+                }
+            ]
+        });
 
         return res.status(200).json({
             success: true,
@@ -55,7 +64,9 @@ export const createUser = async (req, res) => {
 export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = await User.findByPk(id);
+        const user = await User.findByPk({
+            where: { id, deleted_at: null },
+        });
         if (!user) {
             return res.api.error("User not found");
         }
@@ -74,7 +85,9 @@ export const updateUser = async (req, res) => {
         const { id } = req.params;
         const { name, email, is_active, role } = req.body;
 
-        const user = await User.findByPk(id);
+        const user = await User.findByPk({
+            where: { id, deleted_at: null }
+        });
         if (!user) {
             return res.api.notFound("User not found");
         }
@@ -120,23 +133,6 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-export const restoreUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findByPk(id, { paranoid: false });
-        if (!user) {
-            return res.api.notFound("User not found");
-        }
-        await user.restore();
-        return res.status(200).json({
-            success: true,
-            message: "User restored successfully",
-            data: user
-        });
-    } catch (error) {
-        return res.api.error("Failed to restore user");
-    }
-};
 
 export const resetPassword = async (req, res) => {
     try {
@@ -169,11 +165,13 @@ export const getActiveDoctorCount = async (req, res) => {
                 {
                     model: User,
                     where: {
-                        is_active: true
+                        is_active: true,
+                        deleted_at: null
                     }
                 }
             ]
         });
+        console.log("COUNT RESULT:", count);
 
         return res.status(200).json({
             success: true,
@@ -183,6 +181,11 @@ export const getActiveDoctorCount = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.api.error("Failed to get active doctor count");
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get active doctor count",
+            error: error.message
+        });
     }
 };

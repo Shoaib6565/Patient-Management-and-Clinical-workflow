@@ -19,9 +19,11 @@ export const getAll = async (req, res) => {
             limit = 10
         } = req.query;
 
-        const offset = (page - 1) * limit;
+        const pageNumber = Number(page);
+        const pageSize = Number(limit);
+        const offset = (pageNumber - 1) * pageSize;
 
-        let where = {};
+        let where = { deleted_at: null };
         let patientWhere = {};
 
         if (patientName) {
@@ -32,43 +34,20 @@ export const getAll = async (req, res) => {
             ];
         }
 
-        if (caseNumber) {
-            where.case_number = { [Op.like]: `%${caseNumber}%` };
-        }
-
-        if (caseType) {
-            where.case_type = { [Op.like]: `%${caseType}%` };
-        }
-
-        if (categoryId) {
-            where.category_id = categoryId;
-        }
-
-        if (caseStatus) {
-            where.case_status = { [Op.like]: `%${caseStatus}%` };
-        }
-
-        if (practiceLocationId) {
-            where.practice_location_id = practiceLocationId;
-        }
-
-        if (insuranceProviderId) {
-            where.insurance_id = insuranceProviderId;
-        }
+        if (caseNumber) where.case_number = { [Op.like]: `%${caseNumber}%` };
+        if (caseType) where.case_type = { [Op.like]: `%${caseType}%` };
+        if (categoryId) where.category_id = categoryId;
+        if (caseStatus) where.case_status = { [Op.like]: `%${caseStatus}%` };
+        if (practiceLocationId) where.practice_location_id = practiceLocationId;
+        if (insuranceProviderId) where.insurance_id = insuranceProviderId;
 
         if (startDate || endDate) {
             where.opening_date = {};
-
-            if (startDate) {
-                where.opening_date[Op.gte] = startDate;
-            }
-
-            if (endDate) {
-                where.opening_date[Op.lte] = endDate;
-            }
+            if (startDate) where.opening_date[Op.gte] = startDate;
+            if (endDate) where.opening_date[Op.lte] = endDate;
         }
 
-        const cases = await Case.findAndCountAll({
+        const cases = await Case.findAll({
             where,
             include: [
                 {
@@ -77,20 +56,21 @@ export const getAll = async (req, res) => {
                     required: !!patientName
                 }
             ],
-            limit: Number(limit),
-            offset: Number(offset),
+            limit: pageSize,
+            offset,
             order: [["created_at", "DESC"]]
         });
 
+        const hasNextPage = cases.length === pageSize; 
+        const hasPrevPage = pageNumber > 1;
 
-        const absoluteTotal = await Case.count({ where, include: [{ model: Patient, where: patientWhere }] });
         return res.status(200).json({
             success: true,
-            total: cases.count,
-            page: Number(page),
-            pages: Math.ceil(cases.count / limit),
-            data: cases.rows,
-            totalcases: absoluteTotal
+            page: pageNumber,
+            limit: pageSize,
+            hasNextPage,
+            hasPrevPage,
+            data: cases
         });
 
     } catch (error) {
@@ -104,7 +84,10 @@ export const getById = async (req, res) => {
         const { id } = req.params;
 
         const caseData = await Case.findOne({
-            where: { id },
+            where: {
+                id,
+                deleted_at: null
+            },
         });
 
         if (!caseData) {
@@ -239,7 +222,12 @@ export const update = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const caseData = await Case.findByPk(id);
+        const caseData = await Case.findByPk({
+            where: {
+                id,
+                deleted_at: null
+            },
+        });
 
         if (!caseData) {
             return res.status(404).json({
@@ -285,7 +273,10 @@ export const Delete = async (req, res) => {
 
 export const exportCasesCSV = async (req, res) => {
     try {
-        const allCases = await Case.findAll({ raw: true });
+        const allCases = await Case.findAll({
+            raw: true
+            , where: { deleted_at: null }
+        });
 
         if (!allCases.length) {
             return res.api.notFound("No cases found");
@@ -328,11 +319,14 @@ export const exportCasesCSV = async (req, res) => {
 };
 
 export const getCaseCount = async (req, res) => {
+    console.log("Received request to get total case count");
     try {
-        const count = await Case.count();
+        const count = await Case.count({ where: { deleted_at: null } });
+        console.log("Total cases count: ", count);
         return res.status(200).json({
             success: true,
             totalCases: count
+
         });
     }
     catch (error) {

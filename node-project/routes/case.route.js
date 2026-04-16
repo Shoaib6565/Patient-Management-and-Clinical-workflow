@@ -13,9 +13,10 @@ import { auth } from "../middlewares/auth.middleware.js";
 export default router;
 
 router.post("/", auth, create);
+router.get("/export", auth, exportCasesCSV);
+router.get("/count", getCaseCount);
 router.get("/", auth, getAll);
 router.get("/:id", auth, getById);
 router.put("/:id", auth, update);
 router.delete("/:id", auth, Delete);
-router.get("/export", auth, exportCasesCSV);
-router.get("/count", auth, getCaseCount);
+
