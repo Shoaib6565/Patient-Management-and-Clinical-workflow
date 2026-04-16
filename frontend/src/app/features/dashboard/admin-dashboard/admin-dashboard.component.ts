@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { PatientManagementService } from '../../core/services/PatientManagement.service';
-import
+import { PatientManagementService } from '../../../core/services/PatientManagement.service';
 
 @Component({
   selector: 'app-admin-dashboard',
