@@ -116,13 +116,13 @@
   </ngx-datatable>
 
   <div class="text-sm mt-4 text-gray-600">
-    Showing {{ (paginationData.current_page - 1) * paginationData.per_page + 1 }}
-    to {{ Math.min(paginationData.current_page * paginationData.per_page, paginationData.total) }}
-    of {{ paginationData.total }} patients
+    Showing {{ (paginationData?.current_page - 1) * paginationData?.per_page + 1 }}
+    to {{ Math.min(paginationData?.current_page * paginationData?.per_page, paginationData?.total) }}
+    of {{ paginationData?.total }} patients
   </div>
 
   <!-- PAGINATION -->
-  <div *ngIf="paginationData && paginationData.last_page > 1" class="mt-4">
+  <div *ngIf="paginationData && paginationData?.last_page > 1" class="mt-4">
 
     <app-pagination [pagination]="paginationData" (pageChange)="onPageChange($event)">
     </app-pagination>

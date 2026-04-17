@@ -24,6 +24,7 @@ import { PatientFormComponent } from './features/patients/patient-form/patient-f
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
   { path: 'signin', component: SigninComponent, canActivate: [guestGuard] },
+
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
@@ -49,53 +50,53 @@ export const routes: Routes = [
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
     ],
   },
+
+
+
+
+  // grouping for all protected routes with dashboard layout
   {
-    path: 'cases',
-    component: CaseListComponent,
-    children: [
-      { path: 'case-form', component: CaseFormComponent },
-      { path: 'case-detail', component: CaseDetailComponent },
-    ],
-  },
-  {
-    path: 'appointments',
-    component: AppointmentListComponent,
-    children: [
-      { path: 'appointment-form', component: AppointmentFormComponent },
-      { path: 'appointment-calendar-view', component: CalendarViewComponent },
-    ],
-  },
-  {
-    path: 'patients',
-    component: PatientListComponent,
+    path: '',
+    component: DashboardLayoutComponent, //  same layout
     children: [
       {
-        path: 'patient-form',
-        component: PatientFormComponent,
+        path: 'appointments',
+        component: AppointmentListComponent,
+        children: [
+          { path: 'appointment-form', component: AppointmentFormComponent },
+          {
+            path: 'appointment-calendar-view',
+            component: CalendarViewComponent,
+          },
+        ],
+      },
+      {
+        path: 'visits',
+        component: VisitListComponent,
+        children: [{ path: 'visit-form', component: VisitFormComponent }],
+      },
+
+      {
+        path: 'cases',
+        component: CaseListComponent,
+        children: [
+          { path: 'case-form', component: CaseFormComponent },
+          { path: 'case-detail', component: CaseDetailComponent },
+        ],
+      },
+      {
+        path: 'patients',
+        component: PatientListComponent,
+        children: [
+          {
+            path: 'patient-form',
+            component: PatientFormComponent,
+          },
+        ],
       },
     ],
   },
-        {path: 'appointment-form', component: AppointmentFormComponent},
-    
 
-      {path: 'visits',
-    component: VisitListComponent,
-    children: [
-        {path: 'visit-form', component: VisitFormComponent},
-    ]},
-
-
-
-
-  // grouping for all protected routes
-  {
-    path: '',
-    // canActivate: [authGuard],
-    children: [
-      // {path: 'dashboard', component: DashboardLayoutComponent}
-    ],
-  },
-  // {path: '', redirectTo: ''},
 
   // if does not math any routes
   { path: '**', component: NotFoundComponent },

@@ -25,6 +25,7 @@ export class AppointmentListComponent implements OnInit {
   appointments: any[] = [];
   filters: any = {};
 
+
   paginationData: any;
 
   currentPage = 1;

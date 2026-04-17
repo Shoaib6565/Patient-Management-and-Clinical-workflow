@@ -170,11 +170,3 @@ class FirmController extends Controller
     }
 }
 
-// $firms = Firm::query()
-// ->when($search, fn($q) => $q->where('firm_name', 'like', "%$search%"))
-// ->when($status !== null && $status !== 'all', fn($q) =>
-// $q->where('is_active', $status))
-//  ->when($type, fn($q) =>
-// $q->where('firm_type', $type))
-// ->orderBy('firm_name')
-// ->paginate(10);

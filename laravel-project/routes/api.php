@@ -52,11 +52,10 @@ Route::prefix('visits')->group(function () {
 });
 
 // for download csv report (visit and appointment)
-Route::get('/exports/{id}/download', [ExportController::class, 'download']);
+// Route::get('/exports/{id}/download', [ExportController::class, 'download']);
 
 // api route for specialties (crud)
 Route::prefix('specialties')->group(function () {
-    // Route::get('/', [SpecialtyController::class, 'index']);
     Route::get('/', [SpecialtyController::class, 'index']);
     Route::post('/', [SpecialtyController::class, 'store']);
     Route::get('/{id}', [SpecialtyController::class, 'show']); // for edit
@@ -70,8 +69,8 @@ Route::prefix('specialties')->group(function () {
 Route::prefix('practice-locations')->group(function () {
     Route::get('/', [PracticeLocationController::class, 'index']);
     Route::post('/', [PracticeLocationController::class, 'store']);
-    Route::get('/active', [PracticeLocationController::class, 'active']);
-    Route::get('/inactive', [PracticeLocationController::class, 'inactive']);
+    // Route::get('/active', [PracticeLocationController::class, 'active']);
+    // Route::get('/inactive', [PracticeLocationController::class, 'inactive']);
     Route::get('/{id}', [PracticeLocationController::class, 'show']);
     Route::put('/{id}', [PracticeLocationController::class, 'update']);
     Route::delete('/{id}', [PracticeLocationController::class, 'destroy']);
@@ -83,8 +82,8 @@ Route::prefix('practice-locations')->group(function () {
 Route::prefix('insurances')->group(function () {
     Route::get('/', [InsuranceController::class, 'index']);
     Route::post('/', [InsuranceController::class, 'store']);
-    Route::get('/active', [InsuranceController::class, 'active']);
-    Route::get('/inactive', [InsuranceController::class, 'inactive']);
+    // Route::get('/active', [InsuranceController::class, 'active']);
+    // Route::get('/inactive', [InsuranceController::class, 'inactive']);
     Route::get('/{id}', [InsuranceController::class, 'show']);
     Route::put('/{id}', [InsuranceController::class, 'update']);
     Route::delete('/{id}', [InsuranceController::class, 'destroy']);
@@ -110,8 +109,8 @@ Route::prefix('categories')->group(function () {
     Route::get('/{id}', [CategoryController::class, 'show']);
     Route::put('/{id}', [CategoryController::class, 'update']);
     Route::delete('/{id}', [CategoryController::class, 'destroy']);
-    Route::get('/active', [CategoryController::class, 'active']);
-    Route::get('/inactive', [CategoryController::class, 'inactive']);
+    // Route::get('/active', [CategoryController::class, 'active']);
+    // Route::get('/inactive', [CategoryController::class, 'inactive']);
     Route::patch('/{id}/activate', [CategoryController::class, 'activate']);
     Route::patch('/{id}/deactivate', [CategoryController::class, 'deactivate']);
 });

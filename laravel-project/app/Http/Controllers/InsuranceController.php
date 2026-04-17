@@ -11,10 +11,17 @@ class InsuranceController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $filter = $request->filter; // active, inactive, all
 
         $insurances = Insurance::query()
             ->when($search, function ($query) use ($search) {
                 $query->where('insurance_name', 'like', "%$search%");
+            })
+            ->when($filter === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($filter === 'inactive', function ($query) {
+                $query->where('is_active', false);
             })
             ->orderBy('insurance_name')
             ->paginate(10);
@@ -65,29 +72,29 @@ class InsuranceController extends Controller
         ]);
     }
 
-    // Get Active Insurances
-    public function active()
-    {
-        $data = Insurance::where('is_active', true)->get();
+    // //Get Active Insurances
+    // public function active()
+    // {
+    //     $data = Insurance::where('is_active', true)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Active insurances fetched successfully',
-            'data' => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Active insurances fetched successfully',
+    //         'data' => $data,
+    //     ]);
+    // }
 
-    // Get Inactive Insurances
-    public function inactive()
-    {
-        $data = Insurance::where('is_active', false)->get();
+    // // Get Inactive Insurances
+    // public function inactive()
+    // {
+    //     $data = Insurance::where('is_active', false)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Inactive insurances fetched successfully',
-            'data' => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Inactive insurances fetched successfully',
+    //         'data' => $data,
+    //     ]);
+    // }
 
     // Update
     public function update(Request $request, $id)
