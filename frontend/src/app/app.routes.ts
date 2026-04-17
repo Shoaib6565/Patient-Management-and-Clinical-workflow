@@ -32,19 +32,19 @@ export const routes: Routes = [
       {
         path: 'admin',
         component: AdminDashboardComponent,
-        // canActivate: [authGuard, roleGuard],
+        canActivate: [authGuard, roleGuard],
         data: { role: 'Admin' },
       },
       {
         path: 'doctor',
         component: DoctorDashboardComponent,
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
         data: { role: 'Doctor' },
       },
       {
         path: 'fdo',
         component: FrontdeskDashboardComponent,
-        // canActivate: [authGuard, roleGuard],
+        canActivate: [authGuard, roleGuard],
         data: { role: 'FDO' },
       },
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
