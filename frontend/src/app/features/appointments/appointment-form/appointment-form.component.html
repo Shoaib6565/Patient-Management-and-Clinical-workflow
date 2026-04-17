@@ -1,38 +1,187 @@
-<div class="card bg-base-100 shadow-xl p-6 w-full max-w-xl mx-auto">
+<div class="max-w-5xl mx-auto p-6">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">
+          {{ isEdit ? "Update Appointment" : "Create Appointment" }}
+        </h2>
+        <button type="button" class="btn btn-ghost btn-circle" (click)="cancel()" title="Close">
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
 
-  <h2 class="text-xl font-bold mb-4">
-    {{ editMode ? 'Edit Appointment' : 'New Appointment' }}
-  </h2>
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="grid grid-cols-2 gap-4"
+      >
+        <!-- Patient Search -->
+        <div>
+          <label class="label">Patient</label>
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            (input)="searchPatients($event)"
+            placeholder="Search patient"
+          />
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
+          <select
+            class="select select-bordered w-full mt-2"
+            formControlName="patient_id"
+          >
+            <option value="">Select patient</option>
+            <option *ngFor="let p of patients" [value]="p.id">
+              {{ p.name }}
+            </option>
+          </select>
+        </div>
 
-    <input class="input input-bordered w-full mb-3"
-           placeholder="Patient ID"
-           formControlName="patient_id">
+        <!-- Case Search -->
+        <div>
+          <label class="label">Case</label>
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            (input)="searchCases($event)"
+            placeholder="Search case"
+          />
 
-    <input class="input input-bordered w-full mb-3"
-           placeholder="Doctor ID"
-           formControlName="doctor_id">
+          <select
+            class="select select-bordered w-full mt-2"
+            formControlName="case_id"
+          >
+            <option *ngFor="let c of cases" [value]="c.id">
+              {{ c.case_number }} - {{ c.patient_name }}
+            </option>
+          </select>
+        </div>
 
-    <input type="date" class="input input-bordered w-full mb-3"
-           formControlName="appointment_date">
+        <!-- Specialty -->
+        <div>
+          <label class="label">Specialty</label>
+          <select
+            class="select select-bordered w-full"
+            formControlName="specialty_id"
+          >
+            <option *ngFor="let s of specialties" [value]="s.id">
+              {{ s.name }}
+            </option>
+          </select>
+        </div>
 
-    <input type="time" class="input input-bordered w-full mb-3"
-           formControlName="appointment_time">
+        <!-- Location -->
+        <div>
+          <label class="label">Location</label>
+          <select
+            class="select select-bordered w-full"
+            formControlName="practice_location_id"
+          >
+            <option *ngFor="let l of locations" [value]="l.id">
+              {{ l.name }}
+            </option>
+          </select>
+        </div>
 
-    <select class="select select-bordered w-full mb-3"
-            formControlName="appointment_type">
-      <option>Checkup</option>
-      <option>Follow-up</option>
-    </select>
+        <!-- Date -->
+        <div>
+          <label class="label">Date</label>
+          <input
+            type="date"
+            class="input input-bordered w-full"
+            formControlName="appointment_date"
+          />
+        </div>
 
-    <textarea class="textarea textarea-bordered w-full mb-3"
-              formControlName="reason_for_visit"
-              placeholder="Reason"></textarea>
+        <!-- Time -->
+        <div>
+          <label class="label">Time</label>
+          <input
+            type="time"
+            class="input input-bordered w-full"
+            formControlName="appointment_time"
+          />
+        </div>
 
-    <button class="btn btn-primary w-full">
-      {{ editMode ? 'Update' : 'Create' }}
-    </button>
+        <!-- Type -->
+        <div>
+          <label class="label">Type</label>
+          <select
+            class="select select-bordered w-full"
+            formControlName="appointment_type"
+          >
+            <option>New Patient</option>
+            <option>Follow-up</option>
+            <option>Consultation</option>
+            <option>Procedure</option>
+            <option>Telehealth</option>
+            <option>Emergency</option>
+            <option>Routine Checkup</option>
+            <option>Post-op Follow-up</option>
+          </select>
+        </div>
 
-  </form>
+        <!-- Status -->
+        <div>
+          <label class="label">Status</label>
+          <select
+            class="select select-bordered w-full"
+            formControlName="status"
+          >
+            <option>Scheduled</option>
+            <option>Confirmed</option>
+            <option>Checked In</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+            <option>No Show</option>
+            <option>Rescheduled</option>
+          </select>
+        </div>
+
+        <!-- Reminder -->
+        <div>
+          <label class="label">Reminder</label>
+          <select
+            class="select select-bordered w-full"
+            formControlName="reminder_method"
+          >
+            <option value="">None</option>
+            <option>SMS</option>
+            <option>Email</option>
+            <option>Phone</option>
+          </select>
+        </div>
+
+        <!-- Reason -->
+        <div class="col-span-2">
+          <label class="label">Reason</label>
+          <textarea
+            class="textarea textarea-bordered w-full"
+            formControlName="reason_for_visit"
+          ></textarea>
+        </div>
+
+        <!-- Notes -->
+        <div class="col-span-2">
+          <label class="label">Notes</label>
+          <textarea
+            class="textarea textarea-bordered w-full"
+            formControlName="notes"
+          ></textarea>
+        </div>
+
+        <!-- Submit and cancel -->
+        <div class="col-span-2 flex justify-end gap-3 mt-6">
+          <button type="button" class="btn btn-ghost" (click)="cancel()">
+            Cancel
+          </button>
+
+          <button type="submit" class="btn btn-primary flex items-center gap-2">
+            <i class="ti ti-device-floppy"></i>
+            {{ isEdit ? "Update" : "Create" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
