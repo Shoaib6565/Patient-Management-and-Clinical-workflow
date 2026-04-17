@@ -42,6 +42,14 @@ export class SidebarComponent {
     };
     return routes[this.role];
   }
+  get visitsRoute(): string {
+    const routes: Record<UserRole, string> = {
+      Admin:  '/visits',
+      Doctor: '/visits',
+      FDO:    '/visits'
+    };
+    return routes[this.role];
+  }
 
   toggleSettings(): void {
     this.isSettingsOpen = !this.isSettingsOpen;

@@ -16,6 +16,10 @@ import { AppointmentListComponent } from './features/appointments/appointment-li
 import { AppointmentFormComponent } from './features/appointments/appointment-form/appointment-form.component';
 import { CalendarViewComponent } from './features/appointments/calendar-view/calendar-view.component';
 import { roleGuard } from './core/guards/role.guard';
+import { PatientListComponent } from './features/patients/patient-list/patient-list.component';
+import {PatientFormComponent} from './features/patients/patient-form/patient-form.component'
+import { VisitListComponent } from './features/visits/visit-list/visit-list.component';
+import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
@@ -46,8 +50,25 @@ export const routes: Routes = [
     component: AppointmentListComponent,
     children: [
         {path: 'appointment-form', component: AppointmentFormComponent},
-        {path: 'appointment-calendar-view', component: CalendarViewComponent},
     ]},
+
+      {path: 'visits',
+    component: VisitListComponent,
+    children: [
+        {path: 'visit-form', component: VisitFormComponent},
+    ]},
+
+
+    {
+      path:'patients',
+      component:PatientListComponent,
+      children:[
+        {
+          path: 'Patient Form',
+          component:PatientFormComponent
+        }
+      ]
+    },
 
 
 

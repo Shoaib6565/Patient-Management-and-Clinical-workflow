@@ -38,6 +38,7 @@ export class AppointmentService {
   }
 
   updateStatus(id: number, data: any) {
+    console.log('Updating appointment status:', { id, data });
     return this.http.patch(`${this.apiUrl}/appointments/${id}/updateStatus`, data);
   }
 }

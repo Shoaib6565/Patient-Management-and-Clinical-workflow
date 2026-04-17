@@ -8,11 +8,16 @@ class VisitService
 {
     public function getFilteredVisits(array $filters)
     {
-        $query = Visit::with(['patient', 'doctor', 'appointment']);
+        $query = Visit::with(['patient', 'case', 'doctor', 'appointment']);
 
         if (!empty($filters['search'])) {
             $query->where('visit_number', 'like', "%{$filters['search']}%");
         }
+        if(!empty($filters['doctor'])){
+            $query->whereHas('doctor', function($q) use ($filters){
+                $q->whereRaw('name LIKE ?', ["%{$filters['doctor']}%"]);
+            });
+        }   
 
         if (!empty($filters['status'])) {
             $query->where('visit_status', $filters['status']);

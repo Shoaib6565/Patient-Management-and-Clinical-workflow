@@ -1,1 +1,167 @@
-<p>visit-list works!</p>
+<div class="p-4">
+
+  <h1 class="text-2xl font-bold text-center mb-4">Visit List</h1>
+
+  <button class="btn btn-outline mb-3" (click)="goBack()">
+    <i class="ti ti-arrow-left mr-2"></i>
+    Back
+  </button>
+
+  <!-- FILTERS (inside same component as requirement) -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
+
+    <input class="input input-bordered" placeholder="Patient"
+      [(ngModel)]="filters.patient_name">
+
+    <input class="input input-bordered" placeholder="Doctor"
+      [(ngModel)]="filters.doctor">
+
+    <input class="input input-bordered" placeholder="Diagnosis"
+      [(ngModel)]="filters.diagnosis">
+
+    <select class="select select-bordered"
+      [(ngModel)]="filters.visit_status">
+
+      <option value="">All Status</option>
+      <option value="Draft">Draft</option>
+      <option value="Completed">Completed</option>
+      <option value="Cancelled">Cancelled</option>
+      <option value="Billed">Billed</option>
+    </select>
+
+  </div>
+
+  <!-- FILTER BUTTONS -->
+  <div class="flex justify-end gap-2 mb-4">
+    <button class="btn btn-primary" (click)="applyFilter(filters)">
+      Apply
+    </button>
+
+    <button class="btn btn-outline" (click)="resetFilter()">
+      Reset
+    </button>
+  </div>
+
+  <!-- LOADING -->
+    <div *ngIf="loading" class="text-center py-6">
+    <span class="loading loading-spinner loading-lg"></span>
+    <p class="mt-2">Loading visits...</p>
+  </div>
+
+  <!-- TABLE -->
+  <ngx-datatable
+    *ngIf="!loading"
+    class="material"
+    [rows]="visits"
+    [columnMode]="'force'"
+    [headerHeight]="50"
+    [rowHeight]="'auto'">
+
+    <!-- Patient -->
+    <ngx-datatable-column name="Patient">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{ row.patient?.first_name }} {{ row.patient?.middle_name }} {{ row.patient?.last_name }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Case Type -->
+    <ngx-datatable-column name="Case Type">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{ row.case?.case_type }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Doctor -->
+    <ngx-datatable-column name="Doctor">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{ row.doctor?.name }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Date -->
+    <ngx-datatable-column name="Date & Time">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{ row.visit_date  | date: "dd-MM-yyyy" }} {{ row.visit_time }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Diagnosis -->
+    <ngx-datatable-column name="Diagnosis">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{ row.diagnosis }}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- Status -->
+    <ngx-datatable-column name="Status">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span class="badge badge-info">
+          {{ row.visit_status }}
+        </span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <!-- ACTIONS -->
+    <ngx-datatable-column name="Actions">
+      <ng-template ngx-datatable-cell-template let-row="row">
+
+        <!-- EDIT (only if not completed) -->
+        <button
+          
+          class="btn btn-xs btn-warning"
+          [routerLink]="['/visits/edit', row.id]"
+          title="Edit Visit"
+          [disabled]="row.visit_status === 'Completed'">
+          
+
+          <i class="ti ti-edit"></i>
+        </button>
+
+        <!-- FINALIZE -->
+        <button
+          
+          class="btn btn-xs btn-success"
+          (click)="finalize(row.id)"
+           title="Finalize Visit">
+            
+          <i class="ti ti-check"></i>
+        </button>
+
+        <!-- DELETE (admin only) -->
+        <button
+          
+          class="btn btn-xs btn-error"
+          (click)="delete(row.id)"
+           title="Delete Visit">
+
+          <i class="ti ti-trash"></i>
+        </button>
+
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+
+  <div class="text-sm mt-4 text-gray-600 mb-2">
+      Showing {{ (paginationData?.current_page - 1) * paginationData?.per_page + 1 }}
+      to {{ Math.min(paginationData?.current_page * paginationData?.per_page, paginationData?.total) }}
+      of {{ paginationData?.total }} visits   
+   </div>
+
+  <!-- PAGINATION -->
+  <div *ngIf="paginationData?.last_page > 1" class="mt-4">
+    <app-pagination
+      [pagination]="paginationData"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+
+   <!-- EMPTY STATE -->
+  <div
+    *ngIf="!loading && visits.length === 0"
+    class="text-center py-8 text-gray-500"
+  >
+    No visits found.
+  </div>
+
+</div>

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -33,10 +33,17 @@ export class AppointmentListComponent implements OnInit {
 
   loading = false;
 
+  Math = Math; // expose Math to template
+
   constructor(public service: AppointmentService) {}
+  location = inject(Location);
 
   ngOnInit() {
     this.loadData();
+  }
+
+  goBack(){
+    this.location.back();
   }
 
   // load data when page change
@@ -59,7 +66,7 @@ export class AppointmentListComponent implements OnInit {
     this.service.getAppointments(params).subscribe({
       next: (res: any) => {
         console.log('API Response:', res);
-
+        
         this.appointments = res.data || [];
         this.paginationData = res;
         this.currentPage = res.current_page;

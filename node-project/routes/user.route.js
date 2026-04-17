@@ -8,9 +8,9 @@ import { roleMiddleware } from "../middlewares/role.middleware.js";
 export default router;
 
 router.post("/", auth, createUser);
-router.get("/", auth, roleMiddleware("admin"), getAllUsers);
-router.get("/:id", auth, roleMiddleware("admin"), getUserById);
-router.put("/:id", auth, roleMiddleware("admin"), updateUser);
-router.delete("/:id", auth, roleMiddleware("admin"), deleteUser);
-router.post("/reset-password/:id", auth, roleMiddleware("admin"), resetPassword);
-router.get("/active-doctors/count", auth, roleMiddleware("admin"), getActiveDoctorCount);
+router.get("/", auth, roleMiddleware("Admin"), getAllUsers);
+router.get("/:id", auth, roleMiddleware("Admin"), getUserById);
+router.put("/:id", auth, roleMiddleware("Admin"), updateUser);
+router.delete("/:id", auth, roleMiddleware("Admin"), deleteUser);
+router.post("/reset-password/:id", auth, roleMiddleware("Admin"), resetPassword);
+router.get("/active-doctors/count", getActiveDoctorCount);
