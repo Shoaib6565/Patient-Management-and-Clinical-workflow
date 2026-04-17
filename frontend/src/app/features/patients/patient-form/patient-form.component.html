@@ -1,1 +1,155 @@
-<p>patient-form works!</p>
+@if (isOpen) {
+<form [formGroup]="patientForm">
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeDetails()"></div>
+
+    <div
+      class="relative w-full max-w-6xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+      <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
+
+        <div>
+          <h2 class="text-lg font-bold">Patient Profile</h2>
+          <p class="text-xs opacity-60">Detailed patient information overview</p>
+        </div>
+
+        <button class="btn btn-sm btn-circle btn-ghost" (click)="closeDetails()">
+          ✕
+        </button>
+
+      </div>
+      <div class="p-5 overflow-y-auto space-y-6">
+        <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
+
+          <div class="flex items-center gap-4">
+
+            <div class="avatar placeholder">
+              <div class="bg-primary text-white rounded-full w-16 text-xl">
+                {{ patientForm.get('first_name')?.value?.charAt(0) || 'P' }}
+              </div>
+            </div>
+
+            <div>
+              <div class="text-lg font-semibold">
+                {{ patientForm.get('first_name')?.value }}
+                {{ patientForm.get('last_name')?.value }}
+              </div>
+              <div class="text-sm opacity-60">
+                {{ patientForm.get('email')?.value }}
+              </div>
+            </div>
+
+          </div>
+
+          <span class="badge px-3 py-2 text-sm" [ngClass]="{
+              'badge-success': patientForm.get('patient_status')?.value === 'Active',
+              'badge-error': patientForm.get('patient_status')?.value === 'Inactive'
+            }">
+            {{ patientForm.get('patient_status')?.value }}
+          </span>
+
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">CONTACT</h3>
+
+            <p>
+              <span class="opacity-60">Phone:</span>
+              <input class="input input-sm w-full" formControlName="phone" placeholder="Phone" />
+            </p>
+
+            <p>
+              <span class="opacity-60">Mobile:</span>
+              <input class="input input-sm w-full" formControlName="mobile" placeholder="Mobile" />
+            </p>
+
+            <p>
+              <span class="opacity-60">Email:</span>
+              <input class="input input-sm w-full" formControlName="email" placeholder="Email" />
+            </p>
+          </div>
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+
+            <p>
+              <span class="opacity-60">Gender:</span>
+              <select class="select select-sm w-full" formControlName="gender">
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer Not to Say">Prefer Not to Say</option>
+              </select>
+            </p>
+
+            <p>
+              <span class="opacity-60">DOB:</span>
+              <input type="date" class="input input-sm w-full" formControlName="date_of_birth" />
+            </p>
+
+            <p>
+              <span class="opacity-60">Language:</span>
+              <input class="input input-sm w-full" formControlName="preferred_language" />
+            </p>
+
+          </div>
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">ADDRESS</h3>
+
+            <input class="input input-sm w-full" formControlName="address" placeholder="Address" />
+            <input class="input input-sm w-full" formControlName="city" placeholder="City" />
+            <input class="input input-sm w-full" formControlName="state" placeholder="State" />
+
+            <input class="input input-sm w-full" formControlName="country" placeholder="Country" />
+            <input class="input input-sm w-full" formControlName="zip_code" placeholder="Zip Code" />
+
+          </div>
+          <div class="bg-base-200/30 p-4 rounded-xl md:col-span-2 space-y-2">
+
+            <h3 class="font-semibold text-sm opacity-70">MEDICAL INFO</h3>
+
+            <input class="input input-sm w-full" formControlName="primary_physician" placeholder="Physician" />
+
+            <input class="input input-sm w-full" formControlName="insurance_provider"
+              placeholder="Insurance Provider" />
+
+            <input class="input input-sm w-full" formControlName="insurance_policy_number"
+              placeholder="Policy Number" />
+
+          </div>
+
+          <div class="bg-red-50/10 border border-red-200/20 p-4 rounded-xl space-y-2">
+
+            <h3 class="font-semibold text-sm text-red-400">EMERGENCY CONTACT</h3>
+
+            <input class="input input-sm w-full" formControlName="emergency_contact_name" placeholder="Name" />
+
+            <input class="input input-sm w-full" formControlName="emergency_contact_phone" placeholder="Phone" />
+
+          </div>
+
+          <div class="flex justify-end gap-2 border-t bg-base-200/40 px-6 py-4">
+
+            <button class="btn btn-ghost" (click)="closeDetails()">
+              Cancel
+            </button>
+
+            <button class="btn btn-primary" (click)="createPatient()" [disabled]="loading || patientForm.invalid">
+
+              @if (loading) {
+              <span class="loading loading-spinner"></span>
+              }
+
+              Save Patient
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</form>
+}

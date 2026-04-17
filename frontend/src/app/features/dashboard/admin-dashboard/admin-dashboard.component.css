@@ -1,0 +1,56 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.subtitle {
+  color: gray;
+  margin-bottom: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: #f5f7fa;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.card.highlight {
+  background: linear-gradient(to right, #1e5aa6, #2d7be5);
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.chart, .visit {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.visit-item {
+  margin-bottom: 15px;
+}
+
+.bar {
+  background: #eee;
+  height: 8px;
+  border-radius: 5px;
+  margin: 5px 0;
+}
+
+.fill {
+  background: #1e5aa6;
+  height: 100%;
+  border-radius: 5px;
+}

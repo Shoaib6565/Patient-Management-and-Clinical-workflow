@@ -5,57 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use  App\Jobs\ExportVisitsCsvJob;
+use App\Services\VisitService;
+use App\Models\Export;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class VisitController extends Controller
 {
 
-
-    private function getFilteredVisits(Request $request)
+    protected $visitService;
+    public function __construct(VisitService $visitService)
     {
-        $query = Visit::with(['patient', 'doctor', 'appointment']);
-
-        // Search (visit number)
-        if ($request->search) {
-            $query->where('visit_number', 'like', "%{$request->search}%");
-        }
-
-        // Status
-        if ($request->status) {
-            $query->where('visit_status', $request->status);
-        }
-
-        // Date Range
-        if ($request->start_date && $request->end_date) {
-            $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
-        }
-
-        // Case Type (from appointment → case)
-        if ($request->case_type) {
-            $query->whereHas('appointment.case', function ($q) use ($request) {
-                $q->where('case_type', $request->case_type);
-            });
-        }
-
-        // Diagnosis
-        if ($request->diagnosis) {
-            $query->where('diagnosis', 'like', "%{$request->diagnosis}%");
-        }
-
-        // Patient Name
-        if ($request->patient_name) {
-            $query->whereHas('patient', function ($q) use ($request) {
-                $q->whereRaw("CONCAT(first_name,' ',last_name) LIKE ?", ["%{$request->patient_name}%"]);
-            });
-        }
-
-        return $query;
+        $this->visitService = $visitService;
     }
+
+
 
 
     // Get Visits
     public function index(Request $request)
     {
-        $query = $this->getFilteredVisits($request);
+        $query = $this->visitService
+        ->getFilteredVisits($request->all());
 
         $visits = $query->latest()->paginate(10);
 
@@ -63,10 +35,11 @@ class VisitController extends Controller
     }
 
 
-    // export to csv
+    // // export to csv
     public function export(Request $request)
     {
-        $query = $this->getFilteredVisits($request);
+        $query = $this->visitService
+        ->getFilteredVisits($request->all());
 
         $visits = $query->get(); // no pagination
 
@@ -116,6 +89,28 @@ class VisitController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+
+
+    //// //  with job and queue
+//     public function export(Request $request)
+// {
+//     $user = $request->attributes->get('auth_user') ?? null;
+
+//     //  create export record
+//     $export = Export::create([
+//         'user_id' => $user->id,
+//         'type' => 'visit',
+//         'status' => 'processing'
+//     ]);
+
+//     //  dispatch job
+//     ExportVisitsCsvJob::dispatch($request->all(), $export->id);
+
+//     return response()->json([
+//         'message' => 'Visit export started'
+//     ]);
+// }
+
     // show all list
 
     public function show($id)
@@ -155,7 +150,9 @@ class VisitController extends Controller
         }
 
         // Only doctor allowed
-        if (Auth::user()->role !== 'Doctor') {
+        $user = $request->attributes->get('auth_user');
+
+        if ($user->role !== 'Doctor') {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
@@ -197,9 +194,10 @@ class VisitController extends Controller
 
     // //  Admin Delete (Soft Delete)
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if (Auth::user()->role !== 'Admin') {
+        $user = $request->attributes->get('auth_user');
+        if ($user->role !== 'Admin') {  // check after, error can occur (Auth::user()->role)
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
@@ -247,56 +245,53 @@ class VisitController extends Controller
             'message' => 'Visit completed'
         ]);
     }
+
+
+
+    // // visit statics
+    // public function statistics(Request $request)
+    // {
+    //     $query = Visit::query();
+
+    //     // Optional: filter by doctor
+    //     if ($request->doctor_id) {
+    //         $query->where('doctor_id', $request->doctor_id);
+    //     }
+
+    //     // Optional: filter by date range
+    //     if ($request->start_date && $request->end_date) {
+    //         $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
+    //     }
+
+    //     $totalVisits = $query->count();
+
+    //     $completedVisits = (clone $query)->where('visit_status', 'Completed')->count();
+    //     $draftVisits     = (clone $query)->where('visit_status', 'Draft')->count();
+    //     $cancelledVisits = (clone $query)->where('visit_status', 'Cancelled')->count();
+    //     $billedVisits    = (clone $query)->where('visit_status', 'Billed')->count();
+
+    //     // Visits per doctor
+    //     $visitsPerDoctor = $query->select('doctor_id')
+    //         ->with('doctor:id,name')
+    //         ->selectRaw('doctor_id, COUNT(*) as total')
+    //         ->groupBy('doctor_id')
+    //         ->get();
+
+    //     // Visits per specialty
+    //     $visitsPerSpecialty = $query->select('specialty_id')
+    //         ->with('specialty:id,specialty_name')
+    //         ->selectRaw('specialty_id, COUNT(*) as total')
+    //         ->groupBy('specialty_id')
+    //         ->get();
+
+    //     return response()->json([
+    //         'total_visits' => $totalVisits,
+    //         'completed_visits' => $completedVisits,
+    //         'draft_visits' => $draftVisits,
+    //         'cancelled_visits' => $cancelledVisits,
+    //         'billed_visits' => $billedVisits,
+    //         'visits_per_doctor' => $visitsPerDoctor,
+    //         'visits_per_specialty' => $visitsPerSpecialty,
+    //     ]);
+    // }
 }
-
-
-
-
-
-
-// // visit statics
-// public function statistics(Request $request)
-// {
-//     $query = Visit::query();
-
-//     // Optional: filter by doctor
-//     if ($request->doctor_id) {
-//         $query->where('doctor_id', $request->doctor_id);
-//     }
-
-//     // Optional: filter by date range
-//     if ($request->start_date && $request->end_date) {
-//         $query->whereBetween('visit_date', [$request->start_date, $request->end_date]);
-//     }
-
-//     $totalVisits = $query->count();
-
-//     $completedVisits = (clone $query)->where('visit_status', 'Completed')->count();
-//     $draftVisits     = (clone $query)->where('visit_status', 'Draft')->count();
-//     $cancelledVisits = (clone $query)->where('visit_status', 'Cancelled')->count();
-//     $billedVisits    = (clone $query)->where('visit_status', 'Billed')->count();
-
-//     // Visits per doctor
-//     $visitsPerDoctor = $query->select('doctor_id')
-//         ->with('doctor:id,name')
-//         ->selectRaw('doctor_id, COUNT(*) as total')
-//         ->groupBy('doctor_id')
-//         ->get();
-
-//     // Visits per specialty
-//     $visitsPerSpecialty = $query->select('specialty_id')
-//         ->with('specialty:id,specialty_name')
-//         ->selectRaw('specialty_id, COUNT(*) as total')
-//         ->groupBy('specialty_id')
-//         ->get();
-
-//     return response()->json([
-//         'total_visits' => $totalVisits,
-//         'completed_visits' => $completedVisits,
-//         'draft_visits' => $draftVisits,
-//         'cancelled_visits' => $cancelledVisits,
-//         'billed_visits' => $billedVisits,
-//         'visits_per_doctor' => $visitsPerDoctor,
-//         'visits_per_specialty' => $visitsPerSpecialty,
-//     ]);
-// }

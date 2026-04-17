@@ -1,8 +1,8 @@
 // models/firm.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class Firm extends Model {
     static associate(models) {
       this.hasMany(models.Case, { foreignKey: 'firm_id' });
@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Firm.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       firm_name: DataTypes.STRING,
       firm_type: DataTypes.ENUM('Legal','Corporate','Government','Other'),
       address: DataTypes.TEXT,

@@ -10,10 +10,17 @@ class SpecialtyController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $filter = $request->filter; // active, inactive, all
 
         $specialties = Specialty::query()
             ->when($search, function ($query) use ($search) {
                 $query->where('specialty_name', 'like', "%$search%");
+            })
+            ->when($filter === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($filter === 'inactive', function ($query) {
+                $query->where('is_active', false);
             })
             ->orderBy('specialty_name')
             ->paginate(10);
@@ -62,28 +69,28 @@ class SpecialtyController extends Controller
 
     // filter active and de-active specialties
     //  Get Active Specialties
-    public function active()
-    {
-        $data = Specialty::where('is_active', true)->get();
+    // public function active()
+    // {
+    //     $data = Specialty::where('is_active', true)->get();
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Active specialties fetched successfully',
-            'data'    => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status'  => true,
+    //         'message' => 'Active specialties fetched successfully',
+    //         'data'    => $data,
+    //     ]);
+    // }
 
-    // Get Inactive Specialties
-    public function inactive()
-    {
-        $data = Specialty::where('is_active', false)->get();
+    // // Get Inactive Specialties
+    // public function inactive()
+    // {
+    //     $data = Specialty::where('is_active', false)->get();
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Inactive specialties fetched successfully',
-            'data'    => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status'  => true,
+    //         'message' => 'Inactive specialties fetched successfully',
+    //         'data'    => $data,
+    //     ]);
+    // }
 
     //  Update
     public function update(Request $request, $id)

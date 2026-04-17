@@ -1,8 +1,8 @@
 // models/insurance.js
 'use strict';
-const { Model } = require('sequelize');
+import { Model } from 'sequelize'; 
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class Insurance extends Model {
     static associate(models) {
       this.hasMany(models.Case, { foreignKey: 'insurance_id' });
@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Insurance.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       insurance_name: DataTypes.STRING,
       insurance_code: { type: DataTypes.STRING, unique: true },
       address: DataTypes.TEXT,

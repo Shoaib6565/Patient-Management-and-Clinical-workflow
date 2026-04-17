@@ -1,1 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+/* @import "~@tabler/icons-webfont/tabler-icons.min.css"; */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@plugin "daisyui";
+
+
+/* @import "lucide-static/font/lucide.css"; */

@@ -1,0 +1,244 @@
+/* ── Wrapper ─────────────────────────────────────────── */
+.navbar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf5;
+  box-shadow: 0 1px 12px rgba(37, 99, 235, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Sides ───────────────────────────────────────────── */
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Logo ────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+  flex-shrink: 0;
+}
+
+.logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logo-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+}
+
+.logo-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ── Icon buttons ────────────────────────────────────── */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: background 0.18s, color 0.18s;
+  position: relative;
+}
+
+.icon-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* ── Notification dot ────────────────────────────────── */
+.notif-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 1.5px solid #ffffff;
+}
+
+/* ── Divider ─────────────────────────────────────────── */
+.divider-v {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+/* ── User trigger ────────────────────────────────────── */
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.user-trigger:hover {
+  background: #f1f5f9;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.user-role-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+
+
+/* ── Dropdown ────────────────────────────────────────── */
+/* ── User dropdown wrap ──────────────────────────────── */
+.user-dropdown-wrap {
+  position: relative;
+}
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.user-trigger:hover {
+  background: #f1f5f9;
+}
+
+/* ── Dropdown panel ──────────────────────────────────── */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+  padding: 8px;
+  width: 210px;
+  z-index: 999;
+
+  /* hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+
+.dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ── Dropdown header ─── */
+.dropdown-user-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  pointer-events: none;
+}
+
+.menu-item:hover {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.menu-item-danger {
+  color: #ef4444;
+}
+
+.menu-item-danger:hover {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+/* ── Role badges ─────────────────────────────────────── */
+.badge-role {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-admin {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.badge-doctor {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-frontdesk {
+  background: #fef3c7;
+  color: #92400e;
+}

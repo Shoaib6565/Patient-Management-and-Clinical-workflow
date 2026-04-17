@@ -12,10 +12,17 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $filter = $request->filter; // active, inactive, all
 
         $categories = Category::query()
             ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', "%$search%");
+            })
+            ->when($filter === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($filter === 'inactive', function ($query) {
+                $query->where('is_active', false);
             })
             ->orderBy('name')
             ->paginate(10);
@@ -62,29 +69,29 @@ class CategoryController extends Controller
         ]);
     }
 
-    //  Active Categories
-    public function active()
-    {
-        $data = Category::where('is_active', true)->get();
+    // // Active Categories
+    // public function active()
+    // {
+    //     $data = Category::where('is_active', true)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Active categories fetched successfully',
-            'data' => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Active categories fetched successfully',
+    //         'data' => $data,
+    //     ]);
+    // }
 
-    //  Inactive Categories
-    public function inactive()
-    {
-        $data = Category::where('is_active', false)->get();
+    // //  Inactive Categories
+    // public function inactive()
+    // {
+    //     $data = Category::where('is_active', false)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Inactive categories fetched successfully',
-            'data' => $data,
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Inactive categories fetched successfully',
+    //         'data' => $data,
+    //     ]);
+    // }
 
     //  Update
     public function update(Request $request, $id)

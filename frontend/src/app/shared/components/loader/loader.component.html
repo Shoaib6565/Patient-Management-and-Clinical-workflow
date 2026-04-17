@@ -1,1 +1,11 @@
-<p>loader works!</p>
+<div class="loader-backdrop" *ngIf="show">
+  <div class="loader-box">
+
+    <!-- Spinner -->
+    <div class="spinner" [style.width.px]="size" [style.height.px]="size"></div>
+
+    <!-- Text -->
+    <p class="loader-text">{{ text }}</p>
+
+  </div>
+</div>

@@ -4,69 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Jobs\ExportAppointmentsCsvJob;
+use App\Services\AppointmentService;
+use App\Services\NotificationService;
+use App\Models\Export;
+use App\Models\Notification;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AppointmentController extends Controller
 {
 
 
+    protected $appointmentService;
 
-
-    // function for share logic
-    private function getFilteredAppointments(Request $request)
+    public function __construct(AppointmentService $appointmentService)
     {
-        $query = Appointment::with([
-            'patient:id,first_name,last_name',
-            'doctor:id,name',
-            'specialty:id,specialty_name',
-            'practiceLocation:id,location_name',
-            'createdBy:id,name'
-        ]);
-
-        // Patient Name
-        if ($request->patient_name) {
-            $query->whereHas('patient', function ($q) use ($request) {
-                $q->whereRaw("CONCAT(first_name,' ',last_name) LIKE ?", ["%{$request->patient_name}%"]);
-            });
-        }
-
-        // Doctor Name
-        if ($request->doctor_name) {
-            $query->whereHas('doctor', function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->doctor_name}%");
-            });
-        }
-
-        // Specialty
-        if ($request->specialty_name) {
-            $query->where('specialty_name', $request->specialty_name);
-        }
-
-        // Date Range
-        if ($request->start_date && $request->end_date) {
-            $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
-        }
-
-        // Appointment Type
-        if ($request->appointment_type) {
-            $query->where('appointment_type', $request->appointment_type);
-        }
-
-        // Status
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-
-        // Practice Location
-        if ($request->location_name) {
-            $query->where('location_name', $request->location_name);
-        }
-
-        // Created By (FDO)
-        if ($request->created_by) {
-            $query->where('created_by', $request->created_by);
-        }
-
-        return $query;
+        $this->appointmentService = $appointmentService;
     }
 
     // total appointments for admin dashboard
@@ -83,10 +36,10 @@ class AppointmentController extends Controller
         ]);
     }
 
-    // 1. List + Filters (Admin & FDO)
+    // 1. List + Filters (Admin and FDO)
     public function index(Request $request)
     {
-        $query = $this->getFilteredAppointments($request);
+        $query = $this->appointmentService->getFilteredAppointments($request->all()); // array pass
 
         $appointments = $query->latest()->paginate(10);
 
@@ -95,48 +48,57 @@ class AppointmentController extends Controller
 
 
 
-    // function for export to csv file
+    /// export to csv (Admin )
+    // public function export(Request $request)
+    // {
+    //     $user = $request->attributes->get('auth_user'); // because not logged in currently
+    //     $export = Export::create([
+    //         'user_id' => $user->id,
+    //         'type' => 'appointment',
+    //         'status' => 'processing'
+    //     ]);
+    //     ExportAppointmentsCsvJob::dispatch($request->all(), $export->id);
+
+    //     return response()->json([
+    //         'message' => 'Export started. You will be notified when ready.'
+    //     ]);
+    // }
+
+
     public function export(Request $request)
     {
-        $query = $this->getFilteredAppointments($request);
+        $query = $this->appointmentService->getFilteredAppointments($request->all());
 
-        $appointments = $query->get();
+        $appointments = $query->get(); //  no pagination
 
-        $fileName = "appointments_" . now()->format('Ymd_His') . ".csv";
+        $filename = 'appointments_' . now()->format('Y_m_d_H_i_s') . '.csv';
 
         $headers = [
             "Content-Type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
+            "Content-Disposition" => "attachment; filename=$filename",
         ];
 
-        $callback = function () use ($appointments) {
+        $columns = [
+            'ID',
+            'Patient',
+            'Doctor',
+            'Date',
+            'Status'
+        ];
 
+        $callback = function () use ($appointments, $columns) {
             $file = fopen('php://output', 'w');
 
-            // csv header
-            fputcsv($file, [
-                'Patient Name',
-                'Doctor Name',
-                'Specialty',
-                'Date',
-                'Time',
-                'Type',
-                'Status',
-                'Location',
-                'Created By'
-            ]);
+            // header row
+            fputcsv($file, $columns);
 
-            foreach ($appointments as $a) {
+            foreach ($appointments as $appointment) {
                 fputcsv($file, [
-                    $a->patient->first_name . ' ' . $a->patient->last_name,
-                    $a->doctor->name,
-                    $a->specialty->specialty_name ?? '',
-                    $a->appointment_date,
-                    $a->appointment_time,
-                    $a->appointment_type,
-                    $a->status,
-                    $a->practiceLocation->location_name ?? '',
-                    $a->createdBy->name ?? ''
+                    $appointment->id,
+                    $appointment->patient->name ?? '',
+                    $appointment->doctor->name ?? '',
+                    $appointment->appointment_date ?? '',
+                    $appointment->status ?? '',
                 ]);
             }
 
@@ -146,6 +108,7 @@ class AppointmentController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    
     //  2. Create Appointment (FDO)
     public function store(Request $request)
     {
@@ -168,6 +131,27 @@ class AppointmentController extends Controller
             ...$request->all(),
             'created_by' => $user->id // FDO ID
         ]);
+
+
+        // notification store in db
+        Notification::create([
+            'user_id' => $request->doctor_id,
+            'type' => 'appointment',
+            'message' => 'New appointment assigned',
+            'data' => [
+                'appointment_id' => $appointment->id
+            ]
+        ]);
+
+        $notificationService = app(NotificationService::class);
+
+        $notificationService->sendToUser(
+            $request->doctor_id,
+            [
+                'message' => 'New appointment assigned',
+                'appointment_id' => $appointment->id
+            ]
+        );
 
         return response()->json([
             'status' => true,
@@ -258,6 +242,29 @@ class AppointmentController extends Controller
     }
 
 
+    // Doctor can change status to completed
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Scheduled,In Progress,Completed,Cancelled'
+        ]);
+
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            return response()->json(['status' => false], 404);
+        }
+
+        $appointment->update(['status' => $request->status]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Status updated successfully'
+        ]);
+
+    }
+
+
     //  Soft Delete (Admin only)
     public function destroy($id)
     {
@@ -276,7 +283,10 @@ class AppointmentController extends Controller
     }
 
 
-    //  History (Patient or Doctor based)
+    //  History Patient or Doctor based
+    //for doctor View reports of complete visits (filter by date, case type, diagnosis, or patient )
+    // inprogress
+
     public function history($patient_id)
     {
         $data = Appointment::where('patient_id', $patient_id)

@@ -1,33 +1,40 @@
-// models/user.js
-'use strict';
-const { Model } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class User extends Model {
     static associate(models) {
-      this.hasMany(models.Appointment, { foreignKey: 'doctor_id', as: 'doctorAppointments' });
-      this.hasMany(models.Appointment, { foreignKey: 'created_by', as: 'createdAppointments' });
-
-      this.belongsToMany(models.Role, {
+      // MANY-to-MANY with Role
+      User.belongsToMany(models.Role, {
         through: models.UserRole,
-        foreignKey: 'user_id',
+        foreignKey: "user_id",
+        otherKey: "role_id",
+        as: "roles",
       });
     }
   }
 
   User.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       name: DataTypes.STRING,
-      email: { type: DataTypes.STRING, unique: true },
+      email: DataTypes.STRING,
       password: DataTypes.STRING,
-      is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      }
     },
     {
       sequelize,
-      modelName: 'User',
-      tableName: 'users',
-      paranoid: true,
+      modelName: "User",
+      tableName: "users",
       underscored: true,
+      paranoid: true,
     }
   );
 
