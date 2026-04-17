@@ -1,20 +1,23 @@
 <div class="p-4">
   <h1 class="text-2xl font-bold text-center mb-4">Appointment List</h1>
+  <div class="flex items-center justify-between mb-4">
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="ti ti-arrow-left mr-2"></i>
+      Back
+    </button>
+    <button class="btn btn-outline btn-primary" (click)="createAppointment()">
+      <i class="ti ti-plus mr-2"></i>
+      Create Appointment
+    </button>
+  </div>
 
   <!-- FILTER COMPONENT -->
-  <app-appointment-filter
-    (applyFilter)="onApplyFilter($event)"
-    (resetFilter)="onResetFilter()"
-  >
+  <app-appointment-filter (applyFilter)="onApplyFilter($event)" (resetFilter)="onResetFilter()">
   </app-appointment-filter>
 
   <!-- ACTION BAR -->
   <div class="flex justify-between my-3">
-    <button
-
-      class="btn btn-primary"
-      (click)="exportCSV()"
-    >
+    <button class="btn btn-primary" (click)="exportCSV()">
       Export CSV
     </button>
   </div>
@@ -26,14 +29,8 @@
   </div>
 
   <!-- TABLE -->
-  <ngx-datatable
-    *ngIf="!loading"
-    class="material"
-    [rows]="appointments"
-    [columnMode]="'force'"
-    [headerHeight]="50"
-    [rowHeight]="'auto'"
-  >
+  <ngx-datatable *ngIf="!loading" class="material" [rows]="appointments" [columnMode]="'force'" [headerHeight]="50"
+    [rowHeight]="'auto'">
     <!-- PATIENT -->
     <ngx-datatable-column name="Patient">
       <ng-template ngx-datatable-cell-template let-row="row">
@@ -73,7 +70,7 @@
     </ngx-datatable-column>
 
     <!-- DATE -->
-    <ngx-datatable-column name="Date">
+    <ngx-datatable-column name="Date&Time">
       <ng-template ngx-datatable-cell-template let-row="row">
         {{ row.appointment_date | date: "dd-MM-yyyy" }}
         {{ row.appointment_time }}
@@ -90,58 +87,49 @@
     </ngx-datatable-column>
 
     <!-- ACTIONS -->
-  <ngx-datatable-column name="Actions">
-    <ng-template ngx-datatable-cell-template let-row="row">
+    <ngx-datatable-column name="Actions">
+      <ng-template ngx-datatable-cell-template let-row="row">
 
-      <!-- EDIT -->
+        <!-- EDIT -->
 
-      <button
+        <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]" title="Edit">
 
-        class="btn btn-sm btn-warning btn-square mr-1"
-        [routerLink]="['/appointments/edit', row.id]"
-        title="Edit">
+          <i class="ti ti-edit"></i>
 
-         <i-lucide icon="pencil" class="w-4 h-4"></i-lucide>
-      </button>
+        </button>
 
-      <!-- COMPLETE -->
+        <!-- COMPLETE -->
 
-      <button
-
-        class="btn btn-sm btn-success btn-square mr-1"
-        (click)="service.updateStatus(row.id, { status: 'Completed' })"
-        title="Complete">
-         <i-lucide icon="check" class="w-4 h-4"></i-lucide>
-      </button>
+        <button class="btn btn-xs btn-success" (click)="service.updateStatus(row.id, { status: 'Completed' })"
+          title="Complete">
+          <i class="ti ti-check"></i>
+        </button>
 
 
-      <!-- DELETE -->
+        <!-- DELETE -->
 
-      <button
-
-        class="btn btn-sm btn-error btn-square"
-        (click)="delete(row.id)"
-        title="Delete" >
-        <i-lucide icon="trash-2" class="w-4 h-4"></i-lucide>
-      </button>
-    </ng-template>
-  </ngx-datatable-column>
+        <button class="btn btn-xs btn-error" (click)="delete(row.id)" title="Delete">
+          <i class="ti ti-trash"></i>
+        </button>
+      </ng-template>
+    </ngx-datatable-column>
   </ngx-datatable>
 
+  <div class="text-sm mt-4 text-gray-600">
+    Showing {{ (paginationData.current_page - 1) * paginationData.per_page + 1 }}
+    to {{ Math.min(paginationData.current_page * paginationData.per_page, paginationData.total) }}
+    of {{ paginationData.total }} patients
+  </div>
+
   <!-- PAGINATION -->
- <div *ngIf="paginationData && paginationData.last_page > 1" class="mt-4">
-    <app-pagination
-      [pagination]="paginationData"
-      (pageChange)="onPageChange($event)"
-    >
+  <div *ngIf="paginationData && paginationData.last_page > 1" class="mt-4">
+
+    <app-pagination [pagination]="paginationData" (pageChange)="onPageChange($event)">
     </app-pagination>
   </div>
 
   <!-- EMPTY STATE -->
-  <div
-    *ngIf="!loading && appointments.length === 0"
-    class="text-center py-8 text-gray-500"
-  >
+  <div *ngIf="!loading && appointments.length === 0" class="text-center py-8 text-gray-500">
     No appointments found.
   </div>
 </div>

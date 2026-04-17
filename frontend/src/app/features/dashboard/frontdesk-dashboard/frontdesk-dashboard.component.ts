@@ -1,6 +1,7 @@
-// src/app/features/dashboard/frontdesk-dashboard/frontdesk-dashboard.component.ts
-import { Component, OnInit } from '@angular/core';
+
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 export type AppointmentStatus =
   | 'IN_PROGRESS'
@@ -59,7 +60,7 @@ export class FrontdeskDashboardComponent implements OnInit {
   userName = 'Sarah';
   currentDate = new Date();
 
-  // ── Stat Cards ──────────────────────────────────────────
+  // ── Stat Cards 
   statCards: StatCard[] = [
     {
       label: 'NEW PATIENTS',
@@ -77,7 +78,7 @@ export class FrontdeskDashboardComponent implements OnInit {
     },
   ];
 
-  // ── Doctor Availability ──────────────────────────────────
+  // ── Doctor Availability 
   doctors: DoctorAvailability[] = [
     { name: 'Dr. Aris',   status: 'available',  statusLabel: 'Avail.'   },
     { name: 'Dr. Miller', status: 'surgery',    statusLabel: 'Surgery'  },
@@ -165,6 +166,8 @@ export class FrontdeskDashboardComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  router = inject(Router)
+
   // ── Helpers ──────────────────────────────────────────────
   getStatusLabel(status: AppointmentStatus): string {
     const map: Record<AppointmentStatus, string> = {
@@ -210,13 +213,14 @@ export class FrontdeskDashboardComponent implements OnInit {
   }
 
   onRegisterNewPatient(): void {
+    
     console.log('Register new patient clicked');
-    // this.router.navigate(['/patients/new']);
+    this.router.navigate(['/patients/patient-form']);
   }
 
   onScheduleAppointment(): void {
     console.log('Schedule appointment clicked');
-    // this.router.navigate(['/appointments/new']);
+    // this.router.navigate(['/appointments/appointment-form']);
   }
 
   onViewAllDocuments(): void {

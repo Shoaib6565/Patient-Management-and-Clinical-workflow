@@ -81,6 +81,13 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
+
+  createAppointment() {
+    // Navigate to the appointment form page
+    // You can use Angular's Router for navigation
+    // For example:
+    // this.router.navigate(['/appointment-form']);
+  }
   //  Pagination event
   onPageChange(page: number) {
     this.currentPage = page;
