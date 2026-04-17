@@ -10,7 +10,8 @@ import {
     exportPatientsCSV,
     getPatientByAppointmentId,
     getTotalAppointmentCount,
-    getTotalPatientCount
+    getTotalPatientCount,
+    checkDuplicatePatient
 } from "../controllers/patientManagement.controller.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 import { auth } from "../middlewares/auth.middleware.js";
@@ -27,6 +28,7 @@ router.delete("/:id", auth, roleMiddleware("Admin"), deletePatient);
 router.get("/appointmentCount/total", getTotalAppointmentCount);
 
 router.get("/patientCount/total", getTotalPatientCount);
+router.get('/check-duplicate', checkDuplicatePatient);
 
 
 

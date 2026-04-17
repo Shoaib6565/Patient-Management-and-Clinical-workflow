@@ -1,6 +1,18 @@
 <div class="p-4 space-y-4">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold">Patients</h2>
 
-  <!-- Filters -->
+    <div class="flex gap-2">
+      <button class="btn btn-outline btn-sm" (click)="exportCsv()">
+        Export CSV
+      </button>
+
+      <button class="btn btn-primary btn-sm" (click)="registerPatient()">
+        Register New Patient
+      </button>
+    </div>
+  </div>
+
   <div class="card bg-base-100 shadow-md p-4">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
@@ -15,32 +27,26 @@
       <input type="date" class="input input-bordered w-full" [(ngModel)]="filters.dob_from" />
 
       <input type="date" class="input input-bordered w-full" [(ngModel)]="filters.dob_to" />
-
     </div>
 
     <div class="flex gap-3 mt-4 justify-end">
-      <button class="btn btn-primary" (click)="applyFilters()">
-        Apply Filters
-      </button>
-
-      <button class="btn btn-outline" (click)="resetFilters()">
-        Reset Filters
-      </button>
+      <button class="btn btn-primary" (click)="applyFilters()">Apply Filters</button>
+      <button class="btn btn-outline" (click)="resetFilters()">Reset Filters</button>
     </div>
   </div>
 
-  <!-- Table -->
   <div class="card bg-base-100 shadow-md">
     <div class="overflow-x-auto">
       <table class="table">
 
         <thead>
           <tr>
-            <th>Patient</th>
+            <th>Patient Name</th>
             <th>DOB</th>
             <th>Gender</th>
             <th>Contact</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -48,33 +54,17 @@
 
           @if (patients.length === 0) {
           <tr>
-            <td colspan="5" class="text-center py-6 text-gray-400">
+            <td colspan="6" class="text-center py-6 text-gray-400">
               No patients found
             </td>
           </tr>
           }
 
           @for (patient of patients; track patient.id) {
-          <tr class="cursor-pointer hover:bg-base-200 transition"
-            [class.bg-base-300]="selectedPatient?.id === patient.id" (click)="selectPatient(patient)">
+          <tr class="cursor-pointer hover:bg-base-200 transition" (click)="selectPatient(patient)">
 
-            <td class="flex items-center gap-3">
-              <div class="avatar placeholder">
-                <div class="bg-primary text-white rounded-full w-10">
-                  <span>
-                    {{ patient.first_name?.charAt(0) || 'P' }}
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <div class="font-bold">
-                  {{ patient.first_name }} {{ patient.middle_name }} {{ patient.last_name }}
-                </div>
-                <div class="text-sm opacity-50">
-                  {{ patient.email }}
-                </div>
-              </div>
+            <td>
+              {{ patient.first_name }} {{ patient.middle_name }} {{ patient.last_name }}
             </td>
 
             <td>{{ patient.date_of_birth | date:'mediumDate' }}</td>
@@ -83,11 +73,17 @@
 
             <td>
               <span class="badge" [ngClass]="{
-                  'badge-success': patient.patient_status === 'Active',
-                  'badge-error': patient.patient_status === 'Inactive'
-                }">
+                    'badge-success': patient.patient_status === 'Active',
+                    'badge-error': patient.patient_status === 'Inactive'
+                  }">
                 {{ patient.patient_status }}
               </span>
+            </td>
+
+            <td>
+              <button class="btn btn-xs btn-error" (click)="openDeleteModal(patient); $event.stopPropagation()">
+                Delete
+              </button>
             </td>
 
           </tr>
@@ -98,12 +94,9 @@
     </div>
   </div>
 
-  <!-- Pagination -->
   <div class="flex justify-between items-center">
-
     <div class="text-sm text-gray-500">
-      Showing {{ pagination?.currentPage || 1 }}
-      of {{ pagination?.totalPages || 1 }}
+      Page {{ pagination?.currentPage || 1 }} of {{ pagination?.totalPages || 1 }}
     </div>
 
     <div class="join">
@@ -113,54 +106,137 @@
       </button>
       }
     </div>
-
   </div>
 
-  <!-- Patient Details Panel -->
   @if (selectedPatient) {
-  <div class="card bg-base-100 shadow-md p-6 mt-4">
-    <h2 class="text-lg font-bold mb-4">Patient Details</h2>
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeDetails()"></div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      class="relative w-full max-w-6xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
 
-      <div><b>Name:</b> {{ selectedPatient.first_name }} {{ selectedPatient.middle_name }} {{ selectedPatient.last_name
-        }}</div>
-      <div><b>Email:</b> {{ selectedPatient.email }}</div>
+      <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
 
-      <div><b>Phone:</b> {{ selectedPatient.phone }}</div>
-      <div><b>Mobile:</b> {{ selectedPatient.mobile }}</div>
+        <div>
+          <h2 class="text-lg font-bold">Patient Profile</h2>
+          <p class="text-xs opacity-60">Detailed patient information overview</p>
+        </div>
 
-      <div><b>Gender:</b> {{ selectedPatient.gender }}</div>
-      <div><b>DOB:</b> {{ selectedPatient.date_of_birth | date:'mediumDate' }}</div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-sm btn-circle btn-ghost" (click)="closeDetails()">
+            ✕
+          </button>
+        </div>
 
-      <div><b>Address:</b> {{ selectedPatient.address }}</div>
-      <div><b>City:</b> {{ selectedPatient.city }}</div>
+      </div>
 
-      <div><b>State:</b> {{ selectedPatient.state }}</div>
-      <div><b>Zip:</b> {{ selectedPatient.zip_code }}</div>
+      <div class="p-5 overflow-y-auto space-y-6">
 
-      <div><b>Country:</b> {{ selectedPatient.country }}</div>
-      <div><b>Language:</b> {{ selectedPatient.preferred_language }}</div>
+        <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
 
-      <div><b>Physician:</b> {{ selectedPatient.primary_physician }}</div>
-      <div><b>Status:</b> {{ selectedPatient.patient_status }}</div>
+          <div class="flex items-center gap-4">
 
-      <div><b>Insurance:</b> {{ selectedPatient.insurance_provider }}</div>
-      <div><b>Policy #:</b> {{ selectedPatient.insurance_policy_number }}</div>
+            <div class="avatar placeholder">
+              <div class="bg-primary text-white rounded-full w-16 text-xl">
+                {{ selectedPatient.first_name?.charAt(0) || 'P' }}
+              </div>
+            </div>
 
-      <div><b>Emergency Contact:</b> {{ selectedPatient.emergency_contact_name }}</div>
-      <div><b>Emergency Phone:</b> {{ selectedPatient.emergency_contact_phone }}</div>
+            <div>
+              <div class="text-lg font-semibold">
+                {{ selectedPatient.first_name }} {{ selectedPatient.last_name }}
+              </div>
+              <div class="text-sm opacity-60">
+                {{ selectedPatient.email }}
+              </div>
+            </div>
 
-      <div><b>Registered:</b> {{ selectedPatient.registration_date | date:'medium' }}</div>
+          </div>
 
+          <span class="badge px-3 py-2 text-sm" [ngClass]="{
+              'badge-success': selectedPatient.patient_status === 'Active',
+              'badge-error': selectedPatient.patient_status === 'Inactive'
+            }">
+            {{ selectedPatient.patient_status }}
+          </span>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">CONTACT</h3>
+            <p><span class="opacity-60">Phone:</span> {{ selectedPatient.phone || '-' }}</p>
+            <p><span class="opacity-60">Mobile:</span> {{ selectedPatient.mobile || '-' }}</p>
+            <p><span class="opacity-60">Email:</span> {{ selectedPatient.email || '-' }}</p>
+          </div>
+
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <p><span class="opacity-60">Gender:</span> {{ selectedPatient.gender || '-' }}</p>
+            <p><span class="opacity-60">DOB:</span> {{ selectedPatient.date_of_birth | date:'mediumDate' }}</p>
+            <p><span class="opacity-60">Language:</span> {{ selectedPatient.preferred_language || '-' }}</p>
+          </div>
+
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">ADDRESS</h3>
+            <p>{{ selectedPatient.address || '-' }}</p>
+            <p>{{ selectedPatient.city }}, {{ selectedPatient.state }}</p>
+            <p>{{ selectedPatient.country }} - {{ selectedPatient.zip_code }}</p>
+          </div>
+
+          <div class="bg-base-200/30 p-4 rounded-xl md:col-span-2 space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">MEDICAL INFO</h3>
+            <p><span class="opacity-60">Physician:</span> {{ selectedPatient.primary_physician || '-' }}</p>
+            <p><span class="opacity-60">Insurance:</span> {{ selectedPatient.insurance_provider || '-' }}</p>
+            <p><span class="opacity-60">Policy:</span> {{ selectedPatient.insurance_policy_number || '-' }}</p>
+          </div>
+
+          <div class="bg-red-50/10 border border-red-200/20 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm text-red-400">EMERGENCY CONTACT</h3>
+            <p>{{ selectedPatient.emergency_contact_name || '-' }}</p>
+            <p>{{ selectedPatient.emergency_contact_phone || '-' }}</p>
+          </div>
+
+        </div>
+
+        <button class="btn btn-sm btn-primary" (click)="updatePatient(selectedPatient)">
+          Update
+        </button>
+
+      </div>
     </div>
+  </div>
+  }
 
-    <div class="mt-4 text-right">
-      <button class="btn btn-sm btn-outline" (click)="closeDetails()">
-        Close
-      </button>
+  @if (showDeleteModal) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <div class="relative bg-base-100 p-6 rounded-xl w-full max-w-md shadow-2xl z-[10000]">
+
+      <h2 class="text-lg font-bold text-red-500">
+        Delete Patient
+      </h2>
+
+      <p class="mt-2 text-sm">
+        Are you sure you want to delete
+        <b>{{ patientToDelete?.first_name }} {{ patientToDelete?.last_name }}</b>?
+      </p>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button class="btn btn-outline" (click)="closeDeleteModal()">
+          Cancel
+        </button>
+
+        <button class="btn btn-error" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+
     </div>
   </div>
   }
 
 </div>
+
+<router-outlet></router-outlet>
