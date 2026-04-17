@@ -296,5 +296,34 @@ export const getTotalPatientCount = async (req, res) => {
 
 }
 
+export const checkDuplicatePatient = async (req, res) => {
+  try {
+    const { first_name, last_name, date_of_birth } = req.query;
 
+    if (!first_name || !last_name || !date_of_birth) {
+      return res.status(400).json({
+        message: "first_name, last_name, and date_of_birth are required",
+      });
+    }
 
+    const existingPatient = await Patient.findOne({
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      date_of_birth,
+    });
+
+    return res.status(200).json({
+      exists: !!existingPatient,
+      message: existingPatient
+        ? "Patient already exists"
+        : "No duplicate found",
+      data: existingPatient || null,
+    });
+  }
+  catch (error) {
+    return res.status(500).json({
+      message: "Failed to check duplicate patient",
+      error: error.message
+    });
+  }
+}
