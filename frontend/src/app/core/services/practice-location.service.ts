@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PracticeLocationService {
-  
-  private apiUrl = 'http://localhost:8000/api/practice-locations'; // 🔁 change if needed
+
+  private apiUrl = environment.apiLaravelUrl + '/practice-locations'; // change if needed
 
   constructor(private http: HttpClient) {}
 

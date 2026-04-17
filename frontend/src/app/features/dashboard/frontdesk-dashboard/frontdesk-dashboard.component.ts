@@ -60,7 +60,7 @@ export class FrontdeskDashboardComponent implements OnInit {
   userName = 'Sarah';
   currentDate = new Date();
 
-  // ── Stat Cards 
+  // ── Stat Cards
   statCards: StatCard[] = [
     {
       label: 'NEW PATIENTS',
@@ -78,7 +78,7 @@ export class FrontdeskDashboardComponent implements OnInit {
     },
   ];
 
-  // ── Doctor Availability 
+  // ── Doctor Availability
   doctors: DoctorAvailability[] = [
     { name: 'Dr. Aris',   status: 'available',  statusLabel: 'Avail.'   },
     { name: 'Dr. Miller', status: 'surgery',    statusLabel: 'Surgery'  },
@@ -213,14 +213,14 @@ export class FrontdeskDashboardComponent implements OnInit {
   }
 
   onRegisterNewPatient(): void {
-    
+
     console.log('Register new patient clicked');
     this.router.navigate(['/patients/patient-form']);
   }
 
   onScheduleAppointment(): void {
     console.log('Schedule appointment clicked');
-    // this.router.navigate(['/appointments/appointment-form']);
+    this.router.navigate(['/appointments/create']);
   }
 
   onViewAllDocuments(): void {

@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { AppointmentFilterComponent } from '../../../shared/components/appointment-filters/appointment-filters.component';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-appointment-list',
@@ -21,26 +22,29 @@ import { AppointmentFilterComponent } from '../../../shared/components/appointme
   templateUrl: './appointment-list.component.html',
   styleUrls: ['./appointment-list.component.css'],
 })
+// RouterModule is already imported, so router-outlet will work
 export class AppointmentListComponent implements OnInit {
   appointments: any[] = [];
   filters: any = {};
-
-
   paginationData: any;
-
   currentPage = 1;
-
   role: string | undefined = localStorage.getItem('role') || undefined;
-
   loading = false;
-
+  isFormOpen = false;
   Math = Math; // expose Math to template
 
   constructor(public service: AppointmentService) {}
   location = inject(Location);
+  router = inject(Router)
 
   ngOnInit() {
     this.loadData();
+    // Detect when form opens/closes by listening to route changes
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.isFormOpen = event.url.includes('/appointments/create') || event.url.includes('/appointments/edit');
+    });
   }
 
   goBack(){
@@ -67,7 +71,7 @@ export class AppointmentListComponent implements OnInit {
     this.service.getAppointments(params).subscribe({
       next: (res: any) => {
         console.log('API Response:', res);
-        
+
         this.appointments = res.data || [];
         this.paginationData = res;
         this.currentPage = res.current_page;
@@ -84,6 +88,7 @@ export class AppointmentListComponent implements OnInit {
 
 
   createAppointment() {
+      this.router.navigate(['/appointments/create']);
     // Navigate to the appointment form page
     // You can use Angular's Router for navigation
     // For example:
