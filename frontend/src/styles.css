@@ -1,5 +1,10 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@plugin "daisyui";
+@plugin "daisyui",
+
+
+
+@import "lucide-static/font/lucide.css";

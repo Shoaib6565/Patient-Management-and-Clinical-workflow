@@ -25,12 +25,14 @@ export const routes: Routes = [
     component: DashboardLayoutComponent,
     children: [
       { path: 'admin', component: AdminDashboardComponent,
-         canActivate: [authGuard,roleGuard ],data: { role: 'Admin' } 
+        //  canActivate: [authGuard,roleGuard ],data: { role: 'Admin' }
          },
       { path: 'doctor', component: DoctorDashboardComponent,
-         canActivate: [authGuard],data: { role: 'Doctor' }
+        //  canActivate: [authGuard],data: { role: 'Doctor' }
          },
-      { path: 'fdo', component: FrontdeskDashboardComponent, canActivate: [authGuard, roleGuard],data: { role: 'FDO' } },
+      { path: 'fdo', component: FrontdeskDashboardComponent,
+        //  canActivate: [authGuard, roleGuard],data: { role: 'FDO' }
+        },
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
     ],
   },

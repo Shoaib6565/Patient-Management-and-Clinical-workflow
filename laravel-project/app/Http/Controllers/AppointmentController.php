@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use Illuminate\Http\Request;
-use  App\Jobs\ExportAppointmentsCsvJob;
+use App\Jobs\ExportAppointmentsCsvJob;
 use App\Services\AppointmentService;
 use App\Services\NotificationService;
 use App\Models\Export;
 use App\Models\Notification;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AppointmentController extends Controller
 {
@@ -48,21 +49,66 @@ class AppointmentController extends Controller
 
 
     /// export to csv (Admin )
+    // public function export(Request $request)
+    // {
+    //     $user = $request->attributes->get('auth_user'); // because not logged in currently
+    //     $export = Export::create([
+    //         'user_id' => $user->id,
+    //         'type' => 'appointment',
+    //         'status' => 'processing'
+    //     ]);
+    //     ExportAppointmentsCsvJob::dispatch($request->all(), $export->id);
+
+    //     return response()->json([
+    //         'message' => 'Export started. You will be notified when ready.'
+    //     ]);
+    // }
+
+
     public function export(Request $request)
     {
-        $user = $request->attributes->get('auth_user'); // because not logged in currently
-        $export = Export::create([
-            'user_id' => $user->id,
-            'type' => 'appointment',
-            'status' => 'processing'
-        ]);
-        ExportAppointmentsCsvJob::dispatch($request->all(), $export->id);
+        $query = $this->appointmentService->getFilteredAppointments($request->all());
 
-        return response()->json([
-            'message' => 'Export started. You will be notified when ready.'
-        ]);
+        $appointments = $query->get(); //  no pagination
+
+        $filename = 'appointments_' . now()->format('Y_m_d_H_i_s') . '.csv';
+
+        $headers = [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+        ];
+
+        $columns = [
+            'ID',
+            'Patient',
+            'Doctor',
+            'Date',
+            'Status'
+        ];
+
+        $callback = function () use ($appointments, $columns) {
+            $file = fopen('php://output', 'w');
+
+            // header row
+            fputcsv($file, $columns);
+
+            foreach ($appointments as $appointment) {
+                fputcsv($file, [
+                    $appointment->id,
+                    $appointment->patient->name ?? '',
+                    $appointment->doctor->name ?? '',
+                    $appointment->appointment_date ?? '',
+                    $appointment->status ?? '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
+    
     //  2. Create Appointment (FDO)
     public function store(Request $request)
     {
@@ -89,7 +135,7 @@ class AppointmentController extends Controller
 
         // notification store in db
         Notification::create([
-            'user_id' =>  $request->doctor_id,
+            'user_id' => $request->doctor_id,
             'type' => 'appointment',
             'message' => 'New appointment assigned',
             'data' => [
