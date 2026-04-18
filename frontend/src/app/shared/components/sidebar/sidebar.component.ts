@@ -16,7 +16,6 @@ export class SidebarComponent {
   @Input() isOpen: boolean = true;
 
   // Replace with real role from AuthService
-  // e.g. this.authService.currentUser.role
   role: UserRole = localStorage.getItem('role') as UserRole || 'Admin';
 
   isSettingsOpen = false;
@@ -29,27 +28,11 @@ export class SidebarComponent {
     const routes: Record<UserRole, string> = {
       Admin:  '/dashboard/admin',
       Doctor: '/dashboard/doctor',
-      FDO:    '/dashboard/frontdesk'
+      FDO:    '/dashboard/fdo'
     };
     return routes[this.role];
   }
 
-  get appointmentsRoute(): string {
-    const routes: Record<UserRole, string> = {
-      Admin:  '/appointments',
-      Doctor: '/appointments',
-      FDO:    '/appointments'
-    };
-    return routes[this.role];
-  }
-  get visitsRoute(): string {
-    const routes: Record<UserRole, string> = {
-      Admin:  '/visits',
-      Doctor: '/visits',
-      FDO:    '/visits'
-    };
-    return routes[this.role];
-  }
 
   toggleSettings(): void {
     this.isSettingsOpen = !this.isSettingsOpen;

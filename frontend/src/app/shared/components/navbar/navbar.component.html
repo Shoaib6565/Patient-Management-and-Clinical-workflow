@@ -77,3 +77,13 @@
 
   </div>
 </nav>
+
+<!-- Logout Confirmation Dialog -->
+<app-confirm-dialog
+  [visible]="showConfirmDialog"
+  title="Logout Confirmation"
+  message="Are you sure you want to logout?"
+  buttonName="Logout"
+  (onConfirm)="confirmLogout()"
+  (onCancel)="cancelLogout()">
+</app-confirm-dialog>

@@ -8,7 +8,7 @@
           <i class="ti ti-arrow-left mr-2"></i>
           Back
         </button>
-        <button class="btn btn-outline btn-primary" (click)="createAppointment()">
+        <button class="btn btn-outline btn-primary" (click)="createAppointment()" [disabled]="!canCreate()">
           <i class="ti ti-plus mr-2"></i>
           Create Appointment
         </button>
@@ -103,7 +103,7 @@
 
             <!-- COMPLETE -->
 
-            <button class="btn btn-xs btn-success" (click)="service.updateStatus(row.id, { status: 'Completed' })"
+            <button class="btn btn-xs btn-success" (click)="completeAppointment(row.id)"
               title="Complete">
               <i class="ti ti-check"></i>
             </button>
@@ -145,4 +145,14 @@
       <router-outlet></router-outlet>
     </div>
   </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirm-dialog
+    [visible]="confirmDialog.visible"
+    [title]="confirmDialog.title"
+    [message]="confirmDialog.message"
+    [buttonName]="confirmDialog.buttonName"
+    (onConfirm)="onConfirmDialog()"
+    (onCancel)="onCancelDialog()">
+  </app-confirm-dialog>
 </div>

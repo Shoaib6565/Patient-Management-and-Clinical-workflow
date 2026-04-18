@@ -4,7 +4,7 @@ import db from "../models/index.js";
 import { JWT_SECRET } from "../config/jwt.js";
 import { redis } from "../config/redis.js";
 
-const { User, Role, Permission } = db;
+const { User, Role, Permission, UserRole } = db;
 
 
 export const login = async (req, res) => {
@@ -37,7 +37,20 @@ export const login = async (req, res) => {
     }
 
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // const isMatch = await bcrypt.compare(password, user.password);
+    // if (!isMatch) {
+    //   return res.status(401).json({
+    //     message: "Invalid password",
+    //   });
+    // }
+
+    let isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch && user.password.startsWith('$2y$')) {
+      const fixedHash = user.password.replace('$2y$', '$2b$');
+      isMatch = await bcrypt.compare(password, fixedHash);
+    }
+
     if (!isMatch) {
       return res.status(401).json({
         message: "Invalid password",
@@ -45,10 +58,20 @@ export const login = async (req, res) => {
     }
 
 
+
+
+    // Fetch user roles for adding in token payload and then frontend can use it for role based access control
+    const userRole = await UserRole.findOne({
+      where: { user_id: user.id },
+      include: [{ model: Role, attributes: ['name'] }]
+    });
+    const role = userRole?.Role?.name;
+
     const token = jwt.sign(
       {
         id: user.id,
         email: user.email,
+        role: role
       },
       JWT_SECRET,
       { expiresIn: "30m" }
@@ -57,6 +80,9 @@ export const login = async (req, res) => {
     return res.json({
       message: "Login successful",
       token,
+      user: {
+        name: user.name,
+      },
     });
 
   } catch (error) {

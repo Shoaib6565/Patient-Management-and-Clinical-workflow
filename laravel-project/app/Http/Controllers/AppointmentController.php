@@ -108,7 +108,7 @@ class AppointmentController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    
+
     //  2. Create Appointment (FDO)
     public function store(Request $request)
     {
@@ -142,9 +142,7 @@ class AppointmentController extends Controller
                 'appointment_id' => $appointment->id
             ]
         ]);
-
         $notificationService = app(NotificationService::class);
-
         $notificationService->sendToUser(
             $request->doctor_id,
             [

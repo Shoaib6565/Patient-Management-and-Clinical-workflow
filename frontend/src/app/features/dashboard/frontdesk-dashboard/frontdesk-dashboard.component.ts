@@ -57,7 +57,7 @@ export interface Document {
   styleUrls: ['./frontdesk-dashboard.component.css'],
 })
 export class FrontdeskDashboardComponent implements OnInit {
-  userName = 'Sarah';
+  userName = localStorage.getItem('userName') || 'Front Desk Staff';
   currentDate = new Date();
 
   // ── Stat Cards
@@ -85,7 +85,7 @@ export class FrontdeskDashboardComponent implements OnInit {
     { name: 'Dr. Lee',    status: 'onduty',     statusLabel: 'On Duty'  },
   ];
 
-  // ── Daily Agenda ─────────────────────────────────────────
+  // ── Daily Agenda
   appointments: Appointment[] = [
     {
       time: '9:00 AM',
@@ -142,7 +142,7 @@ export class FrontdeskDashboardComponent implements OnInit {
     },
   ];
 
-  // ── Documents ────────────────────────────────────────────
+  // ── Documents
   documents: Document[] = [
     {
       name: 'Lab_Results_Michael_R.pdf',
@@ -168,7 +168,7 @@ export class FrontdeskDashboardComponent implements OnInit {
 
   router = inject(Router)
 
-  // ── Helpers ──────────────────────────────────────────────
+  // ── Helpers ─
   getStatusLabel(status: AppointmentStatus): string {
     const map: Record<AppointmentStatus, string> = {
       IN_PROGRESS:     'In Progress',

@@ -5,6 +5,7 @@ import { VisitService } from '../../../core/services/visit.service';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialogComponent } from '../../../shared/components/modal/confirmations-dialog/confirmations-dialog.component';
 
 @Component({
   selector: 'app-visit-list',
@@ -14,7 +15,8 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     RouterModule,
     NgxDatatableModule,
-    PaginationComponent
+    PaginationComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './visit-list.component.html',
   styleUrls: ['./visit-list.component.css']
@@ -38,6 +40,16 @@ export class VisitListComponent implements OnInit {
 
   location = inject(Location);
   Math = Math; // expose Math to template
+
+  // Confirmation dialog properties
+  confirmDialog = {
+    visible: false,
+    title: '',
+    message: '',
+    buttonName: '',
+    action: ''
+  };
+  selectedId: number | null = null;
 
   constructor(public service: VisitService) {}
 
@@ -109,14 +121,49 @@ export class VisitListComponent implements OnInit {
   }
 
   delete(id: number) {
-    this.service.deleteVisit(id).subscribe(() => {
-      this.loadData(this.currentPage);
-    });
+    this.selectedId = id;
+    this.confirmDialog = {
+      visible: true,
+      title: 'Delete Visit',
+      message: 'Are you sure you want to delete this visit? This action cannot be undone.',
+      buttonName: 'Delete',
+      action: 'delete'
+    };
   }
 
   finalize(id: number) {
-    this.service.completeVisit(id).subscribe(() => {
-      this.loadData(this.currentPage);
-    });
+    this.selectedId = id;
+    this.confirmDialog = {
+      visible: true,
+      title: 'Finalize Visit',
+      message: 'Are you sure you want to finalize this visit? Once finalized, it cannot be edited.',
+      buttonName: 'Finalize',
+      action: 'finalize'
+    };
+  }
+
+  onConfirmDialog() {
+    if (!this.selectedId) return;
+
+    if (this.confirmDialog.action === 'delete') {
+      this.service.deleteVisit(this.selectedId).subscribe(() => {
+        this.loadData(this.currentPage);
+        this.closeDialog();
+      });
+    } else if (this.confirmDialog.action === 'finalize') {
+      this.service.completeVisit(this.selectedId).subscribe(() => {
+        this.loadData(this.currentPage);
+        this.closeDialog();
+      });
+    }
+  }
+
+  onCancelDialog() {
+    this.closeDialog();
+  }
+
+  closeDialog() {
+    this.confirmDialog.visible = false;
+    this.selectedId = null;
   }
 }
