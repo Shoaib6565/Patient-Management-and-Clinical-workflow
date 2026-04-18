@@ -12,7 +12,7 @@ export const roleGuard: CanActivateFn = (route) => {
   return authService.isLoggedIn$.pipe(
     take(1),
     map((isLoggedIn: boolean) => {
-      const role = localStorage.getItem('role');
+      const role = authService.getRole();
 
       if (isLoggedIn && role === expectedRole) {
         return true;

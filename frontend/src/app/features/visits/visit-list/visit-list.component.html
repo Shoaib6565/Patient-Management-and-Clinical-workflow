@@ -107,29 +107,29 @@
 
         <!-- EDIT (only if not completed) -->
         <button
-          
+
           class="btn btn-xs btn-warning"
           [routerLink]="['/visits/edit', row.id]"
           title="Edit Visit"
           [disabled]="row.visit_status === 'Completed'">
-          
+
 
           <i class="ti ti-edit"></i>
         </button>
 
         <!-- FINALIZE -->
         <button
-          
+
           class="btn btn-xs btn-success"
           (click)="finalize(row.id)"
            title="Finalize Visit">
-            
+
           <i class="ti ti-check"></i>
         </button>
 
         <!-- DELETE (admin only) -->
         <button
-          
+
           class="btn btn-xs btn-error"
           (click)="delete(row.id)"
            title="Delete Visit">
@@ -145,7 +145,7 @@
   <div class="text-sm mt-4 text-gray-600 mb-2">
       Showing {{ (paginationData?.current_page - 1) * paginationData?.per_page + 1 }}
       to {{ Math.min(paginationData?.current_page * paginationData?.per_page, paginationData?.total) }}
-      of {{ paginationData?.total }} visits   
+      of {{ paginationData?.total }} visits
    </div>
 
   <!-- PAGINATION -->
@@ -163,5 +163,18 @@
   >
     No visits found.
   </div>
+
+   <!-- for opening visit form -->
+   <router-outlet></router-outlet>
+
+  <!-- Confirmation Dialog -->
+  <app-confirm-dialog 
+    [visible]="confirmDialog.visible"
+    [title]="confirmDialog.title"
+    [message]="confirmDialog.message"
+    [buttonName]="confirmDialog.buttonName"
+    (onConfirm)="onConfirmDialog()"
+    (onCancel)="onCancelDialog()">
+  </app-confirm-dialog>
 
 </div>

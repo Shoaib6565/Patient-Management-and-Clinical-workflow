@@ -3,12 +3,14 @@ import { Injectable ,inject } from "@angular/core";
 import { API_URL } from "../constants/apiUrl.constant";
 import { BehaviorSubject, Observable } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from "@angular/router";
 
 @Injectable({
     providedIn: 'root',
 })
-export class AuthService {  
+export class AuthService {
   private readonly http: HttpClient = inject(HttpClient);
+  router = inject(Router);
   private readonly apiUrl = API_URL;
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
   public isLoggedIn$: Observable<boolean> = this.isLoggedInSubject.asObservable();
@@ -18,6 +20,11 @@ export class AuthService {
   private hasToken(): boolean {
     return !!localStorage.getItem('authToken');
   }
+
+  public setName(name: string): void {
+    localStorage.setItem('userName', name);
+  }
+
 
   setToken(token: string): void {
     localStorage.setItem('authToken', token);
@@ -38,7 +45,7 @@ export class AuthService {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        return decodedToken.role || null; 
+        return decodedToken.role || null;
       } catch (error) {
         console.error('Error decoding token:', error);
         return null;
@@ -58,6 +65,8 @@ export class AuthService {
 
   logout() {
     this.removeToken();
+    localStorage.removeItem('userName');
+    this.router.navigate(['/signin']);
     return this.http.post(`${this.apiUrl.baseUrl}${this.apiUrl.auth}/logout`, {});
   }
 

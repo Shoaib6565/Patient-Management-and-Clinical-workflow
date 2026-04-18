@@ -1,1 +1,164 @@
-<p>visit-form works!</p>
+<!-- BACKDROP -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-base-100 w-full max-w-5xl rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold">
+        {{ isEdit ? 'Update Visit' : 'Create Visit' }}
+      </h2>
+
+      <button class="btn btn-sm btn-circle btn-ghost" (click)="cancel()">✕</button>
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="visitForm" (ngSubmit)="submit()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- Diagnosis -->
+      <div class="form-control col-span-2">
+        <label class="label">Diagnosis *</label>
+        <textarea class="textarea textarea-bordered" formControlName="diagnosis"></textarea>
+        <span class="text-error text-sm"
+          *ngIf="visitForm.get('diagnosis')?.touched && visitForm.get('diagnosis')?.invalid">
+          Diagnosis is required
+        </span>
+      </div>
+
+      <!-- Treatment -->
+      <div class="form-control col-span-2">
+        <label class="label">Treatment *</label>
+        <textarea class="textarea textarea-bordered" formControlName="treatment"></textarea>
+      </div>
+
+      <!-- Treatment Plan -->
+      <div class="form-control col-span-2">
+        <label class="label">Treatment Plan</label>
+        <textarea class="textarea textarea-bordered" formControlName="treatment_plan"></textarea>
+      </div>
+
+      <!-- Prescription -->
+      <div class="form-control col-span-2">
+        <label class="label">Prescription</label>
+        <textarea class="textarea textarea-bordered" formControlName="prescription"></textarea>
+      </div>
+
+      <!-- Symptoms -->
+      <div class="form-control">
+        <label class="label">Symptoms</label>
+        <input type="text" class="input input-bordered" formControlName="symptoms">
+      </div>
+
+      <!-- Visit Duration -->
+      <div class="form-control">
+        <label class="label">Visit Duration (min)</label>
+        <input type="number" class="input input-bordered" formControlName="visit_duration_minutes">
+      </div>
+
+      <!--  Vital Signs -->
+      <div formGroupName="vital_signs" class="col-span-2 grid grid-cols-2 gap-4">
+
+        <div class="form-control">
+          <label class="label">BP</label>
+          <input class="input input-bordered" formControlName="bp" placeholder="120/80">
+        </div>
+
+        <div class="form-control">
+          <label class="label">Heart Rate</label>
+          <input type="number" class="input input-bordered" formControlName="heart_rate">
+        </div>
+
+        <div class="form-control">
+          <label class="label">Temperature</label>
+          <input type="number" class="input input-bordered" formControlName="temperature">
+        </div>
+
+        <div class="form-control">
+          <label class="label">Weight (kg)</label>
+          <input type="number" class="input input-bordered" formControlName="weight">
+        </div>
+
+        <div class="form-control">
+          <label class="label">Height (cm)</label>
+          <input type="number" class="input input-bordered" formControlName="height">
+        </div>
+
+        <div class="form-control">
+          <label class="label">BMI</label>
+          <input class="input input-bordered" formControlName="bmi" readonly>
+        </div>
+
+      </div>
+
+      <!-- ICD Codes -->
+      <div class="form-control col-span-2">
+        <label class="label">Diagnosis Codes (ICD-10)</label>
+
+        <div class="flex flex-wrap gap-3">
+          <label *ngFor="let code of icdOptions"
+                 class="cursor-pointer flex items-center gap-2">
+
+            <input type="checkbox"
+                   class="checkbox checkbox-primary"
+                   (change)="onICDChange(code, $event)"
+                   [checked]="visitForm.value.diagnosis_codes?.includes(code)">
+
+            <span>{{ code }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Follow Up -->
+      <div class="form-control">
+        <label class="cursor-pointer label">
+          <span>Follow-up Required</span>
+          <input type="checkbox" class="toggle toggle-primary" formControlName="follow_up_required">
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">Follow-up Date</label>
+        <input type="date" class="input input-bordered" formControlName="follow_up_date">
+      </div>
+
+      <!-- Referral -->
+      <div class="form-control">
+        <label class="cursor-pointer label">
+          <span>Referral Made</span>
+          <input type="checkbox" class="toggle toggle-secondary" formControlName="referral_made">
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">Referral To</label>
+        <input type="text" class="input input-bordered" formControlName="referral_to">
+      </div>
+
+      <!-- Status -->
+      <div class="form-control col-span-2">
+        <label class="label">Visit Status</label>
+        <select class="select select-bordered" formControlName="visit_status">
+          <option>Draft</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+          <option>Billed</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-control col-span-2">
+        <label class="label">Notes</label>
+        <textarea class="textarea textarea-bordered" formControlName="notes"></textarea>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="col-span-2 flex justify-end gap-3 mt-4">
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Saving...' : 'Update Visit' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

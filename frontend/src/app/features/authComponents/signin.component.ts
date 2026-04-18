@@ -73,6 +73,7 @@ export class SigninComponent {
       }
 
       this.authService.setToken(token);
+      this.authService.setName(response?.user?.name || 'User');
       this.authService.currentUser().subscribe({
         next: (userRes: any) => {
           const user=userRes?.user;

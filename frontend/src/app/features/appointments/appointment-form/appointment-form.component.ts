@@ -15,11 +15,10 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './appointment-form.component.html',
-  styleUrls: ['./appointment-form.component.css']
+  styleUrls: ['./appointment-form.component.css'],
 })
 export class AppointmentFormComponent implements OnInit {
-
-    constructor(
+  constructor(
     // private fb: FormBuilder,
     private appointmentService: AppointmentService,
     private locationService: PracticeLocationService,
@@ -27,7 +26,7 @@ export class AppointmentFormComponent implements OnInit {
     private casesService: CasesService,
     private patientService: PatientManagementService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   fb = inject(FormBuilder);
@@ -52,9 +51,18 @@ export class AppointmentFormComponent implements OnInit {
     status: ['Scheduled'],
     reminder_method: [''],
     reason_for_visit: ['', Validators.required],
-    notes: ['']
+    notes: [''],
   });
 
+formatDate(date: string) { 
+  if (!date) return '';
+  return date.split('T')[0];
+}
+
+  formatTime(time: string) {
+  if (!time) return '';
+  return time.substring(0, 5);
+}
 
 
   ngOnInit() {
@@ -63,26 +71,52 @@ export class AppointmentFormComponent implements OnInit {
 
     this.loadDropdowns();
 
+
     if (this.isEdit) {
-      this.appointmentService.getAppointmentById(this.id).subscribe((res: any) => {
-        this.form.patchValue(res.data);
-      });
+      this.appointmentService
+        .getAppointmentById(this.id)
+        .subscribe((res: any) => {
+          console.log('res.data', res.data);
+          this.form.patchValue({
+            case_id: res.data.case_id || res.data.case?.id,
+            patient_id: res.data.patient_id || res.data.patient?.id,
+            doctor_id: res.data.doctor_id,
+            specialty_id: res.data.specialty_id || res.data.specialty?.id,
+            practice_location_id:
+              res.data.practice_location_id || res.data.location?.id,
+
+            appointment_date: this.formatDate(res.data.appointment_date),
+            appointment_time: this.formatTime(res.data.appointment_time),
+
+            appointment_type: res.data.appointment_type,
+            status: res.data.status,
+            reminder_method: res.data.reminder_method,
+            reason_for_visit: res.data.reason_for_visit,
+            notes: res.data.notes,
+          });
+        });
     }
   }
 
   loadDropdowns() {
-    this.specialtyService.getSpecialties().subscribe((res: any) => this.specialties = res.data);
-    this.locationService.getAll().subscribe((res: any) => this.locations = res.data);
+    this.specialtyService
+      .getSpecialties()
+      .subscribe((res: any) => (this.specialties = res.data));
+    this.locationService
+      .getAll()
+      .subscribe((res: any) => (this.locations = res.data));
   }
 
   searchPatients(event: any) {
-    this.patientService.getAllPatients(event.target.value)
-      .subscribe((res: any) => this.patients = res.data);
+    this.patientService
+      .getAllPatients(event.target.value)
+      .subscribe((res: any) => (this.patients = res.data));
   }
 
   searchCases(event: any) {
-    this.casesService.getAllCases() // inside bracket  event.target.value
-      .subscribe((res: any) => this.cases = res.data);
+    this.casesService
+      .getAllCases() // inside bracket  event.target.value
+      .subscribe((res: any) => (this.cases = res.data));
   }
 
   cancel() {
