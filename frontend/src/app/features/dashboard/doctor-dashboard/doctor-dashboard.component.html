@@ -1,1 +1,88 @@
-<p>doctor-dashboard works!</p>
+<div class="p-4 space-y-4">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold">My Appointments</h2>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card bg-base-100 shadow-md">
+    <div class="overflow-x-auto">
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Specialty</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @if (appointments.length === 0) {
+          <tr>
+            <td colspan="8" class="text-center py-6 text-gray-400">
+              No appointments found
+            </td>
+          </tr>
+          }
+
+          @for (app of appointments; track app.id) {
+          <tr (click)="selectAppointment(app)" class="hover:bg-base-200 cursor-pointer">
+
+            <td>
+              {{ app.patient?.first_name }} {{ app.patient?.last_name }}
+            </td>
+
+            <td>
+              {{ app.doctor?.name }}
+            </td>
+
+            <td>
+              {{ app.specialty?.specialty_name }}
+            </td>
+
+            <td>
+              {{ app.practice_location?.location_name }}
+            </td>
+
+            <td>
+              {{ app.appointment_date | date:'mediumDate' }}
+            </td>
+
+            <td>
+              {{ app.appointment_time }} - {{ app.end_time }}
+            </td>
+
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-success': app.status === 'Confirmed',
+                'badge-warning': app.status === 'Pending',
+                'badge-error': app.status === 'Cancelled'
+              }">
+                {{ app.status }}
+              </span>
+            </td>
+
+            <td>
+              <button class="btn btn-xs btn-primary"
+                (click)="openStatusModal(app); $event.stopPropagation()">
+                Update
+              </button>
+            </td>
+
+          </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
