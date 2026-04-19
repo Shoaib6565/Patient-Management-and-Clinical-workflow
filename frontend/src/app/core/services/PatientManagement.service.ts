@@ -66,4 +66,9 @@ export class PatientManagementService {
     );
   }
 
+   getPatientByAppointmentId(DoctorId: string | number) {
+  return this.http.get(
+    `${this.apiUrl.baseUrl}${this.apiUrl.patients}/appointment/${DoctorId}`
+  );
+}
 }
