@@ -180,6 +180,7 @@ export class AppointmentListComponent implements OnInit {
         .subscribe(() => {
           this.loadData(this.currentPage);
           this.closeDialog();
+          this.router.navigate(['/visits/create', this.selectedId]);
         });
     }
   }
@@ -198,7 +199,10 @@ export class AppointmentListComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'appointments.csv';
+      const now = new Date();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const fileName = `appointments_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.csv`;
+      a.download = fileName;
       a.click();
     });
   }

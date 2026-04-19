@@ -129,7 +129,7 @@ class AppointmentController extends Controller
 
         $appointment = Appointment::create([
             ...$request->all(),
-            'created_by' => $user->id // FDO ID
+            'created_by' => $request->doctor_id || $user->id // FDO ID
         ]);
 
 

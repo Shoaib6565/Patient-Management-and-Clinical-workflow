@@ -39,6 +39,7 @@ export class VisitService {
 
   //  Export visits to CSV
   exportVisits(params?: any): Observable<Blob> {
+    console.log('exportvisit call in visit service')
     return this.http.get(`${this.baseUrl}/export`, {
       params,
       responseType: 'blob'

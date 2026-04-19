@@ -32,6 +32,7 @@ import { LocationListComponent } from './features/settings/locations/location-li
 import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
 import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
 import { FdoListComponent } from './features/userManagement/fdo-list/fdo-list.component';
+import { DoctorListComponent } from './features/userManagement/doctor-list/doctor-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
@@ -63,9 +64,6 @@ export const routes: Routes = [
     ],
   },
 
-
-
-
   // grouping for all protected routes with dashboard layout
   {
     path: '',
@@ -89,7 +87,6 @@ export const routes: Routes = [
         children: [
           { path: 'edit/:id', component: VisitFormComponent },
           { path: 'create/:appointmentId', component: VisitFormComponent },
-
         ],
       },
 
@@ -116,45 +113,56 @@ export const routes: Routes = [
         component: SpecialtyListComponent,
         children: [
           { path: 'create', component: SpecialtyFormComponent },
-          {path: 'edit/:id', component: SpecialtyFormComponent },
-        ]
+          { path: 'edit/:id', component: SpecialtyFormComponent },
+        ],
       },
       {
         path: 'firms',
         component: FirmListComponent,
         children: [
           { path: 'create', component: FirmFormComponent },
-          {path: 'edit/:id', component: FirmFormComponent },
-        ]
+          { path: 'edit/:id', component: FirmFormComponent },
+        ],
       },
       {
         path: 'insurances',
         component: InsuranceListComponent,
         children: [
           { path: 'create', component: InsuranceFormComponent },
-          {path: 'edit/:id', component: InsuranceFormComponent },
-        ]
+          { path: 'edit/:id', component: InsuranceFormComponent },
+        ],
       },
       {
         path: 'categories',
         component: CategoryListComponent,
         children: [
           { path: 'create', component: CategoryFormComponent },
-          {path: 'edit/:id', component: CategoryFormComponent },
-        ]
+          { path: 'edit/:id', component: CategoryFormComponent },
+        ],
       },
       {
         path: 'locations',
         component: LocationListComponent,
         children: [
           { path: 'create', component: LocationFormComponent },
-          {path: 'edit/:id', component: LocationFormComponent },
-        ]
+          { path: 'edit/:id', component: LocationFormComponent },
+        ],
       },
-
+      // user management routes
+      {
+        path: 'users',
+        component: UserFormComponent,
+        children: [
+          {
+            path: 'user-form',
+            component: UserFormComponent,
+          },
+        ],
+      },
+      {path:'fdo-list', component: FdoListComponent},
+      {path: 'doctor-list', component: DoctorListComponent},
     ],
   },
-
 
   // if does not math any routes
   { path: '**', component: NotFoundComponent },

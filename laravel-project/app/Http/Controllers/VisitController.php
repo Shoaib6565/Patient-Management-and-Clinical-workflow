@@ -150,14 +150,14 @@ class VisitController extends Controller
         }
 
         // Only doctor allowed
-        $user = $request->attributes->get('auth_user');
+        // $user = $request->attributes->get('auth_user');
 
-        if ($user->role !== 'Doctor') {
-            return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized'
-            ], 403);
-        }
+        // if ($user->role !== 'Doctor') {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Unauthorized'
+        //     ], 403);
+        // }
 
         $visit->update([
 

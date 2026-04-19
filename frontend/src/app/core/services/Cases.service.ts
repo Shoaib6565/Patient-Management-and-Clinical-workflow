@@ -1,4 +1,4 @@
-import { HttpClient,HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { API_URL } from '../constants/apiUrl.constant';
 
@@ -12,16 +12,17 @@ export class CasesService {
   constructor() {}
 
   getAllCases(filters: any = {}) {
-     let params = new HttpParams();
+    let params = new HttpParams();
 
     Object.keys(filters).forEach((key) => {
       if (filters[key]) {
         params = params.set(key, filters[key]);
       }
-    
     });
 
-    return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.cases}`);
+    return this.http.get(`${this.apiUrl.baseUrl}${this.apiUrl.cases}`, {
+      params,
+    });
   }
   getCaseById(caseId: string) {
     return this.http.get(

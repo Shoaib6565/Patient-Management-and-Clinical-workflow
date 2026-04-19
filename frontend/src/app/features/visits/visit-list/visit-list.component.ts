@@ -111,10 +111,22 @@ export class VisitListComponent implements OnInit {
     this.loadData(1);
   }
   exportToCSV() {
+    console.log('export to csv clicked in visit list component')
     const params = {
       ...this.filters
     };
-    this.visitService.exportVisits(params);
+    this.visitService.exportVisits(params).subscribe((blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      const now = new Date();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const fileName = `visits_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.csv`;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
   }
 
 

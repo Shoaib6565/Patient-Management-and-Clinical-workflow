@@ -107,7 +107,7 @@
             <!-- COMPLETE -->
 
             <button class="btn btn-xs btn-success" (click)="completeAppointment(row.id)"
-              title="Complete" [disabled]="!canComplete()">
+              title="Complete" [disabled]="!canComplete() || row.status === 'Completed'">
               <i class="ti ti-check"></i>
             </button>
 
