@@ -30,6 +30,8 @@ import { CategoryListComponent } from './features/settings/categories/category-l
 import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
 import { LocationListComponent } from './features/settings/locations/location-list/location-list.component';
 import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
+import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
+import { FdoListComponent } from './features/userManagement/fdo-list/fdo-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },

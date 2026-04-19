@@ -1,5 +1,5 @@
 import db from "../models/index.js";
-const { User, UserRole } = db;
+const { User, UserRole,Role } = db;
 import bcrypt from 'bcryptjs';
 
 export const getAllUsers = async (req, res) => {
@@ -7,10 +7,12 @@ export const getAllUsers = async (req, res) => {
         const users = await User.findAll({
             attributes: { exclude: ['password'] },
             where: { deleted_at: null },
-            include: [
+             include: [
                 {
-                    model: UserRole,
-                    attributes: ['role_id']
+                    model: Role,
+                    as: "roles",   // IMPORTANT (must match association)
+                    attributes: ['id', 'name'],
+                    through: { attributes: [] } // hides pivot table
                 }
             ]
         });
@@ -81,34 +83,44 @@ export const getUserById = async (req, res) => {
     }
 };
 export const updateUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, email, is_active, role } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, email, is_active } = req.body;
 
-        const user = await User.findByPk({
-            where: { id, deleted_at: null }
-        });
-        if (!user) {
-            return res.api.notFound("User not found");
-        }
+    const user = await User.findOne({
+      where: {
+        id,
+        deleted_at: null
+      }
+    });
 
-        const updatedData = {};
-
-        if (name !== undefined) updatedData.name = name;
-        if (email !== undefined) updatedData.email = email;
-        if (is_active !== undefined) updatedData.is_active = is_active;
-        if (role !== undefined) updatedData.role = role;
-
-        await user.update(updatedData);
-
-        return res.status(200).json({
-            success: true,
-            message: "User updated successfully",
-            data: user
-        });
-    } catch (error) {
-        return res.api.error("Failed to update user");
+    if (!user) {
+      return res.status(404).json({
+        success:false,
+        message:"User not found"
+      });
     }
+
+    await user.update({
+      name,
+      email,
+      is_active
+    });
+    console.log(user);
+    return res.status(200).json({
+      success:true,
+      message:"Updated successfully",
+      data:user
+    });
+
+  } catch(error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success:false,
+      message:"Update failed"
+    });
+  }
 };
 
 export const deleteUser = async (req, res) => {

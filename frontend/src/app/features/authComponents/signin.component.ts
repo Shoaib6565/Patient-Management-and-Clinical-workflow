@@ -84,6 +84,7 @@ export class SigninComponent {
           }
           console.log('Logged in user:', user);
           const role = user.roles[0].name;
+          localStorage.setItem('role',role);
           if (role === 'Admin') {
             this.router.navigate(['/dashboard/admin']);
           } else if (role === 'Doctor') {

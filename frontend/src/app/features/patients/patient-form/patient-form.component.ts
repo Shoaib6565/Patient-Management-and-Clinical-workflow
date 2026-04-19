@@ -71,7 +71,7 @@ export class PatientFormComponent {
         const age = this.calculateAge(dob);
         this.patientForm.get('age')?.setValue(age, { emitEvent: false });
       });
-      this.createPatient
+    this.createPatient;
   }
 
   calculateAge(dob: string): number {
@@ -97,46 +97,24 @@ export class PatientFormComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.patientService
-      .checkDuplicatePatient(
-        formValue.first_name!,
-        formValue.last_name!,
-        formValue.date_of_birth!,
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.exists) {
-            this.errorMessage = 'Patient already exists with same details';
-            this.loading = false;
-            return;
-          }
-          this.patientService.createPatient(formValue).subscribe({
-            next: (createRes: any) => {
-              this.successMessage = createRes.message;
+    this.patientService.createPatient(formValue).subscribe({
+      next: (createRes: any) => {
+        this.successMessage = createRes.message;
 
-              this.patientForm.reset({
-                preferred_language: 'English',
-                patient_status: 'Active',
-                registration_date: new Date().toISOString(),
-              });
+        this.patientForm.reset({
+          preferred_language: 'English',
+          patient_status: 'Active',
+          registration_date: new Date().toISOString(),
+        });
 
-              this.loading = false;
-            },
-            error: (err) => {
-              this.errorMessage =
-                err?.error?.message || 'Failed to create patient';
-              this.loading = false;
-            },
-          });
-        },
-        error: () => {
-          this.errorMessage = 'Duplicate check failed';
-          this.loading = false;
-        },
-      });
+        this.loading = false;
+      },
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to create patient';
+        this.loading = false;
+      },
+    });
   }
-
-
 
   closeDetails() {
     this.isOpen = false;

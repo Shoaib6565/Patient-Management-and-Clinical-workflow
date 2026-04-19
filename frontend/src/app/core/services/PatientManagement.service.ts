@@ -65,16 +65,5 @@ export class PatientManagementService {
       `${this.apiUrl.baseUrl}${this.apiUrl.patients}/patientCount/total`,
     );
   }
-  checkDuplicatePatient(first_name: string, last_name: string, date_of_birth: string) {
-  return this.http.get<any>(
-    `${this.apiUrl.baseUrl}${this.apiUrl.patients}/check-duplicate`,
-    {
-      params: {
-        first_name,
-        last_name,
-        date_of_birth,
-      },
-    }
-  );
-}
+
 }
