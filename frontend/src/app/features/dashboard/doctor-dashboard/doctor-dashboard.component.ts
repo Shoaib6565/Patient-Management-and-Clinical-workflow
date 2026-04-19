@@ -53,9 +53,7 @@ loadAppointments() {
       this.appointments = data.filter((app: any) =>
         Number(app.doctor_id) === Number(this.currentDoctorId)
       );
-      console.log('ALL APPOINTMENTS:', data);
-console.log('CURRENT DOCTOR ID:', this.currentDoctorId);
-
+     
       this.pages = Array.from(
         { length: this.pagination?.totalPages || 0 },
         (_, i) => i + 1

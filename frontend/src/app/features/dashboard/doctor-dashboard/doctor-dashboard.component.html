@@ -1,11 +1,7 @@
 <div class="p-4 space-y-4">
-
-  <!-- HEADER -->
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-bold">My Appointments</h2>
   </div>
-
-  <!-- TABLE -->
   <div class="card bg-base-100 shadow-md">
     <div class="overflow-x-auto">
       <table class="table">
@@ -13,8 +9,6 @@
         <thead>
           <tr>
             <th>Patient</th>
-            <th>Doctor</th>
-            <th>Specialty</th>
             <th>Location</th>
             <th>Date</th>
             <th>Time</th>
@@ -37,16 +31,9 @@
           <tr (click)="selectAppointment(app)" class="hover:bg-base-200 cursor-pointer">
 
             <td>
-              {{ app.patient?.first_name }} {{ app.patient?.last_name }}
+              {{ app.patient.first_name }} {{ app.patient?.last_name }}
             </td>
 
-            <td>
-              {{ app.doctor?.name }}
-            </td>
-
-            <td>
-              {{ app.specialty?.specialty_name }}
-            </td>
 
             <td>
               {{ app.practice_location?.location_name }}
