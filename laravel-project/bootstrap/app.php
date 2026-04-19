@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         'node.jwt' => \App\Http\Middleware\VerifyNodeJwt::class,
     ]);
         //
+          //CORS is enabled
+     $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

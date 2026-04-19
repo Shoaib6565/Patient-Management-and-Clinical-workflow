@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost:8000'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +94,9 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
+
+    // for JWT token verification from Node
+    'jwt_node_secret' => env('JWT_NODE_SECRET'),
 
     'cipher' => 'AES-256-CBC',
 

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { VisitService } from '../../../core/services/visit.service';
 import { CommonModule } from '@angular/common';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { AuthService } from '../../../core/services/auth-service.service';
 
 @Component({
   selector: 'app-visit-form',
@@ -13,6 +14,7 @@ import { AppointmentService } from '../../../core/services/appointment.service';
   styleUrl: './visit-form.component.css'
 })
 export class VisitFormComponent implements OnInit {
+  authService = inject(AuthService);
 
   visitForm!: FormGroup;
   visitId!: number | null;
@@ -28,7 +30,7 @@ export class VisitFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private visitService: VisitService,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +46,14 @@ export class VisitFormComponent implements OnInit {
 
     this.setupBMI();
   }
+
+  role : string | null = this.authService.getRole() || null;
+  canUpdate(): boolean {
+    if (this.role === 'Admin') return true;
+    if (this.role === 'Doctor' && this.visitForm.value.visit_status !== 'Finalized') return true;
+    return false;
+  }
+
 
   initForm() {
     this.visitForm = this.fb.group({

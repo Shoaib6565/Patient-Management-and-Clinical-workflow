@@ -59,4 +59,34 @@ export class FirmService {
   deactivateFirm(id: number): Observable<any> {
     return this.http.patch(`${this.baseUrl}/deactivate/${id}`, {});
   }
+
+  // Alias methods for component usage
+  getAll(params?: any): Observable<any> {
+    return this.getFirms(
+      params?.search || '',
+      params?.status || 'all',
+      params?.type || '',
+      params?.page || 1
+    );
+  }
+
+  create(data: any): Observable<any> {
+    return this.createFirm(data);
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.updateFirm(id, data);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.deleteFirm(id);
+  }
+
+  activate(id: number): Observable<any> {
+    return this.activateFirm(id);
+  }
+
+  deactivate(id: number): Observable<any> {
+    return this.deactivateFirm(id);
+  }
 }

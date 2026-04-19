@@ -53,4 +53,33 @@ export class SpecialtyService {
     return this.http.patch(`${this.apiUrl}/${id}/deactivate`, {});
   }
 
+  // Alias methods for component usage
+  getAll(params?: any): Observable<any> {
+    return this.getSpecialties(
+      params?.search || '',
+      params?.filter || 'all',
+      params?.page || 1
+    );
+  }
+
+  create(data: any): Observable<any> {
+    return this.createSpecialty(data);
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.updateSpecialty(id, data);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.deleteSpecialty(id);
+  }
+
+  activate(id: number): Observable<any> {
+    return this.activateSpecialty(id);
+  }
+
+  deactivate(id: number): Observable<any> {
+    return this.deactivateSpecialty(id);
+  }
+
 }

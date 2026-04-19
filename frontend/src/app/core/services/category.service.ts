@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
 
-  private baseUrl = 'http://localhost:8000/api/categories'; // adjust if needed
+  private baseUrl = environment.apiLaravelUrl + '/categories';
 
   constructor(private http: HttpClient) {}
 
@@ -55,5 +56,26 @@ export class CategoryService {
   //  Deactivate
   deactivateCategory(id: number): Observable<any> {
     return this.http.patch(`${this.baseUrl}/${id}/deactivate`, {});
+  }
+
+  // Alias methods for component usage
+  create(data: any): Observable<any> {
+    return this.createCategory(data);
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.updateCategory(id, data);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.deleteCategory(id);
+  }
+
+  activate(id: number): Observable<any> {
+    return this.activateCategory(id);
+  }
+
+  deactivate(id: number): Observable<any> {
+    return this.deactivateCategory(id);
   }
 }

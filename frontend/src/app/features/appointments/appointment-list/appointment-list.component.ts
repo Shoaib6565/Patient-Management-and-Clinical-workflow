@@ -203,6 +203,11 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
+   canExport(): boolean {
+    return this.role === 'Admin';
+  }
+
+
   canCreate(): boolean {
     return this.role === 'FDO' || this.role === 'Admin';
   }

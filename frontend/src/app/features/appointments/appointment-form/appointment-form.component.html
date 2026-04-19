@@ -178,7 +178,7 @@
             Cancel
           </button>
 
-          <button type="submit" class="btn btn-primary flex items-center gap-2">
+          <button type="submit" class="btn btn-primary flex items-center gap-2" [disabled]="form.invalid || !canCreateAndUpdate()">
             <i class="ti ti-device-floppy"></i>
             {{ isEdit ? "Update" : "Create" }}
           </button>

@@ -20,7 +20,9 @@
 
       <!-- ACTION BAR -->
       <div class="flex justify-between my-3">
-        <button class="btn btn-primary" (click)="exportCSV()">
+        <button class="btn btn-primary" (click)="exportCSV()"
+         [disabled]="!canExport()">
+          <i class="ti ti-file-export mr-2"></i>
           Export CSV
         </button>
       </div>
@@ -95,7 +97,8 @@
 
             <!-- EDIT -->
 
-            <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]" title="Edit">
+            <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]"
+             title="Edit" [disabled]="!canEdit()">
 
               <i class="ti ti-edit"></i>
 
@@ -104,14 +107,15 @@
             <!-- COMPLETE -->
 
             <button class="btn btn-xs btn-success" (click)="completeAppointment(row.id)"
-              title="Complete">
+              title="Complete" [disabled]="!canComplete()">
               <i class="ti ti-check"></i>
             </button>
 
 
             <!-- DELETE -->
 
-            <button class="btn btn-xs btn-error" (click)="delete(row.id)" title="Delete">
+            <button class="btn btn-xs btn-error" (click)="delete(row.id)"
+             title="Delete" [disabled]="!canDelete()">
               <i class="ti ti-trash"></i>
             </button>
           </ng-template>

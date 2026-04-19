@@ -9,6 +9,7 @@ import { SpecialtyService } from '../../../core/services/specialty.service';
 import { CasesService } from './../../../core/services/Cases.service';
 import { PatientManagementService } from '../../../core/services/PatientManagement.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/services/auth-service.service';
 
 @Component({
   selector: 'app-appointment-form',
@@ -25,6 +26,7 @@ export class AppointmentFormComponent implements OnInit {
     private specialtyService: SpecialtyService,
     private casesService: CasesService,
     private patientService: PatientManagementService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -54,7 +56,7 @@ export class AppointmentFormComponent implements OnInit {
     notes: [''],
   });
 
-formatDate(date: string) { 
+formatDate(date: string) {
   if (!date) return '';
   return date.split('T')[0];
 }
@@ -117,6 +119,11 @@ formatDate(date: string) {
     this.casesService
       .getAllCases() // inside bracket  event.target.value
       .subscribe((res: any) => (this.cases = res.data));
+  }
+
+  canCreateAndUpdate(): boolean {
+    const role = this.authService.getRole();
+    return role === 'Admin' || role === 'FDO';
   }
 
   cancel() {

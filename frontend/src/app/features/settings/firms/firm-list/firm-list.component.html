@@ -1,1 +1,99 @@
-<p>firm-list works!</p>
+<div class="p-6">
+
+  <div class="flex justify-between mb-4">
+    <h2 class="text-xl font-bold">Firms</h2>
+    <button class="btn btn-primary" (click)="openCreate()"
+      [disabled]="!canCreateEditAndDelete()">
+      <i class="ti ti-plus"></i>
+       Add</button>
+  </div>
+
+  <!-- FILTER -->
+  <app-filter (apply)="applyFilter($event)"
+              (reset)="resetFilter()"></app-filter>
+
+  <!-- TABLE -->
+  <ngx-datatable
+    class="material"
+    [rows]="rows"
+    [columnMode]="'force'"
+    [headerHeight]="50"
+    [rowHeight]="'auto'"
+    [limit]="10">
+
+    <ngx-datatable-column name="Firm Name" prop="firm_name"></ngx-datatable-column>
+    <ngx-datatable-column name="Type" prop="firm_type"></ngx-datatable-column>
+    <ngx-datatable-column name="Phone" prop="phone"></ngx-datatable-column>
+
+    <ngx-datatable-column name="Status">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <span class="badge"
+          [ngClass]="row.is_active ? 'badge-success' : 'badge-error'">
+          {{ row.is_active ? 'Active' : 'Inactive' }}
+        </span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Actions">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+
+        <div class="flex gap-2">
+
+          <button class="btn btn-sm btn-info"
+            title="Edit"
+            (click)="openEdit(row)"
+            [disabled]="!canCreateEditAndDelete()">
+            <i class="ti ti-edit"></i>
+          </button>
+
+          <button class="btn btn-sm btn-error"
+            title="Delete"
+            (click)="delete(row.id)"
+            [disabled]="!canCreateEditAndDelete()">
+            <i class="ti ti-trash"></i>
+          </button>
+
+          <label class="label cursor-pointer">
+            <input type="checkbox"
+              class="toggle"
+              title="Toggle Status"
+              [checked]="row.is_active"
+              (change)="toggle(row)"
+              [disabled]="!canCreateEditAndDelete()">
+          </label>
+
+        </div>
+
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+
+  <!-- PAGINATION -->
+  <div class="mt-4">
+    <app-pagination [pagination]="pagination" (pageChange)="load($event)"></app-pagination>
+  </div>
+
+  <!-- MODAL -->
+  <app-modal *ngIf="showForm" (close)="showForm=false">
+
+    <app-firm-form
+      [isEdit]="isEdit"
+      [data]="selectedData"
+      (saved)="onSaved()"
+      (cancel)="showForm=false">
+    </app-firm-form>
+
+  </app-modal>
+
+  <!-- CONFIRMATION DIALOG -->
+  <app-confirm-dialog
+    [visible]="showConfirmDialog"
+    title="Confirm Delete"
+    message="Are you sure you want to delete this item?"
+    buttonName="Delete"
+    (onConfirm)="onConfirmDelete()"
+    (onCancel)="onCancelDelete()">
+  </app-confirm-dialog>
+
+</div>

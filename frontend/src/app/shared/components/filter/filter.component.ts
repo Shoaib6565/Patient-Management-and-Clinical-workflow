@@ -1,38 +1,31 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-export type FilterType = 'text' | 'select' | 'dateRange';
-
-export interface FilterField {
-  key: string;
-  label?: string;
-  type: FilterType;
-  options?: string[];
-}
-
 @Component({
-  selector: 'app-data-filter',
+  selector: 'app-filter',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.css']
+  templateUrl: './filter.component.html'
 })
-export class DataFilterComponent {
+export class FilterComponent {
 
-  @Input() fields: FilterField[] = [];
+  search = '';
+  status = 'all';
 
-  @Output() filterChange = new EventEmitter<any>();
+  @Output() apply = new EventEmitter<any>();
+  @Output() reset = new EventEmitter<void>();
 
-  filterValues: any = {};
-
-  // update filter
-  onChange() {
-    this.filterChange.emit(this.filterValues);
+  onApply() {
+    this.apply.emit({
+      search: this.search,
+      status: this.status
+    });
   }
 
-  reset() {
-    this.filterValues = {};
-    this.filterChange.emit(this.filterValues);
+  onReset() {
+    this.search = '';
+    this.status = 'all';
+    this.reset.emit();
   }
 }

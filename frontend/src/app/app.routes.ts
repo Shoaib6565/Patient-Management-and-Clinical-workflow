@@ -20,6 +20,16 @@ import { PatientListComponent } from './features/patients/patient-list/patient-l
 import { VisitListComponent } from './features/visits/visit-list/visit-list.component';
 import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
 import { PatientFormComponent } from './features/patients/patient-form/patient-form.component';
+import { SpecialtyListComponent } from './features/settings/specialties/specialty-list/specialty-list.component';
+import { SpecialtyFormComponent } from './features/settings/specialties/specialty-form/specialty-form.component';
+import { FirmListComponent } from './features/settings/firms/firm-list/firm-list.component';
+import { FirmFormComponent } from './features/settings/firms/firm-form/firm-form.component';
+import { InsuranceListComponent } from './features/settings/insurance/insurance-list/insurance-list.component';
+import { InsuranceFormComponent } from './features/settings/insurance/insurance-form/insurance-form.component';
+import { CategoryListComponent } from './features/settings/categories/category-list/category-list.component';
+import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
+import { LocationListComponent } from './features/settings/locations/location-list/location-list.component';
+import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
@@ -99,6 +109,47 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'specialties',
+        component: SpecialtyListComponent,
+        children: [
+          { path: 'create', component: SpecialtyFormComponent },
+          {path: 'edit/:id', component: SpecialtyFormComponent },
+        ]
+      },
+      {
+        path: 'firms',
+        component: FirmListComponent,
+        children: [
+          { path: 'create', component: FirmFormComponent },
+          {path: 'edit/:id', component: FirmFormComponent },
+        ]
+      },
+      {
+        path: 'insurances',
+        component: InsuranceListComponent,
+        children: [
+          { path: 'create', component: InsuranceFormComponent },
+          {path: 'edit/:id', component: InsuranceFormComponent },
+        ]
+      },
+      {
+        path: 'categories',
+        component: CategoryListComponent,
+        children: [
+          { path: 'create', component: CategoryFormComponent },
+          {path: 'edit/:id', component: CategoryFormComponent },
+        ]
+      },
+      {
+        path: 'locations',
+        component: LocationListComponent,
+        children: [
+          { path: 'create', component: LocationFormComponent },
+          {path: 'edit/:id', component: LocationFormComponent },
+        ]
+      },
+
     ],
   },
 
