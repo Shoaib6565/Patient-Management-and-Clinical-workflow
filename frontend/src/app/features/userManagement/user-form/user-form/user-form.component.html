@@ -1,0 +1,107 @@
+@if (isOpen) {
+<form [formGroup]="userForm">
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeForm()"></div>
+    <div class="relative w-full max-w-4xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+      <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
+        <div>
+          <h2 class="text-lg font-bold">User Profile</h2>
+          <p class="text-xs opacity-60">Create and manage system user</p>
+        </div>
+
+        <button class="btn btn-sm btn-circle btn-ghost" (click)="closeForm()">
+          ✕
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-6">
+        <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
+
+          <div class="flex items-center gap-4">
+
+            <div class="avatar placeholder">
+              <div class="bg-primary text-white rounded-full w-16 text-xl">
+                {{ userForm.get('name')?.value?.charAt(0) || 'U' }}
+              </div>
+            </div>
+
+            <div>
+              <div class="text-lg font-semibold">
+                {{ userForm.get('name')?.value }}
+              </div>
+              <div class="text-sm opacity-60">
+                {{ userForm.get('email')?.value }}
+              </div>
+            </div>
+
+          </div>
+
+          <span class="badge px-3 py-2 text-sm"
+            [ngClass]="{
+              'badge-success': userForm.get('is_active')?.value,
+              'badge-error': !userForm.get('is_active')?.value
+            }">
+            {{ userForm.get('is_active')?.value ? 'Active' : 'Inactive' }}
+          </span>
+
+        </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">USER INFO</h3>
+
+            <input class="input input-sm w-full" formControlName="name" placeholder="Full Name" />
+
+            <input class="input input-sm w-full" formControlName="email" placeholder="Email" />
+
+            <input type="password" class="input input-sm w-full" formControlName="password" placeholder="Password" />
+
+          </div>
+
+
+          <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+            <h3 class="font-semibold text-sm opacity-70">ACCESS CONTROL</h3>
+
+            <select class="select select-sm w-full" formControlName="role_id">
+              <option value="">Select Role</option>
+              <option value="2">Doctor</option>
+              <option value="3">Receptionist</option>
+            </select>
+
+            <label class="flex items-center gap-2 mt-2">
+              <input type="checkbox" class="toggle toggle-sm" formControlName="is_active" />
+              <span class="text-sm">Active User</span>
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+   
+      <div class="flex justify-end gap-2 border-t bg-base-200/40 px-6 py-4">
+
+        <button class="btn btn-ghost" (click)="closeForm()">
+          Cancel
+        </button>
+
+        <button class="btn btn-primary"
+          (click)="createUser()"
+          [disabled]="loading || userForm.invalid">
+
+          @if (loading) {
+            <span class="loading loading-spinner"></span>
+          }
+
+          Create User
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+</form>
+}

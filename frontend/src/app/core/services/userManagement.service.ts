@@ -42,13 +42,7 @@ export class UserManagementService {
   resetPassword(userId: string, newPassword: string) {
     return this.http.post(
       `${this.apiUrl.baseUrl}${this.apiUrl.users}/reset-password/${userId}`,
-      { newPassword },
-    );
-  }
-  restoreUser(userId: string) {
-    return this.http.post(
-      `${this.apiUrl.baseUrl}${this.apiUrl.users}/restore/${userId}`,
-      {},
+      { new_password: newPassword },
     );
   }
   getActiveDoctorCount() {

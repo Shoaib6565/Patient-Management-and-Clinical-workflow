@@ -18,6 +18,8 @@ import { CalendarViewComponent } from './features/appointments/calendar-view/cal
 import { roleGuard } from './core/guards/role.guard';
 import { PatientListComponent } from './features/patients/patient-list/patient-list.component';
 import { PatientFormComponent } from './features/patients/patient-form/patient-form.component';
+import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
+import { FdoListComponent } from './features/userManagement/fdo-list/fdo-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
@@ -47,39 +49,61 @@ export const routes: Routes = [
       { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Optional: default subroute
     ],
   },
-  {
-    path: 'cases',
-    component: CaseListComponent,
-    children: [
-      { path: 'case-form', component: CaseFormComponent },
-      { path: 'case-detail', component: CaseDetailComponent },
-    ],
-  },
-  {
-    path: 'appointments',
-    component: AppointmentListComponent,
-    children: [
-      { path: 'appointment-form', component: AppointmentFormComponent },
-      { path: 'appointment-calendar-view', component: CalendarViewComponent },
-    ],
-  },
-  {
-    path: 'patients',
-    component: PatientListComponent,
-    children: [
-      {
-        path: 'patient-form',
-        component: PatientFormComponent,
-      },
-    ],
-  },
 
-  // grouping for all protected routes
+
+
+
+  // grouping for all protected routes with dashboard layout
   {
     path: '',
-    // canActivate: [authGuard],
+    component: DashboardLayoutComponent, //  same layout
     children: [
-      // {path: 'dashboard', component: DashboardLayoutComponent}
+      {
+        path: 'appointments',
+        component: AppointmentListComponent,
+        children: [
+          { path: 'create', component: AppointmentFormComponent },
+          { path: 'edit/:id', component: AppointmentFormComponent },
+          {
+            path: 'appointment-calendar-view',
+            component: CalendarViewComponent,
+          },
+        ],
+      },
+      // {
+      //   path: 'visits',
+      //   component: VisitListComponent,
+      //   children: [{ path: 'visit-form', component: VisitFormComponent }],
+      // },
+
+      {
+        path: 'cases',
+        component: CaseListComponent,
+        children: [
+          { path: 'case-form', component: CaseFormComponent },
+        ],
+      },
+      {
+        path: 'patients',
+        component: PatientListComponent,
+        children: [
+          {
+            path: 'patient-form',
+            component: PatientFormComponent,
+          },
+        ],
+      },
+      {
+        path:'user',
+        component:FdoListComponent,
+         children: [
+          {
+        path:'user-form',
+        component:UserFormComponent
+          },
+
+        ],
+      }
     ],
   },
   // {path: '', redirectTo: ''},

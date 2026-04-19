@@ -7,7 +7,7 @@ import { auth } from "../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 export default router;
 
-router.post("/", auth, createUser);
+router.post("/", createUser);
 router.get("/", auth, roleMiddleware("Admin"), getAllUsers);
 router.get("/:id", auth, roleMiddleware("Admin"), getUserById);
 router.put("/:id", auth, roleMiddleware("Admin"), updateUser);
