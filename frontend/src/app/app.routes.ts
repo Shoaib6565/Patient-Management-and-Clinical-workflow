@@ -20,6 +20,7 @@ import { InsuranceFormComponent } from './features/settings/insurance/insurance-
 import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
 import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
 import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
+import { PatientHistoryComponent  } from "./features/patients/patient-history/patient-history.component"
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
@@ -101,6 +102,7 @@ export const routes: Routes = [
             .then(m => m.PatientListComponent),
       },
       { path: 'patients/patient-form', component: PatientFormComponent },
+      { path: 'patient-history/:id', component: PatientHistoryComponent },
 
       //  SPECIALTIES
       {
@@ -154,7 +156,7 @@ export const routes: Routes = [
 
       //  USERS 
       {
-        path: 'users',
+        path: 'users/user-form',
         component: UserFormComponent,
       },
 

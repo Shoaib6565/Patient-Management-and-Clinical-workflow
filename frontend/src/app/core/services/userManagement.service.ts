@@ -17,6 +17,14 @@ export class UserManagementService {
       `${this.apiUrl.baseUrl}${this.apiUrl.users}`,
     );
   }
+
+  // get docotor
+  getDoctors() {
+    return this.http.get<any>(
+      `${this.apiUrl.baseUrl}${this.apiUrl.users}/doctors`,
+    );
+  }
+
   getUserById(userId: string) {
     return this.http.get(
       `${this.apiUrl.baseUrl}${this.apiUrl.users}/${userId}`,

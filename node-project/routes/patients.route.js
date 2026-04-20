@@ -16,7 +16,7 @@ import { roleMiddleware } from "../middlewares/role.middleware.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 router.get("/export", auth, roleMiddleware("Admin"), exportPatientsCSV);
-router.get("/getPatientByAppointmentId/:appointmentId", auth, roleMiddleware("Admin", "doctor", "FDO"), getPatientByAppointmentId);
+router.get("/getPatientByAppointmentId/:appointmentId", auth, roleMiddleware("Admin", "Doctor", "FDO"), getPatientByAppointmentId);
 
 router.post("/", auth, roleMiddleware("FDO","Admin"), createPatient);
 router.get("/", auth, roleMiddleware("Admin", "FDO"), getAllPatients);

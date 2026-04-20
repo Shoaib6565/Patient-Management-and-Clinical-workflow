@@ -31,6 +31,7 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
+
 export const createUser = async (req, res) => {
     try {
         const { name, email, password, is_active, role_id } = req.body;

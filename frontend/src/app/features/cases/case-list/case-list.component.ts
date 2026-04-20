@@ -196,9 +196,4 @@ closeEdit() {
     const role = localStorage.getItem('role');
     return role ? input.includes(role) : false;
   }
-  isAdminAndFDO(){
-    const role = localStorage.getItem('role');
-    return role;
-  }
-
 }

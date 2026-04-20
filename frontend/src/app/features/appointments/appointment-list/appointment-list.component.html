@@ -104,6 +104,14 @@
 
             </button>
 
+            <!-- View Patient Detail -->
+              <button class="btn btn-xs btn-warning" [routerLink]="['/patient-history', row.id]"
+             title="Patient Detail" [disabled]="!canEdit()">
+
+             <i class="ti ti-eye"></i>
+
+            </button>
+
             <!-- COMPLETE -->
 
             <button class="btn btn-xs btn-success" (click)="completeAppointment(row.id)"

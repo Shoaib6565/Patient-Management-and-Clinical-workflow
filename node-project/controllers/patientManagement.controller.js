@@ -305,13 +305,13 @@ export const exportPatientsCSV = async (req, res) => {
 
 export const getPatientByAppointmentId = async (req, res) => {
   try {
-    const { DoctorId } = req.params;
+    const { appointmentId  } = req.params;
 
     const patientData = await Patient.findOne({
       include: [
         {
           model: Appointment,
-          where: { id: DoctorId },
+          where: { id: appointmentId },
           attributes: ["status"],
           required: true,
           include: [

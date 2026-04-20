@@ -75,6 +75,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
     appointment_type: ['', Validators.required],
     duration_minutes: [30, Validators.required],
     reason_for_visit: ['', Validators.required],
+    appointment_status: ['Scheduled', Validators.required],
     notes: ['']
   });
 
@@ -116,6 +117,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
 
         this.allCases = this.extractArray(results.cases);
         this.cases = [...this.allCases];
+        console.log('allcases: ----->',this.allCases);
 
         if (this.isEdit) {
           this.loadAppointment();
@@ -148,6 +150,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
             appointment_type: d.appointment_type,
             duration_minutes: d.duration_minutes || 30,
             reason_for_visit: d.reason_for_visit,
+            appointment_status: d.status || 'Scheduled',
             notes: d.notes
           });
 
@@ -206,7 +209,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
 
   const doctor = this.allDoctors.find(d => d.id == doctorId);
 
-  // optional filtering logic (safe)
+  // optional filtering logic 
   if (doctor?.specialties) {
     this.specialties = doctor.specialties;
   }
@@ -217,7 +220,6 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
 }
 
 onSpecialtyChange(specialtyId: string) {
-  // future filtering logic
   console.log('Specialty changed:', specialtyId);
 }
 
@@ -229,8 +231,10 @@ onSpecialtyChange(specialtyId: string) {
 
     const payload = {
       ...this.form.value,
+      status: this.form.value.appointment_status,
       created_by: localStorage.getItem('userId')
     };
+    delete payload.appointment_status;
 
     const req = this.isEdit
       ? this.appointmentService.updateAppointment(this.id, payload)

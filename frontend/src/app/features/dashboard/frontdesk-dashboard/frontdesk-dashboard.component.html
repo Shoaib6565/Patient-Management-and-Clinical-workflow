@@ -1,9 +1,7 @@
 <!-- frontdesk-dashboard.component.html -->
 <div class="fd-page">
 
-  <!-- ═══════════════════════════════════════
-       PAGE HEADER
-  ═══════════════════════════════════════ -->
+  <!--PAGE HEADER -->
   <div class="fd-page-header">
     <div>
       <h1 class="fd-title">Front Desk Dashboard</h1>
@@ -20,9 +18,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════
-       TOP ROW: Stat Cards + Doctor Availability
-  ═══════════════════════════════════════ -->
+  <!--  TOP ROW: Stat Cards + Doctor Availability -->
   <div class="fd-top-row">
 
     <!-- Stat Cards -->
@@ -59,15 +55,9 @@
         </svg>
         DOCTOR AVAILABILITY
       </div>
-      <div class="fd-doc-pills">
-        <div
-          class="fd-doc-pill"
-          *ngFor="let doc of doctors"
-          [ngClass]="getDoctorStatusClass(doc.status)"
-        >
-          <span class="fd-doc-pill__dot"></span>
-          {{ doc.name }} ({{ doc.statusLabel }})
-        </div>
+      <div class="fd-doc-card__summary">
+        <span class="fd-doc-count">{{ activeDoctorsCount }}</span>
+        <span class="fd-doc-status-text">Active doctors available</span>
       </div>
       <!-- decorative cross icon -->
       <div class="fd-doc-card__deco">
@@ -79,9 +69,7 @@
 
   </div>
 
-  <!-- ═══════════════════════════════════════
-       MAIN CONTENT: Agenda + Right Panel
-  ═══════════════════════════════════════ -->
+  <!--  MAIN CONTENT: Agenda + Right Panel-->
   <div class="fd-main-grid">
 
     <!-- ── Daily Agenda ── -->
@@ -181,6 +169,9 @@
           <button class="fd-view-all-btn" (click)="onViewAllDocuments()">View All</button>
         </div>
         <div class="fd-doc-list">
+          <div class="fd-doc-empty" *ngIf="documents.length === 0">
+            <span>No documents available right now.</span>
+          </div>
           <div class="fd-doc-item" *ngFor="let doc of documents">
             <div class="fd-doc-icon" [ngClass]="getDocIconClass(doc.urgency)">
               <!-- PDF icon -->
