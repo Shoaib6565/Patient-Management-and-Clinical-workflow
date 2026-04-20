@@ -1,19 +1,16 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use Illuminate\Http\Request;
-use App\Jobs\ExportAppointmentsCsvJob;
-use App\Services\AppointmentService;
-use App\Services\NotificationService;
 use App\Models\Export;
 use App\Models\Notification;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Services\AppointmentService;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentController extends Controller
 {
-
 
     protected $appointmentService;
 
@@ -30,9 +27,9 @@ class AppointmentController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => [
-                'total_appointments' => $totalAppointments
-            ]
+            'data'   => [
+                'total_appointments' => $totalAppointments,
+            ],
         ]);
     }
 
@@ -45,8 +42,6 @@ class AppointmentController extends Controller
 
         return response()->json($appointments);
     }
-
-
 
     /// export to csv (Admin )
     // public function export(Request $request)
@@ -64,7 +59,6 @@ class AppointmentController extends Controller
     //     ]);
     // }
 
-
     public function export(Request $request)
     {
         $query = $this->appointmentService->getFilteredAppointments($request->all());
@@ -74,7 +68,7 @@ class AppointmentController extends Controller
         $filename = 'appointments_' . now()->format('Y_m_d_H_i_s') . '.csv';
 
         $headers = [
-            "Content-Type" => "text/csv",
+            "Content-Type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$filename",
         ];
 
@@ -83,7 +77,7 @@ class AppointmentController extends Controller
             'Patient',
             'Doctor',
             'Date',
-            'Status'
+            'Status',
         ];
 
         $callback = function () use ($appointments, $columns) {
@@ -108,56 +102,59 @@ class AppointmentController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-
     //  2. Create Appointment (FDO)
     public function store(Request $request)
     {
         $request->validate([
-            'case_id' => 'required',
-            'patient_id' => 'required',
-            'doctor_id' => 'required',
-            'specialty_id' => 'required',
+            'case_id'              => 'required',
+            'patient_id'           => 'required',
+            'doctor_id'            => 'required',
+            'specialty_id'         => 'required',
             'practice_location_id' => 'required',
-            'appointment_date' => 'required|date',
-            'appointment_time' => 'required',
-            'appointment_type' => 'required',
-            'reason_for_visit' => 'required'
+            'appointment_date'     => 'required|date',
+            'appointment_time'     => 'required',
+            'appointment_type'     => 'required',
+            'reason_for_visit'     => 'required',
         ]);
-
 
         $user = $request->attributes->get('auth_user');
 
         $appointment = Appointment::create([
-            ...$request->all(),
-            'created_by' => $request->doctor_id || $user->id // FDO ID
+             ...$request->all(),
+            'created_by' => $request->created_by || $user->id, // FDO ID
         ]);
 
-
-        // notification store in db
-        Notification::create([
-            'user_id' => $request->doctor_id,
-            'type' => 'appointment',
-            'message' => 'New appointment assigned',
-            'data' => [
-                'appointment_id' => $appointment->id
-            ]
-        ]);
-        $notificationService = app(NotificationService::class);
-        $notificationService->sendToUser(
-            $request->doctor_id,
-            [
+        try {
+            // store in DB
+            Notification::create([
+                'user_id' => $request->doctor_id,
+                'type'    => 'appointment',
                 'message' => 'New appointment assigned',
-                'appointment_id' => $appointment->id
-            ]
-        );
+                'data'    => [
+                    'appointment_id' => $appointment->id,
+                ],
+            ]);
+
+            // send real-time notification
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $request->doctor_id,
+                [
+                    'message'        => 'New appointment assigned',
+                    'appointment_id' => $appointment->id,
+                ]
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Notification failed: ' . $e->getMessage());
+        }
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Appointment created successfully',
-            'data' => $appointment
+            'data'    => $appointment,
         ]);
     }
-
 
     // 3. Show (Edit View)
     public function show($id)
@@ -166,120 +163,114 @@ class AppointmentController extends Controller
             'patient',
             'doctor',
             'specialty',
-            'practiceLocation'
+            'practiceLocation',
         ])->find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false, 'message' => 'Not found'], 404);
         }
 
         return response()->json(['status' => true, 'data' => $appointment]);
     }
 
-
     //  Update (FDO)
     public function update(Request $request, $id)
     {
         $appointment = Appointment::find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false, 'message' => 'Not found'], 404);
         }
 
         $appointment->update($request->all());
 
         return response()->json([
-            'status' => true,
-            'message' => 'Appointment updated successfully'
+            'status'  => true,
+            'message' => 'Appointment updated successfully',
         ]);
     }
-
 
     //  Cancel Appointment (FDO)
     public function cancel($id)
     {
         $appointment = Appointment::find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false], 404);
         }
 
         $appointment->update(['status' => 'Cancelled']);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Appointment cancelled'
+            'status'  => true,
+            'message' => 'Appointment cancelled',
         ]);
     }
-
 
     //  Reschedule (FDO)
     public function reschedule(Request $request, $id)
     {
         $request->validate([
             'appointment_date' => 'required|date',
-            'appointment_time' => 'required'
+            'appointment_time' => 'required',
         ]);
 
         $appointment = Appointment::find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false], 404);
         }
 
         $appointment->update([
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
-            'status' => 'Rescheduled'
+            'status'           => 'Rescheduled',
         ]);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Appointment rescheduled'
+            'status'  => true,
+            'message' => 'Appointment rescheduled',
         ]);
     }
-
 
     // Doctor can change status to completed
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Scheduled,In Progress,Completed,Cancelled'
+            'status' => 'required|in:Scheduled,In Progress,Completed,Cancelled',
         ]);
 
         $appointment = Appointment::find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false], 404);
         }
 
         $appointment->update(['status' => $request->status]);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Status updated successfully'
+            'status'  => true,
+            'message' => 'Status updated successfully',
         ]);
 
     }
-
 
     //  Soft Delete (Admin only)
     public function destroy($id)
     {
         $appointment = Appointment::find($id);
 
-        if (!$appointment) {
+        if (! $appointment) {
             return response()->json(['status' => false], 404);
         }
 
         $appointment->delete();
 
         return response()->json([
-            'status' => true,
-            'message' => 'Deleted successfully'
+            'status'  => true,
+            'message' => 'Deleted successfully',
         ]);
     }
-
 
     //  History Patient or Doctor based
     //for doctor View reports of complete visits (filter by date, case type, diagnosis, or patient )
@@ -293,7 +284,7 @@ class AppointmentController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $data
+            'data'   => $data,
         ]);
     }
 }
