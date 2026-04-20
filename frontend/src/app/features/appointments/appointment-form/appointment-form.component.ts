@@ -1,9 +1,3 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { forkJoin, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,28 +12,17 @@ import { SpecialtyService } from '../../../core/services/specialty.service';
 import { CasesService } from '../../../core/services/Cases.service';
 import { PatientManagementService } from '../../../core/services/PatientManagement.service';
 import { UserManagementService } from '../../../core/services/userManagement.service';
-import { PracticeLocationService } from '../../../core/services/practice-location.service';
-import { SpecialtyService } from '../../../core/services/specialty.service';
-import { CasesService } from '../../../core/services/Cases.service';
-import { PatientManagementService } from '../../../core/services/PatientManagement.service';
-import { UserManagementService } from '../../../core/services/userManagement.service';
 
 @Component({
   selector: 'app-appointment-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './appointment-form.component.html'
 })
 export class AppointmentFormComponent implements OnInit, OnDestroy {
-export class AppointmentFormComponent implements OnInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   private destroy$ = new Subject<void>();
-  private fb = inject(FormBuilder);
-  private destroy$ = new Subject<void>();
-
   constructor(
     private appointmentService: AppointmentService,
     private locationService: PracticeLocationService,

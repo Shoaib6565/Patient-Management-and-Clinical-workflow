@@ -10,26 +10,16 @@ import { DoctorDashboardComponent } from './features/dashboard/doctor-dashboard/
 import { FrontdeskDashboardComponent } from './features/dashboard/frontdesk-dashboard/frontdesk-dashboard.component';
 import { AppointmentFormComponent } from './features/appointments/appointment-form/appointment-form.component';
 import { CalendarViewComponent } from './features/appointments/calendar-view/calendar-view.component';
-import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
-import { CaseFormComponent } from './features/cases/case-form/case-form.component';
-import { CaseDetailComponent } from './features/cases/case-detail/case-detail.component';
-import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
-import { CaseFormComponent } from './features/cases/case-form/case-form.component';
-import { CaseDetailComponent } from './features/cases/case-detail/case-detail.component';
 import { PatientFormComponent } from './features/patients/patient-form/patient-form.component';
-import { SpecialtyFormComponent } from './features/settings/specialties/specialty-form/specialty-form.component';
-import { FirmFormComponent } from './features/settings/firms/firm-form/firm-form.component';
-import { InsuranceFormComponent } from './features/settings/insurance/insurance-form/insurance-form.component';
-import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
-import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
-import { SpecialtyFormComponent } from './features/settings/specialties/specialty-form/specialty-form.component';
-import { FirmFormComponent } from './features/settings/firms/firm-form/firm-form.component';
-import { InsuranceFormComponent } from './features/settings/insurance/insurance-form/insurance-form.component';
-import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
-import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
 import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
 import { PatientHistoryComponent  } from "./features/patients/patient-history/patient-history.component"
 import { roleGuard } from './core/guards/role.guard';
+import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
+import { SpecialtyFormComponent } from './features/settings/specialties/specialty-form/specialty-form.component';
+import { FirmFormComponent } from './features/settings/firms/firm-form/firm-form.component';
+import { InsuranceFormComponent } from './features/settings/insurance/insurance-form/insurance-form.component';
+import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
+import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
 
 export const routes: Routes = [
 
@@ -39,7 +29,6 @@ export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
   { path: 'signin', component: SigninComponent, canActivate: [guestGuard] },
 
-  // Dashboard
 
   // Dashboard
   {
@@ -70,16 +59,11 @@ export const routes: Routes = [
   },
 
   // Protected Pages (Lazy Lists)
-  // Protected Pages (Lazy Lists)
   {
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
-    component: DashboardLayoutComponent,
-    canActivate: [authGuard],
     children: [
-
-      //  APPOINTMENTS
 
       //  APPOINTMENTS
       {
@@ -103,6 +87,7 @@ export const routes: Routes = [
       { path: 'visits/create/:appointmentId', component: VisitFormComponent },
 
       //  CASES
+      {
         loadComponent: () =>
           import('./features/appointments/appointment-list/appointment-list.component')
             .then(m => m.AppointmentListComponent),
@@ -111,33 +96,6 @@ export const routes: Routes = [
       { path: 'appointments/edit/:id', component: AppointmentFormComponent },
       { path: 'appointments/appointment-calendar-view', component: CalendarViewComponent },
 
-      //  VISITS
-      {
-        path: 'visits',
-        loadComponent: () =>
-          import('./features/visits/visit-list/visit-list.component')
-            .then(m => m.VisitListComponent),
-      },
-      { path: 'visits/edit/:id', component: VisitFormComponent },
-      { path: 'visits/create/:appointmentId', component: VisitFormComponent },
-
-      //  CASES
-      {
-        path: 'cases',
-        loadComponent: () =>
-          import('./features/cases/case-list/case-list.component')
-            .then(m => m.CaseListComponent),
-      },
-      { path: 'cases/case-form', component: CaseFormComponent },
-      { path: 'cases/case-detail', component: CaseDetailComponent },
-
-      //  PATIENTS
-        loadComponent: () =>
-          import('./features/cases/case-list/case-list.component')
-            .then(m => m.CaseListComponent),
-      },
-      { path: 'cases/case-form', component: CaseFormComponent },
-      { path: 'cases/case-detail', component: CaseDetailComponent },
 
       //  PATIENTS
       {
