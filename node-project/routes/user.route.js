@@ -7,9 +7,9 @@ import { auth } from "../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 export default router;
 
-router.post("/", auth, createUser);
-router.get("/", auth, roleMiddleware("Admin"), getAllUsers);
-router.get("/:id", auth, roleMiddleware("Admin"), getUserById);
+router.post("/", createUser);
+router.get("/", auth, roleMiddleware("Admin","FDO"), getAllUsers);
+router.get("/:id", auth, roleMiddleware("Admin","FDO"), getUserById);
 router.put("/:id", auth, roleMiddleware("Admin"), updateUser);
 router.delete("/:id", auth, roleMiddleware("Admin"), deleteUser);
 router.post("/reset-password/:id", auth, roleMiddleware("Admin"), resetPassword);

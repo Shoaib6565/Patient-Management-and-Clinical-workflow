@@ -1,1 +1,182 @@
-<p>case-form works!</p>
+@if (isOpen) {
+
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeDetails()">
+  </div>
+
+  <form [formGroup]="caseForm" (ngSubmit)="createCase()"
+    class="relative w-full max-w-6xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
+      <div>
+        <h2 class="text-lg font-bold">Case Details</h2>
+        <p class="text-xs opacity-60">Create and manage case information</p>
+      </div>
+
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" (click)="closeDetails()">
+        ✕
+      </button>
+    </div>
+
+    <div class="p-5 overflow-y-auto space-y-6">
+
+      <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
+
+        <div class="flex items-center gap-4">
+
+          <div class="text-sm opacity-60">
+            Patient ID: {{ caseForm.get('patient_id')?.value || 'Not Selected' }}
+          </div>
+        </div>
+
+      </div>
+
+      <select class="select select-sm w-full" formControlName="case_status">
+
+        <option [ngValue]="null">Select Status</option>
+
+        <option [ngValue]="'Active'">Active</option>
+        <option [ngValue]="'On Hold'">On Hold</option>
+        <option [ngValue]="'Closed'">Closed</option>
+        <option [ngValue]="'Transferred'">Transferred</option>
+        <option [ngValue]="'Cancelled'">Cancelled</option>
+
+      </select>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+        <h3 class="font-semibold text-sm opacity-70">CASE INFO</h3>
+
+
+        <input class="input input-sm w-full" formControlName="patient_id" placeholder="Patient ID" readonly />
+
+        <select class="select select-sm w-full" formControlName="practice_location_id">
+          <option [ngValue]="null">Select Practice Location</option>
+
+          <option [ngValue]="1">Central Medical Clinic</option>
+          <option [ngValue]="2">Northside Medical Center</option>
+          <option [ngValue]="3">East End Health Center</option>
+
+        </select>
+        <select class="select select-sm w-full" formControlName="case_type">
+
+          <option [ngValue]="null">Select Case Type</option>
+
+          <option [ngValue]="'Initial Consultation'">Initial Consultation</option>
+          <option [ngValue]="'Follow-up'">Follow-up</option>
+          <option [ngValue]="'Emergency'">Emergency</option>
+          <option [ngValue]="'Chronic Care'">Chronic Care</option>
+          <option [ngValue]="'Preventive Care'">Preventive Care</option>
+          <option [ngValue]="'Pre-surgical'">Pre-surgical</option>
+          <option [ngValue]="'Post-surgical'">Post-surgical</option>
+
+        </select>
+
+        <select class="select select-sm w-full" formControlName="priority">
+          <option [ngValue]="null">Select Priority</option>
+
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+
+      <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+        <h3 class="font-semibold text-sm opacity-70">MEDICAL & INSURANCE</h3>
+
+        <select class="select select-sm w-full" formControlName="category_id">
+          <option value="">Select Category</option>
+
+          <option value="1">General Medicine</option>
+          <option value="2">Surgery</option>
+          <option value="3">Pediatrics</option>
+          <option value="4">Cardiology</option>
+          <option value="5">Orthopedics</option>
+          <option value="6">Neurology</option>
+          <option value="7">Dermatology</option>
+          <option value="8">Gynecology</option>
+          <option value="9">Ophthalmology</option>
+          <option value="10">ENT</option>
+          <option value="11">Dental</option>
+          <option value="12">Psychiatry</option>
+          <option value="13">Physical Therapy</option>
+          <option value="14">Emergency</option>
+          <option value="15">Other</option>
+        </select>
+        <select class="select select-sm w-full" formControlName="insurance_id">
+          <option value="null">Select Insurance</option>
+
+          <option value="1">Blue Cross Health Insurance</option>
+          <option value="2">Aetna Medical Insurance</option>
+          <option value="3">United Healthcare</option>
+          <option value="4">Government Health Insurance</option>
+
+        </select>
+        <select class="select select-sm w-full" formControlName="firm_id">
+
+          <option value="null">Select Firm</option>
+
+          <option value="1">ABC Legal Associates</option>
+          <option value="2">Global Corporate Solutions</option>
+          <option value="3">Health Government Department</option>
+          <option value="4">Community Support Organization</option>
+
+        </select>
+
+        <div class="space-y-1">
+          <label class="label p-0">
+            <span class="label-text text-sm opacity-70">Date of Accident</span>
+          </label>
+          <input type="date" class="input input-sm w-full" formControlName="date_of_accident" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="label p-0">
+            <span class="label-text text-sm opacity-70">Opening Date</span>
+          </label>
+          <input type="date" class="input input-sm w-full" formControlName="opening_date" />
+        </div>
+      </div>
+
+
+      <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+        <h3 class="font-semibold text-sm opacity-70">REFERRAL INFO</h3>
+
+        <input class="input input-sm w-full" formControlName="referred_by" placeholder="Referred By" />
+
+        <input class="input input-sm w-full" formControlName="referred_doctor_name"
+          placeholder="Referred Doctor Name" />
+
+        <textarea class="textarea textarea-sm w-full" formControlName="clinical_notes"
+          placeholder="Clinical Notes"></textarea>
+      </div>
+
+    </div>
+
+
+
+
+    <div class="flex justify-end gap-2 border-t bg-base-200/40 px-6 py-4">
+
+      <button type="button" class="btn btn-ghost" (click)="closeDetails()">
+        Cancel
+      </button>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading || caseForm.invalid">
+
+        @if (loading) {
+        <span class="loading loading-spinner"></span>
+        }
+
+        Save Case
+      </button>
+
+    </div>
+
+  </form>
+</div>
+
+}

@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { jwtDecode } from 'jwt-decode';
 import {
   FormGroup,
   FormControl,
@@ -71,7 +72,8 @@ export class SigninComponent {
         this.isLoading = false;
         return;
       }
-
+      const payload: any = jwtDecode(token);
+      localStorage.setItem('userId', payload.id);
       this.authService.setToken(token);
       this.authService.setName(response?.user?.name || 'User');
       this.authService.currentUser().subscribe({
@@ -84,6 +86,7 @@ export class SigninComponent {
           }
           console.log('Logged in user:', user);
           const role = user.roles[0].name;
+          localStorage.setItem('role',role);
           if (role === 'Admin') {
             this.router.navigate(['/dashboard/admin']);
           } else if (role === 'Doctor') {

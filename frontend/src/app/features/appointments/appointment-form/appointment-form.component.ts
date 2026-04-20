@@ -1,42 +1,68 @@
-// appointment-form.component.ts
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { forkJoin, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { PracticeLocationService } from '../../../core/services/practice-location.service';
 import { SpecialtyService } from '../../../core/services/specialty.service';
-import { CasesService } from './../../../core/services/Cases.service';
+import { CasesService } from '../../../core/services/Cases.service';
 import { PatientManagementService } from '../../../core/services/PatientManagement.service';
-import { CommonModule } from '@angular/common';
+import { UserManagementService } from '../../../core/services/userManagement.service';
 
 @Component({
   selector: 'app-appointment-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './appointment-form.component.html',
-  styleUrls: ['./appointment-form.component.css'],
+  templateUrl: './appointment-form.component.html'
 })
-export class AppointmentFormComponent implements OnInit {
+export class AppointmentFormComponent implements OnInit, OnDestroy {
+
+  private fb = inject(FormBuilder);
+  private destroy$ = new Subject<void>();
   constructor(
-    // private fb: FormBuilder,
     private appointmentService: AppointmentService,
     private locationService: PracticeLocationService,
     private specialtyService: SpecialtyService,
     private casesService: CasesService,
     private patientService: PatientManagementService,
+    private userService: UserManagementService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
-  fb = inject(FormBuilder);
   isEdit = false;
+  isLoading = false;
   id: any;
 
   patients: any[] = [];
+  allPatients: any[] = [];
+
   cases: any[] = [];
+  allCases: any[] = [];
+
   specialties: any[] = [];
+  allSpecialties: any[] = [];
+
   locations: any[] = [];
+  allLocations: any[] = [];
+
+  doctors: any[] = [];
+  allDoctors: any[] = [];
+
+  //safe response handler
+  private extractArray(res: any): any[] {
+    return Array.isArray(res)
+      ? res
+      : Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res?.data?.patients)
+      ? res.data.patients
+      : [];
+  }
 
   form = this.fb.group({
     case_id: ['', Validators.required],
@@ -46,92 +72,187 @@ export class AppointmentFormComponent implements OnInit {
     practice_location_id: ['', Validators.required],
     appointment_date: ['', Validators.required],
     appointment_time: ['', Validators.required],
-    duration_minutes: [30],
     appointment_type: ['', Validators.required],
-    status: ['Scheduled'],
-    reminder_method: [''],
+    duration_minutes: [30, Validators.required],
     reason_for_visit: ['', Validators.required],
-    notes: [''],
+    appointment_status: ['Scheduled', Validators.required],
+    notes: ['']
   });
-
-formatDate(date: string) { 
-  if (!date) return '';
-  return date.split('T')[0];
-}
-
-  formatTime(time: string) {
-  if (!time) return '';
-  return time.substring(0, 5);
-}
-
 
   ngOnInit() {
     this.id = this.route.snapshot.params['id'];
     this.isEdit = !!this.id;
+    this.loadInitialData();
+  }
 
-    this.loadDropdowns();
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
+  loadInitialData() {
+    forkJoin({
+      specialties: this.specialtyService.getSpecialties('', 'all', 1, 1000),
+      locations: this.locationService.getAll(),
+      doctors: this.userService.getAllUsers(),
+      patients: this.patientService.getAllPatients({ limit: 1000 }),
+      cases: this.casesService.getAllCases({ limit: 1000 })
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (results: any) => {
 
-    if (this.isEdit) {
-      this.appointmentService
-        .getAppointmentById(this.id)
-        .subscribe((res: any) => {
-          console.log('res.data', res.data);
+        this.allSpecialties = this.extractArray(results.specialties);
+        this.specialties = [...this.allSpecialties];
+
+        this.allLocations = this.extractArray(results.locations);
+        this.locations = [...this.allLocations];
+
+        this.allDoctors = this.extractArray(results.doctors)
+          .filter((u: any) => u.roles?.[0]?.name === 'Doctor');
+        this.doctors = [...this.allDoctors];
+
+        this.allPatients = this.extractArray(results.patients);
+        this.patients = [...this.allPatients];
+
+        this.allCases = this.extractArray(results.cases);
+        this.cases = [...this.allCases];
+        console.log('allcases: ----->',this.allCases);
+
+        if (this.isEdit) {
+          this.loadAppointment();
+        } else {
+          this.isLoading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Init load error:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadAppointment() {
+    this.appointmentService.getAppointmentById(this.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          const d = res.data;
+
           this.form.patchValue({
-            case_id: res.data.case_id || res.data.case?.id,
-            patient_id: res.data.patient_id || res.data.patient?.id,
-            doctor_id: res.data.doctor_id,
-            specialty_id: res.data.specialty_id || res.data.specialty?.id,
-            practice_location_id:
-              res.data.practice_location_id || res.data.location?.id,
-
-            appointment_date: this.formatDate(res.data.appointment_date),
-            appointment_time: this.formatTime(res.data.appointment_time),
-
-            appointment_type: res.data.appointment_type,
-            status: res.data.status,
-            reminder_method: res.data.reminder_method,
-            reason_for_visit: res.data.reason_for_visit,
-            notes: res.data.notes,
+            case_id: d.case_id,
+            patient_id: d.patient_id,
+            doctor_id: d.doctor_id,
+            specialty_id: d.specialty_id,
+            practice_location_id: d.practice_location_id,
+            appointment_date: d.appointment_date?.split('T')[0],
+            appointment_time: d.appointment_time?.substring(0, 5),
+            appointment_type: d.appointment_type,
+            duration_minutes: d.duration_minutes || 30,
+            reason_for_visit: d.reason_for_visit,
+            appointment_status: d.status || 'Scheduled',
+            notes: d.notes
           });
-        });
-    }
+
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Appointment load error:', err);
+          this.isLoading = false;
+        }
+      });
   }
 
-  loadDropdowns() {
-    this.specialtyService
-      .getSpecialties()
-      .subscribe((res: any) => (this.specialties = res.data));
-    this.locationService
-      .getAll()
-      .subscribe((res: any) => (this.locations = res.data));
+
+
+  searchPatients(e: any) {
+    const val = e.target?.value?.toLowerCase() || '';
+    this.patients = this.allPatients.filter(p =>
+      (p.first_name + ' ' + p.last_name).toLowerCase().includes(val)
+    );
   }
 
-  searchPatients(event: any) {
-    this.patientService
-      .getAllPatients(event.target.value)
-      .subscribe((res: any) => (this.patients = res.data));
+  searchCases(e: any) {
+    const val = e.target?.value?.toLowerCase() || '';
+    this.cases = this.allCases.filter(c =>
+      (c.case_number || '').toLowerCase().includes(val)
+    );
   }
 
-  searchCases(event: any) {
-    this.casesService
-      .getAllCases() // inside bracket  event.target.value
-      .subscribe((res: any) => (this.cases = res.data));
+  searchDoctors(e: any) {
+    const val = e.target?.value?.toLowerCase() || '';
+    this.doctors = this.allDoctors.filter(d =>
+      (d.first_name + ' ' + d.last_name).toLowerCase().includes(val)
+    );
   }
 
-  cancel() {
-    this.router.navigate(['/appointments']);
+  searchSpecialties(e: any) {
+    const val = e.target?.value?.toLowerCase() || '';
+    this.specialties = this.allSpecialties.filter(s =>
+      (s.specialty_name || s.name || '').toLowerCase().includes(val)
+    );
   }
+
+  searchLocations(e: any) {
+    const val = e.target?.value?.toLowerCase() || '';
+    this.locations = this.allLocations.filter(l =>
+      (l.location_name || l.name || '').toLowerCase().includes(val)
+    );
+  }
+
+  onDoctorChange(doctorId: string) {
+  if (!doctorId) {
+    this.specialties = [...this.allSpecialties];
+    this.locations = [...this.allLocations];
+    return;
+  }
+
+  const doctor = this.allDoctors.find(d => d.id == doctorId);
+
+  // optional filtering logic
+  if (doctor?.specialties) {
+    this.specialties = doctor.specialties;
+  }
+
+  if (doctor?.practice_locations) {
+    this.locations = doctor.practice_locations;
+  }
+}
+
+onSpecialtyChange(specialtyId: string) {
+  console.log('Specialty changed:', specialtyId);
+}
+
 
   submit() {
     if (this.form.invalid) return;
 
-    const req = this.isEdit
-      ? this.appointmentService.updateAppointment(this.id, this.form.value)
-      : this.appointmentService.createAppointment(this.form.value);
+    this.isLoading = true;
 
-    req.subscribe(() => {
-      this.router.navigate(['/appointments']);
+    const payload = {
+      ...this.form.value,
+      status: this.form.value.appointment_status,
+      created_by: localStorage.getItem('userId')
+    };
+    delete payload.appointment_status;
+
+    const req = this.isEdit
+      ? this.appointmentService.updateAppointment(this.id, payload)
+      : this.appointmentService.createAppointment(payload);
+
+    req.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/appointments']);
+      },
+      error: (err) => {
+        console.error('Save error:', err);
+        this.isLoading = false;
+      }
     });
+  }
+
+  onCancel() {
+    this.router.navigate(['/appointments']);
   }
 }

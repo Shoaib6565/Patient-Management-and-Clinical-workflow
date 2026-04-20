@@ -46,7 +46,10 @@
             <th>Gender</th>
             <th>Contact</th>
             <th>Status</th>
+            @if(this.allowFeatures(['Admin']))
+            {
             <th>Actions</th>
+            }
           </tr>
         </thead>
 
@@ -80,11 +83,14 @@
               </span>
             </td>
 
+            @if(this.allowFeatures(['Admin']))
+            {
             <td>
               <button class="btn btn-xs btn-error" (click)="openDeleteModal(patient); $event.stopPropagation()">
                 Delete
               </button>
             </td>
+            }
 
           </tr>
           }
@@ -198,10 +204,19 @@
           </div>
 
         </div>
-
-        <button class="btn btn-sm btn-primary" (click)="updatePatient(selectedPatient)">
+        @if(this.allowFeatures(['Admin','FDO']))
+        {
+        <button class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold
+                 hover:bg-blue-700 transition shadow-md hover:shadow-lg
+                  gap-6" (click)="openEdit(selectedPatient)">
           Update
         </button>
+        <button class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold
+                 hover:bg-blue-700 transition shadow-md hover:shadow-lg
+                  gap-2" (click)="registerCase()">
+          Create Case
+        </button>
+        }
 
       </div>
     </div>
@@ -238,5 +253,110 @@
   }
 
 </div>
+
+@if (isEditMode) {
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <div class="absolute inset-0 bg-black/50" (click)="closeEdit()"></div>
+
+  <div class="relative w-full max-w-6xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl overflow-y-auto p-6 space-y-5">
+
+    <h2 class="text-xl font-bold">Update Patient</h2>
+
+    <div class="grid grid-cols-3 gap-3">
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.first_name" placeholder="First Name" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.middle_name" placeholder="Middle Name" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.last_name" placeholder="Last Name" />
+
+    </div>
+
+
+    <div class="grid grid-cols-3 gap-3">
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.phone" placeholder="Phone" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.mobile" placeholder="Mobile" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.email" placeholder="Email" />
+
+    </div>
+
+    <div class="grid grid-cols-3 gap-3">
+
+      <select class="select select-bordered" [(ngModel)]="editPatient.gender">
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+
+      <input type="date" class="input input-bordered" [(ngModel)]="editPatient.date_of_birth" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.preferred_language" placeholder="Language" />
+
+    </div>
+
+
+    <div class="grid grid-cols-2 gap-3">
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.address" placeholder="Address" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.city" placeholder="City" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.state" placeholder="State" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.country" placeholder="Country" />
+
+    </div>
+
+    <input class="input input-bordered w-full" [(ngModel)]="editPatient.zip_code" placeholder="Zip Code" />
+
+
+    <div class="grid grid-cols-2 gap-3">
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.primary_physician" placeholder="Physician" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.insurance_provider"
+        placeholder="Insurance Provider" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.insurance_policy_number"
+        placeholder="Policy Number" />
+
+      <select class="select select-bordered" [(ngModel)]="editPatient.patient_status">
+        <option>Active</option>
+        <option>Inactive</option>
+      </select>
+
+    </div>
+
+
+    <div class="grid grid-cols-2 gap-3">
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.emergency_contact_name"
+        placeholder="Emergency Contact Name" />
+
+      <input class="input input-bordered" [(ngModel)]="editPatient.emergency_contact_phone"
+        placeholder="Emergency Contact Phone" />
+
+    </div>
+
+
+    <div class="flex justify-end gap-2 pt-4">
+
+      <button class="btn btn-outline" (click)="closeEdit()">
+        Cancel
+      </button>
+
+      <button class="btn btn-primary" (click)="updatePatient()">
+        Update Patient
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+}
 
 <router-outlet></router-outlet>

@@ -6,12 +6,13 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from '../../../shared/components/modal/confirmations-dialog/confirmations-dialog.component';
+import { AuthService } from '../../../core/services/auth-service.service';
 
 @Component({
   selector: 'app-visit-list',
   standalone: true,
   imports: [
-    CommonModule,
+CommonModule,
     FormsModule,
     RouterModule,
     NgxDatatableModule,
@@ -22,6 +23,8 @@ import { ConfirmDialogComponent } from '../../../shared/components/modal/confirm
   styleUrls: ['./visit-list.component.css']
 })
 export class VisitListComponent implements OnInit {
+  visitService = inject(VisitService);
+  authService = inject(AuthService);
 
   visits: any[] = [];
   paginationData: any;
@@ -36,7 +39,7 @@ export class VisitListComponent implements OnInit {
     visit_status: ''
   };
 
-  role: string | null = localStorage.getItem('role');
+  role: string | null = this.authService.getRole() || null;
 
   location = inject(Location);
   Math = Math; // expose Math to template
@@ -107,9 +110,32 @@ export class VisitListComponent implements OnInit {
 
     this.loadData(1);
   }
+  exportToCSV() {
+    console.log('export to csv clicked in visit list component')
+    const params = {
+      ...this.filters
+    };
+    this.visitService.exportVisits(params).subscribe((blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      const now = new Date();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const fileName = `visits_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.csv`;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+
+  canExport(): boolean {
+    return this.role === 'Admin';
+  }
 
   canEdit(row: any): boolean {
-    return this.role === 'Doctor' && row.visit_status !== 'Completed';
+    return (this.role === 'Doctor' || this.role === 'Admin') && row.visit_status !== 'Completed';
   }
 
   canDelete(): boolean {

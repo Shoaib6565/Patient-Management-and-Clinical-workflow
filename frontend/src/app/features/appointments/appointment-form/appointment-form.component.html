@@ -1,188 +1,329 @@
 <div class="max-w-5xl mx-auto p-6">
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body">
+
+      <!-- Header -->
+<div class="max-w-5xl mx-auto p-6">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+
+      <!-- Header -->
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">
           {{ isEdit ? "Update Appointment" : "Create Appointment" }}
         </h2>
-        <button type="button" class="btn btn-ghost btn-circle" (click)="cancel()" title="Close">
-          <i class="ti ti-x text-lg"></i>
+
+        <button
+          type="button"
+          class="btn btn-ghost btn-circle"
+          (click)="onCancel()"
+          [disabled]="isLoading"
+        >
+          ✕
         </button>
       </div>
 
+      <!-- Form -->
       <form
+        *ngIf="!isLoading"
         [formGroup]="form"
         (ngSubmit)="submit()"
         class="grid grid-cols-2 gap-4"
       >
-        <!-- Patient Search -->
+      </form>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Form -->
+      <form
+        *ngIf="!isLoading"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="grid grid-cols-2 gap-4"
+      >
+
+        <!-- Patient -->
         <div>
-          <label class="label">Patient</label>
+          <label class="label">
+            <span class="label-text">Patient <span class="text-red-500">*</span></span>
+          </label>
+
           <input
             type="text"
             class="input input-bordered w-full"
+            placeholder="Search patient..."
             (input)="searchPatients($event)"
-            placeholder="Search patient"
           />
 
           <select
             class="select select-bordered w-full mt-2"
             formControlName="patient_id"
           >
-            <!-- <option value="">Select patient</option> -->
+            <option value="">Select Patient</option>
             <option *ngFor="let p of patients" [value]="p.id">
-              {{ p.name }}
+              {{ p.name || (p.first_name + ' ' + p.last_name) }}
             </option>
           </select>
+          <div *ngIf="form.get('patient_id')?.invalid && form.get('patient_id')?.touched" class="text-red-500 text-sm mt-1">
+            Patient is required
+          </div>
         </div>
 
-        <!-- Case Search -->
+        <!-- Case -->
         <div>
-          <label class="label">Case</label>
+          <label class="label">
+            <span class="label-text">Case <span class="text-red-500">*</span></span>
+          </label>
+
           <input
             type="text"
             class="input input-bordered w-full"
+            placeholder="Search case..."
             (input)="searchCases($event)"
-            placeholder="Search case"
           />
 
           <select
             class="select select-bordered w-full mt-2"
             formControlName="case_id"
           >
+            <option value="">Select Case</option>
             <option *ngFor="let c of cases" [value]="c.id">
-              {{ c.case_number }} - {{ c.patient_name }}
+              {{ c.case_number }} - {{ c.Patient?.first_name }} {{c.Patient?.last_name}}
             </option>
           </select>
+          <div *ngIf="form.get('case_id')?.invalid && form.get('case_id')?.touched" class="text-red-500 text-sm mt-1">
+            Case is required
+          </div>
+        </div>
+
+        <!-- Doctor -->
+        <div>
+          <label class="label">
+            <span class="label-text">Doctor <span class="text-red-500">*</span></span>
+          </label>
+
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            placeholder="Search doctor..."
+            (input)="searchDoctors($event)"
+          />
+
+          <select
+            class="select select-bordered w-full mt-2"
+            formControlName="doctor_id"
+            (change)="onDoctorChange($any($event.target).value)"
+          >
+            <option value="">Select Doctor</option>
+            <option *ngFor="let d of doctors" [value]="d.id">
+              {{ d.name }}
+            </option>
+          </select>
+          <div *ngIf="form.get('doctor_id')?.invalid && form.get('doctor_id')?.touched" class="text-red-500 text-sm mt-1">
+            Doctor is required
+          </div>
         </div>
 
         <!-- Specialty -->
         <div>
-          <label class="label">Specialty</label>
+          <label class="label">
+            <span class="label-text">Specialty <span class="text-red-500">*</span></span>
+          </label>
+
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            placeholder="Search specialty..."
+            (input)="searchSpecialties($event)"
+          />
+
           <select
-            class="select select-bordered w-full"
+            class="select select-bordered w-full mt-2"
             formControlName="specialty_id"
+            (change)="onSpecialtyChange($any($event.target).value)"
           >
-          <option value="">Select specialty</option>
+            <option value="">Select Specialty</option>
             <option *ngFor="let s of specialties" [value]="s.id">
-              {{ s.name }}
+              {{ s.specialty_name || s.name }}
             </option>
           </select>
+          <div *ngIf="form.get('specialty_id')?.invalid && form.get('specialty_id')?.touched" class="text-red-500 text-sm mt-1">
+            Specialty is required
+          </div>
         </div>
 
         <!-- Location -->
         <div>
-          <label class="label">Location</label>
+          <label class="label">
+            <span class="label-text">Practice Location <span class="text-red-500">*</span></span>
+          </label>
+
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            placeholder="Search location..."
+            (input)="searchLocations($event)"
+          />
+
           <select
-            class="select select-bordered w-full"
+            class="select select-bordered w-full mt-2"
             formControlName="practice_location_id"
           >
-            <option value="">Select location</option>
+            <option value="">Select Location</option>
             <option *ngFor="let l of locations" [value]="l.id">
-              {{ l.name }}
+              {{ l.location_name || l.name }}
             </option>
           </select>
+          <div *ngIf="form.get('practice_location_id')?.invalid && form.get('practice_location_id')?.touched" class="text-red-500 text-sm mt-1">
+            Practice Location is required
+          </div>
         </div>
 
         <!-- Date -->
         <div>
-          <label class="label">Date</label>
+          <label class="label">
+            <span class="label-text">Date <span class="text-red-500">*</span></span>
+          </label>
           <input
             type="date"
             class="input input-bordered w-full"
             formControlName="appointment_date"
           />
+          <div *ngIf="form.get('appointment_date')?.invalid && form.get('appointment_date')?.touched" class="text-red-500 text-sm mt-1">
+            Date is required
+          </div>
         </div>
 
         <!-- Time -->
         <div>
-          <label class="label">Time</label>
+          <label class="label">
+            <span class="label-text">Time <span class="text-red-500">*</span></span>
+          </label>
           <input
             type="time"
             class="input input-bordered w-full"
             formControlName="appointment_time"
           />
+          <div *ngIf="form.get('appointment_time')?.invalid && form.get('appointment_time')?.touched" class="text-red-500 text-sm mt-1">
+            Time is required
+          </div>
         </div>
 
         <!-- Type -->
         <div>
-          <label class="label">Type</label>
+          <label class="label">
+            <span class="label-text">Appointment Type <span class="text-red-500">*</span></span>
+          </label>
           <select
             class="select select-bordered w-full"
             formControlName="appointment_type"
           >
-            <option>New Patient</option>
-            <option>Follow-up</option>
-            <option>Consultation</option>
-            <option>Procedure</option>
-            <option>Telehealth</option>
-            <option>Emergency</option>
-            <option>Routine Checkup</option>
-            <option>Post-op Follow-up</option>
+            <option value="">Select Type</option>
+            <option value="New Patient">New Patient</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Consultation">Consultation</option>
           </select>
+          <div *ngIf="form.get('appointment_type')?.invalid && form.get('appointment_type')?.touched" class="text-red-500 text-sm mt-1">
+            Appointment Type is required
+          </div>
         </div>
 
         <!-- Status -->
         <div>
-          <label class="label">Status</label>
+          <label class="label">
+            <span class="label-text">Appointment Status <span class="text-red-500">*</span></span>
+          </label>
           <select
             class="select select-bordered w-full"
-            formControlName="status"
+            formControlName="appointment_status"
           >
-            <option>Scheduled</option>
-            <option>Confirmed</option>
-            <option>Checked In</option>
-            <option>In Progress</option>
-            <option>Completed</option>
-            <option>Cancelled</option>
-            <option>No Show</option>
-            <option>Rescheduled</option>
+            <option value="">Select Status</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Checked In">Checked In</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="No Show">No Show</option>
+            <option value="Rescheduled">Rescheduled</option>
           </select>
+          <div *ngIf="form.get('appointment_status')?.invalid && form.get('appointment_status')?.touched" class="text-red-500 text-sm mt-1">
+            Appointment Status is required
+          </div>
         </div>
 
-        <!-- Reminder -->
+        <!-- Duration -->
         <div>
-          <label class="label">Reminder</label>
-          <select
-            class="select select-bordered w-full"
-            formControlName="reminder_method"
-          >
-            <option value="">None</option>
-            <option>SMS</option>
-            <option>Email</option>
-            <option>Phone</option>
-          </select>
+          <label class="label">
+            <span class="label-text">Duration (minutes) <span class="text-red-500">*</span></span>
+          </label>
+          <input
+            type="number"
+            class="input input-bordered w-full"
+            formControlName="duration_minutes"
+            min="15"
+            step="15"
+          />
+          <div *ngIf="form.get('duration_minutes')?.invalid && form.get('duration_minutes')?.touched" class="text-red-500 text-sm mt-1">
+            Duration is required
+          </div>
         </div>
 
         <!-- Reason -->
         <div class="col-span-2">
-          <label class="label">Reason</label>
+          <label class="label">
+            <span class="label-text">Reason for Visit <span class="text-red-500">*</span></span>
+          </label>
           <textarea
             class="textarea textarea-bordered w-full"
             formControlName="reason_for_visit"
+            rows="3"
+            placeholder="Enter reason for appointment..."
           ></textarea>
+          <div *ngIf="form.get('reason_for_visit')?.invalid && form.get('reason_for_visit')?.touched" class="text-red-500 text-sm mt-1">
+            Reason for Visit is required
+          </div>
         </div>
 
         <!-- Notes -->
         <div class="col-span-2">
-          <label class="label">Notes</label>
+          <label class="label">
+            <span class="label-text">Additional Notes</span>
+          </label>
           <textarea
             class="textarea textarea-bordered w-full"
             formControlName="notes"
+            rows="3"
+            placeholder="Enter any additional notes..."
           ></textarea>
         </div>
 
-        <!-- Submit and cancel -->
-        <div class="col-span-2 flex justify-end gap-3 mt-6">
-          <button type="button" class="btn btn-ghost" (click)="cancel()">
+        <!-- Buttons -->
+        <div class="col-span-2 flex justify-end gap-3 mt-4">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            (click)="onCancel()"
+            [disabled]="isLoading"
+          >
             Cancel
           </button>
 
-          <button type="submit" class="btn btn-primary flex items-center gap-2">
-            <i class="ti ti-device-floppy"></i>
-            {{ isEdit ? "Update" : "Create" }}
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || isLoading"
+          >
+            <span *ngIf="!isLoading">{{ isEdit ? 'Update' : 'Create' }} Appointment</span>
+            <span *ngIf="isLoading">
+              <span class="loading loading-spinner loading-sm"></span>
+            </span>
           </button>
         </div>
+
       </form>
     </div>
   </div>

@@ -29,7 +29,7 @@ Route::prefix('appointments')->group(function () {
     // Actions
     Route::patch('/{id}/cancel', [AppointmentController::class, 'cancel']);
     Route::patch('/{id}/reschedule', [AppointmentController::class, 'reschedule']);
-    // doctor can  change status to completed 
+    // doctor can  change status to completed
     Route::patch('/{id}/updateStatus', [AppointmentController::class, 'updateStatus']);
     // History
     Route::get('/history/{patient_id}', [AppointmentController::class, 'history']);
@@ -69,8 +69,6 @@ Route::prefix('specialties')->group(function () {
 Route::prefix('practice-locations')->group(function () {
     Route::get('/', [PracticeLocationController::class, 'index']);
     Route::post('/', [PracticeLocationController::class, 'store']);
-    // Route::get('/active', [PracticeLocationController::class, 'active']);
-    // Route::get('/inactive', [PracticeLocationController::class, 'inactive']);
     Route::get('/{id}', [PracticeLocationController::class, 'show']);
     Route::put('/{id}', [PracticeLocationController::class, 'update']);
     Route::delete('/{id}', [PracticeLocationController::class, 'destroy']);
@@ -82,8 +80,6 @@ Route::prefix('practice-locations')->group(function () {
 Route::prefix('insurances')->group(function () {
     Route::get('/', [InsuranceController::class, 'index']);
     Route::post('/', [InsuranceController::class, 'store']);
-    // Route::get('/active', [InsuranceController::class, 'active']);
-    // Route::get('/inactive', [InsuranceController::class, 'inactive']);
     Route::get('/{id}', [InsuranceController::class, 'show']);
     Route::put('/{id}', [InsuranceController::class, 'update']);
     Route::delete('/{id}', [InsuranceController::class, 'destroy']);
@@ -109,8 +105,6 @@ Route::prefix('categories')->group(function () {
     Route::get('/{id}', [CategoryController::class, 'show']);
     Route::put('/{id}', [CategoryController::class, 'update']);
     Route::delete('/{id}', [CategoryController::class, 'destroy']);
-    // Route::get('/active', [CategoryController::class, 'active']);
-    // Route::get('/inactive', [CategoryController::class, 'inactive']);
     Route::patch('/{id}/activate', [CategoryController::class, 'activate']);
     Route::patch('/{id}/deactivate', [CategoryController::class, 'deactivate']);
 });

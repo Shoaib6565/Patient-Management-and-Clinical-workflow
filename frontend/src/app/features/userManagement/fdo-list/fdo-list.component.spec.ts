@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InsuranceListComponent } from './insurance-list.component';
+import { FdoListComponent } from './fdo-list.component';
 
-describe('InsuranceListComponent', () => {
-  let component: InsuranceListComponent;
-  let fixture: ComponentFixture<InsuranceListComponent>;
+describe('FdoListComponent', () => {
+  let component: FdoListComponent;
+  let fixture: ComponentFixture<FdoListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [InsuranceListComponent]
+      imports: [FdoListComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(InsuranceListComponent);
+    fixture = TestBed.createComponent(FdoListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,1 +1,455 @@
-<p>case-list works!</p>
+<div class="p-4 space-y-4">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold">Cases</h2>
+
+    <div class="flex gap-2">
+      <button class="btn btn-outline btn-sm" (click)="exportCsv()">
+        Export CSV
+      </button>
+      <button *ngIf="isAdminAndFDO() === 'Admin' || isAdminAndFDO() === 'FDO'"  class="btn btn-outline btn-sm" (click)="registerCase()">
+        Create Case
+      </button>
+    </div>
+  </div>
+  <div class="card bg-base-100 shadow-md p-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+      <input
+        class="input input-bordered"
+        placeholder="Patient Name"
+        [(ngModel)]="filters.patientName"
+      />
+
+      <input
+        class="input input-bordered"
+        placeholder="Case Number"
+        [(ngModel)]="filters.caseNumber"
+      />
+
+      <input
+        class="input input-bordered"
+        placeholder="Case Type"
+        [(ngModel)]="filters.caseType"
+      />
+
+     <select class="select select-bordered"
+  [(ngModel)]="filters.caseStatus">
+
+  <option value="">All Status</option>
+  <option value="Open">Open</option>
+  <option value="Closed">Closed</option>
+  <option value="Pending">Pending</option>
+  <option value="Active">Active</option>
+  <option value="Urgent">Urgent</option>
+
+</select>
+
+      <input
+        type="date"
+        class="input input-bordered"
+        [(ngModel)]="filters.startDate"
+      />
+
+      <input
+        type="date"
+        class="input input-bordered"
+        [(ngModel)]="filters.endDate"
+      />
+
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button class="btn btn-primary" (click)="applyFilters()">Apply</button>
+      <button class="btn btn-outline" (click)="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow-md">
+    <div class="overflow-x-auto">
+
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Case Number</th>
+            <th>Patient</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Opening Date</th>
+
+            @if(this.allowFeatures(['Admin'])) {
+              <th>Actions</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @if (cases.length === 0) {
+          <tr>
+            <td colspan="7" class="text-center py-6 text-gray-400">
+              No cases found
+            </td>
+          </tr>
+          }
+
+          @for (caseItem of cases; track caseItem.id) {
+          <tr
+            class="cursor-pointer hover:bg-base-200 transition"
+            (click)="selectCase(caseItem)"
+          >
+
+            <td>{{ caseItem.case_number }}</td>
+
+            <td>
+              {{ caseItem?.Patient?.first_name || '' }}
+              {{ caseItem?.Patient?.middle_name || '' }}
+              {{ caseItem?.Patient?.last_name || '' }}
+            </td>
+
+            <td>{{ caseItem.case_type }}</td>
+
+            <td>
+             <span
+  class="badge px-2 py-1"
+  [ngClass]="{
+    'badge-success': caseItem.case_status === 'Open' || selectedCase?.case_status === 'Open',
+    'badge-error': caseItem.case_status === 'Closed' || selectedCase?.case_status === 'Closed',
+    'badge-warning': caseItem.case_status === 'Pending' || selectedCase?.case_status === 'Pending',
+    'badge-info': caseItem.case_status === 'Active' || selectedCase?.case_status === 'Active'
+  }"
+>
+  {{ caseItem?.case_status || selectedCase?.case_status }}
+</span>
+            </td>
+
+            <td>{{ caseItem.priority }}</td>
+
+            <td>
+              {{ caseItem.opening_date | date:'mediumDate' }}
+            </td>
+
+            @if(this.allowFeatures(['Admin'])) {
+            <td>
+              <button
+                class="btn btn-xs btn-error"
+                (click)="openDeleteModal(caseItem); $event.stopPropagation()"
+              >
+                Delete
+              </button>
+            </td>
+            }
+
+          </tr>
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+@if (showDeleteModal) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <div class="relative bg-base-100 p-6 rounded-xl w-full max-w-md shadow-2xl z-[10000]">
+
+      <h2 class="text-lg font-bold text-red-500">
+        Delete Patient
+      </h2>
+
+      <p class="mt-2 text-sm">
+        Are you sure you want to delete
+        <b>{{ caseToDelete?.case_num }}</b>?
+      </p>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button class="btn btn-outline" (click)="closeDeleteModal()">
+          Cancel
+        </button>
+
+        <button class="btn btn-error" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+}
+  @if (selectedCase) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <div
+    class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+    (click)="closeDetails()"
+  ></div>
+
+  <div
+    class="relative w-full max-w-6xl max-h-[85vh]
+    bg-base-100 rounded-2xl shadow-2xl
+    flex flex-col overflow-hidden"
+  >
+
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
+
+      <div>
+        <h2 class="text-lg font-bold">
+          Case Profile
+        </h2>
+
+        <p class="text-xs opacity-60">
+          Detailed case information overview
+        </p>
+      </div>
+
+      <button
+        class="btn btn-sm btn-circle btn-ghost"
+        (click)="closeDetails()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="p-5 overflow-y-auto space-y-6">
+      <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
+
+        <div class="flex items-center gap-4">
+
+          <div class="avatar placeholder">
+            <div class="bg-primary text-white rounded-full w-16 text-xl">
+              {{ selectedCase.case_number?.charAt(0) || 'C' }}
+            </div>
+          </div>
+
+          <div>
+            <div class="text-lg font-semibold">
+              {{ selectedCase.case_number }}
+            </div>
+
+            <div class="text-sm opacity-60">
+              {{ selectedCase.case_type }}
+            </div>
+          </div>
+
+        </div>
+
+        <span
+          class="badge px-3 py-2 text-sm"
+          [ngClass]="{
+            'badge-success': selectedCase.case_status === 'Open',
+            'badge-error': selectedCase.case_status === 'Closed',
+            'badge-warning': selectedCase.case_status === 'Pending'
+          }"
+        >
+          {{ selectedCase.case_status }}
+        </span>
+
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+          <h3 class="font-semibold text-sm opacity-70">
+            CASE INFO
+          </h3>
+
+          <p>
+            <span class="opacity-60">Priority:</span>
+            {{ selectedCase.priority || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Opening Date:</span>
+            {{ selectedCase.opening_date | date:'mediumDate' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Accident Date:</span>
+            {{ selectedCase.date_of_accident | date:'mediumDate' }}
+          </p>
+        </div>
+
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+          <h3 class="font-semibold text-sm opacity-70">
+            PATIENT
+          </h3>
+
+          <p>
+            <span class="opacity-60">Name:</span>
+
+            {{ selectedCase?.Patient?.first_name }}
+            {{ selectedCase?.Patient?.last_name }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Phone:</span>
+
+            {{ selectedCase?.Patient?.phone || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Email:</span>
+
+            {{ selectedCase?.Patient?.email || '-' }}
+          </p>
+        </div>
+
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+          <h3 class="font-semibold text-sm opacity-70">
+            REFERRAL
+          </h3>
+
+          <p>
+            <span class="opacity-60">Referred By:</span>
+            {{ selectedCase.referred_by || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Doctor:</span>
+            {{ selectedCase.referred_doctor_name || '-' }}
+          </p>
+
+        </div>
+
+        <div class="bg-base-200/30 p-4 rounded-xl md:col-span-2 space-y-2">
+
+          <h3 class="font-semibold text-sm opacity-70">
+            MEDICAL INFO
+          </h3>
+
+          <p>
+            <span class="opacity-60">Purpose:</span>
+            {{ selectedCase.purpose_of_visit || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Category:</span>
+            {{ selectedCase?.Category?.name || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Insurance:</span>
+            {{ selectedCase?.Insurance?.insurance_name || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Firm:</span>
+            {{ selectedCase?.Firm?.firm_name|| '-' }}
+          </p>
+           <p>
+            <span class="opacity-60">Practice Location:</span>
+            {{ selectedCase?.PracticeLocation?.location_name|| '-' }}
+          </p>
+        </div>
+
+        <div class="bg-red-50/10 border border-red-200/20 p-4 rounded-xl space-y-2">
+
+          <h3 class="font-semibold text-sm text-red-400">
+            CLINICAL NOTES
+          </h3>
+
+          <p>
+            {{ selectedCase.clinical_notes || '-' }}
+          </p>
+
+        </div>
+
+      </div>
+
+      @if(this.allowFeatures(['Admin','FDO']))
+      {
+      <button
+        class="btn btn-sm btn-primary"
+        (click)="openEdit(selectedCase)"
+      >
+        Update
+      </button>
+      }
+
+    </div>
+
+  </div>
+
+</div>
+  }
+
+</div>
+
+@if (isEditMode) {
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <div class="absolute inset-0 bg-black/50" (click)="closeEdit()"></div>
+
+  <div class="relative w-full max-w-5xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl overflow-y-auto p-6 space-y-4">
+
+    <h2 class="text-xl font-bold">Update Case</h2>
+    <div class="grid grid-cols-2 gap-3">
+
+      <input class="input input-bordered"
+        [(ngModel)]="editCase.case_number"
+        placeholder="Case Number" />
+
+      <input class="input input-bordered"
+        [(ngModel)]="editCase.case_type"
+        placeholder="Case Type" />
+
+      <select class="select select-bordered"
+        [(ngModel)]="editCase.case_status">
+        <option>Open</option>
+        <option>Closed</option>
+        <option>Pending</option>
+      </select>
+
+      <input class="input input-bordered"
+        [(ngModel)]="editCase.priority"
+        placeholder="Priority" />
+
+      <input type="date" class="input input-bordered"
+        [(ngModel)]="editCase.opening_date" />
+
+      <input type="date" class="input input-bordered"
+        [(ngModel)]="editCase.date_of_accident" />
+
+    </div>
+
+
+    <div class="grid grid-cols-2 gap-3">
+
+      <input class="input input-bordered"
+        [(ngModel)]="editCase.referred_by"
+        placeholder="Referred By" />
+
+      <input class="input input-bordered"
+        [(ngModel)]="editCase.referred_doctor_name"
+        placeholder="Doctor Name" />
+
+    </div>
+
+    <textarea class="textarea textarea-bordered w-full"
+      [(ngModel)]="editCase.purpose_of_visit"
+      placeholder="Purpose of Visit"></textarea>
+
+    <textarea class="textarea textarea-bordered w-full"
+      [(ngModel)]="editCase.clinical_notes"
+      placeholder="Clinical Notes"></textarea>
+
+
+    <div class="flex justify-end gap-2 pt-4">
+
+      <button class="btn btn-outline" (click)="closeEdit()">
+        Cancel
+      </button>
+
+      <button class="btn btn-primary" (click)="updateCase()">
+        Update Case
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+}
+<router-outlet></router-outlet>

@@ -21,7 +21,6 @@ io.on("connection", (socket) => {
   // listen event from Laravel
   socket.on("send_notification", ({ userId, data }) => {
     const socketId = users[userId];
-
     if (socketId) {
       io.to(socketId).emit("new_notification", data);
     }

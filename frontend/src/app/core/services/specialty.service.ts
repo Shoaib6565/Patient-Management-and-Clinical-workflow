@@ -13,12 +13,13 @@ export class SpecialtyService {
   constructor(private http: HttpClient) {}
 
   // Get all specialties (with search + filter + pagination)
-  getSpecialties(search: string = '', filter: string = 'all', page: number = 1): Observable<any> {
+  getSpecialties(search: string = '', filter: string = 'all', page: number = 1, limit: number = 10): Observable<any> {
 
     let params = new HttpParams()
       .set('search', search)
       .set('filter', filter)
-      .set('page', page);
+      .set('page', page)
+      .set('limit', limit);
 
     return this.http.get(this.apiUrl, { params });
   }
@@ -51,6 +52,35 @@ export class SpecialtyService {
   // Deactivate specialty
   deactivateSpecialty(id: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/deactivate`, {});
+  }
+
+  // Alias methods for component usage
+  getAll(params?: any): Observable<any> {
+    return this.getSpecialties(
+      params?.search || '',
+      params?.filter || 'all',
+      params?.page || 1
+    );
+  }
+
+  create(data: any): Observable<any> {
+    return this.createSpecialty(data);
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.updateSpecialty(id, data);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.deleteSpecialty(id);
+  }
+
+  activate(id: number): Observable<any> {
+    return this.activateSpecialty(id);
+  }
+
+  deactivate(id: number): Observable<any> {
+    return this.deactivateSpecialty(id);
   }
 
 }

@@ -2,6 +2,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AppointmentService } from '../../../core/services/appointment.service';
+import { PatientManagementService } from '../../../core/services/PatientManagement.service';
+import { UserManagementService } from '../../../core/services/userManagement.service';
 
 export type AppointmentStatus =
   | 'IN_PROGRESS'
@@ -9,7 +12,10 @@ export type AppointmentStatus =
   | 'ACTION_REQUIRED'
   | 'CONFIRMED'
   | 'SCHEDULED'
-  | 'COMPLETED';
+  | 'COMPLETED'
+  | 'CHECKED_IN'
+  | 'CANCELLED'
+  | 'NO_SHOW';
 
 export type DoctorStatus = 'available' | 'surgery' | 'onduty' | 'unavailable';
 export type DocFileType = 'pdf' | 'doc' | 'form';
@@ -31,7 +37,7 @@ export interface DoctorAvailability {
 
 export interface Appointment {
   time: string;
-  timeLabel?: string;       // e.g. 'ONGOING' | 'LATE'
+  timeLabel?: string;       //  'ONGOING' | 'LATE'
   timeLabelType?: 'ongoing' | 'late';
   patientName: string;
   patientInitial: string;
@@ -60,113 +66,192 @@ export class FrontdeskDashboardComponent implements OnInit {
   userName = localStorage.getItem('userName') || 'Front Desk Staff';
   currentDate = new Date();
 
-  // ── Stat Cards
+  // Stat Cards
   statCards: StatCard[] = [
     {
       label: 'NEW PATIENTS',
-      value: 12,
-      subtext: '+15% from avg',
-      subtextType: 'positive',
+      value: 0,
+      subtext: 'Loading…',
+      subtextType: 'neutral',
       icon: 'person_add',
     },
     {
-      label: "TODAY'S APPS",
-      value: 24,
-      subtext: '8 completed / 16 remaining',
+      label: 'TOTAL APPTS',
+      value: 0,
+      subtext: 'Loading…',
       subtextType: 'neutral',
       icon: 'calendar_today',
     },
   ];
 
-  // ── Doctor Availability
-  doctors: DoctorAvailability[] = [
-    { name: 'Dr. Aris',   status: 'available',  statusLabel: 'Avail.'   },
-    { name: 'Dr. Miller', status: 'surgery',    statusLabel: 'Surgery'  },
-    { name: 'Dr. Lee',    status: 'onduty',     statusLabel: 'On Duty'  },
-  ];
+  // Doctor Availability
+  activeDoctorsCount = 0;
 
-  // ── Daily Agenda
-  appointments: Appointment[] = [
-    {
-      time: '9:00 AM',
-      timeLabel: 'ONGOING',
-      timeLabelType: 'ongoing',
-      patientName: 'Eleanor Shellstrop',
-      patientInitial: 'ES',
-      visitType: 'General Consultation',
-      room: 'Room 102',
-      status: 'IN_PROGRESS',
-    },
-    {
-      time: '9:30 AM',
-      patientName: 'Michael Realman',
-      patientInitial: 'MR',
-      visitType: 'Follow-up: Cardiology',
-      room: 'Room 204',
-      status: 'ARRIVED',
-    },
-    {
-      time: '10:15 AM',
-      timeLabel: 'LATE',
-      timeLabelType: 'late',
-      patientName: 'Chidi Anagonye',
-      patientInitial: 'CA',
-      visitType: 'Emergency Referral',
-      room: 'Triage 1',
-      status: 'ACTION_REQUIRED',
-      isLate: true,
-    },
-    {
-      time: '11:00 AM',
-      patientName: 'Tahani Al-Jamil',
-      patientInitial: 'TA',
-      visitType: 'Dermatology Scan',
-      room: 'Room 305',
-      status: 'CONFIRMED',
-    },
-    {
-      time: '11:30 AM',
-      patientName: 'Jason Mendoza',
-      patientInitial: 'JM',
-      visitType: 'Post-Op Check',
-      room: 'Room 108',
-      status: 'SCHEDULED',
-    },
-    {
-      time: '12:00 PM',
-      patientName: 'Janet Chen',
-      patientInitial: 'JC',
-      visitType: 'Blood Work Review',
-      room: 'Lab 2',
-      status: 'SCHEDULED',
-    },
-  ];
+  //  Daily Agenda
+  appointments: Appointment[] = [];
 
-  // ── Documents
-  documents: Document[] = [
-    {
-      name: 'Lab_Results_Michael_R.pdf',
-      description: 'Ready for Review',
-      type: 'pdf',
-      urgency: 'danger',
-    },
-    {
-      name: 'Insurance_Auth_Eleanor.doc',
-      description: 'Pending Signature',
-      type: 'doc',
-      urgency: 'normal',
-    },
-    {
-      name: 'Incomplete_Reg_Janet.form',
-      description: 'Missing Address',
-      type: 'form',
-      urgency: 'warning',
-    },
-  ];
+  // Documents
+  documents: Document[] = [];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
 
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly patientService = inject(PatientManagementService);
+  private readonly userService = inject(UserManagementService);
   router = inject(Router)
+
+  private loadDashboardData(): void {
+    const today = this.getTodayIsoDate();
+    this.loadNewPatients(today);
+    this.loadTodayAppointments(today);
+    this.loadTotalAppointments();
+    this.loadActiveDoctors();
+  }
+
+  private getTodayIsoDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  private extractArray(res: any): any[] {
+    if (Array.isArray(res)) return res;
+    if (Array.isArray(res?.data)) return res.data;
+    if (Array.isArray(res?.data?.data)) return res.data.data;
+    if (Array.isArray(res?.data?.patients)) return res.data.patients;
+    return [];
+  }
+
+  private loadNewPatients(date: string): void {
+    this.patientService
+      .getAllPatients({ reg_from: date, reg_to: date, limit: 1000 })
+      .subscribe({
+        next: (res: any) => {
+          const patients = this.extractArray(res);
+          const count = patients.length;
+          const card = this.statCards.find(c => c.label === 'NEW PATIENTS');
+          if (card) {
+            card.value = count;
+            card.subtext = count > 0 ? `${count} registered today` : 'No new registrations';
+            card.subtextType = count > 0 ? 'positive' : 'neutral';
+          }
+        },
+        error: (err) => {
+          console.error('New patient count error:', err);
+          const card = this.statCards.find(c => c.label === 'NEW PATIENTS');
+          if (card) {
+            card.value = 0;
+            card.subtext = 'Unable to load';
+            card.subtextType = 'negative';
+          }
+        }
+      });
+  }
+
+  private loadTodayAppointments(date: string): void {
+    this.appointmentService.getAppointments({ start_date: date, end_date: date, page: 1 }).subscribe({
+      next: (res: any) => {
+        const data = this.extractArray(res);
+        this.appointments = data.map((app: any) => this.mapAppointment(app));
+      },
+      error: (err) => {
+        console.error('Today appointments error:', err);
+        this.appointments = [];
+      }
+    });
+  }
+
+  private loadTotalAppointments(): void {
+    this.appointmentService.getTotalAppointments().subscribe({
+      next: (res: any) => {
+        const count = res?.data?.total_appointments ?? 0;
+        const card = this.statCards.find(c => c.label === 'TOTAL APPTS');
+        if (card) {
+          card.value = count;
+          card.subtext = count === 1 ? 'Appointment recorded' : 'Appointments recorded';
+          card.subtextType = count > 0 ? 'positive' : 'neutral';
+        }
+      },
+      error: (err) => {
+        console.error('Total appointments load error:', err);
+        const card = this.statCards.find(c => c.label === 'TOTAL APPTS');
+        if (card) {
+          card.value = 0;
+          card.subtext = 'Unable to load';
+          card.subtextType = 'negative';
+        }
+      }
+    });
+  }
+
+  private loadActiveDoctors(): void {
+    this.userService.getActiveDoctorCount().subscribe({
+      next: (res: any) => {
+        this.activeDoctorsCount = res?.data?.count ?? 0;
+      },
+      error: (err) => {
+        console.error('Active doctors load error:', err);
+        this.activeDoctorsCount = 0;
+      }
+    });
+  }
+
+  private mapAppointment(app: any): Appointment {
+    const patientName = [app.patient?.first_name, app.patient?.last_name]
+      .filter(Boolean)
+      .join(' ') || app.patient?.name || 'Unknown';
+    const patientInitial = patientName
+      .split(' ')
+      .map((part: string) => part[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase() || 'NA';
+    const appointmentTime = String(app.appointment_time || '').substring(0, 5) || '';
+    const normalizedStatus = this.normalizeStatus(app.status);
+    const isLate = normalizedStatus === 'SCHEDULED' && this.isToday(app.appointment_date) && this.isAppointmentLate(appointmentTime);
+
+    return {
+      time: appointmentTime || 'TBD',
+      timeLabel: normalizedStatus === 'IN_PROGRESS' ? 'ONGOING' : isLate ? 'LATE' : undefined,
+      timeLabelType: normalizedStatus === 'IN_PROGRESS' ? 'ongoing' : isLate ? 'late' : undefined,
+      patientName,
+      patientInitial,
+      visitType: app.appointment_type || app.reason_for_visit || app.specialty?.specialty_name || 'Consultation',
+      room: app.practiceLocation?.location_name || app.practiceLocation?.name || app.practiceLocation?.location_name || app.doctor?.name || 'TBD',
+      status: normalizedStatus,
+      isLate,
+    };
+  }
+
+  private normalizeStatus(status: any): AppointmentStatus {
+    const raw = String(status || '').trim().toUpperCase().replace(/\s+/g, '_');
+    const valid: AppointmentStatus[] = [
+      'IN_PROGRESS',
+      'ARRIVED',
+      'ACTION_REQUIRED',
+      'CONFIRMED',
+      'SCHEDULED',
+      'COMPLETED',
+      'CHECKED_IN',
+      'CANCELLED',
+      'NO_SHOW',
+    ];
+    return valid.includes(raw as AppointmentStatus) ? (raw as AppointmentStatus) : 'SCHEDULED';
+  }
+
+  private isToday(dateString: string): boolean {
+    const today = this.getTodayIsoDate();
+    return String(dateString).startsWith(today);
+  }
+
+  private isAppointmentLate(timeString: string): boolean {
+    if (!timeString) return false;
+    const [hour, minute] = timeString.split(':').map(Number);
+    const now = new Date();
+    const appointment = new Date(now);
+    appointment.setHours(hour, minute, 0, 0);
+    return now > appointment;
+  }
 
   // ── Helpers ─
   getStatusLabel(status: AppointmentStatus): string {
@@ -177,8 +262,11 @@ export class FrontdeskDashboardComponent implements OnInit {
       CONFIRMED:       'Confirmed',
       SCHEDULED:       'Scheduled',
       COMPLETED:       'Completed',
+      CHECKED_IN:      'Checked In',
+      CANCELLED:       'Cancelled',
+      NO_SHOW:         'No Show',
     };
-    return map[status];
+    return map[status] ?? String(status);
   }
 
   getStatusClass(status: AppointmentStatus): string {
@@ -189,8 +277,11 @@ export class FrontdeskDashboardComponent implements OnInit {
       CONFIRMED:       'status-confirmed',
       SCHEDULED:       'status-scheduled',
       COMPLETED:       'status-completed',
+      CHECKED_IN:      'status-arrived',
+      CANCELLED:       'status-cancelled',
+      NO_SHOW:         'status-error',
     };
-    return map[status];
+    return map[status] ?? 'status-scheduled';
   }
 
   getDoctorStatusClass(status: DoctorStatus): string {

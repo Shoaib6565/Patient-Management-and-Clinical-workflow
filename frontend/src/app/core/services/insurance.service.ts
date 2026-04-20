@@ -52,4 +52,33 @@ export class InsuranceService {
   deactivateInsurance(id: number): Observable<any> {
     return this.http.patch(`${this.baseUrl}/deactivate/${id}`, {});
   }
+
+  // Alias methods for component usage
+  getAll(params?: any): Observable<any> {
+    return this.getInsurances(
+      params?.search || '',
+      params?.filter || 'all',
+      params?.page || 1
+    );
+  }
+
+  create(data: any): Observable<any> {
+    return this.createInsurance(data);
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.updateInsurance(id, data);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.deleteInsurance(id);
+  }
+
+  activate(id: number): Observable<any> {
+    return this.activateInsurance(id);
+  }
+
+  deactivate(id: number): Observable<any> {
+    return this.deactivateInsurance(id);
+  }
 }

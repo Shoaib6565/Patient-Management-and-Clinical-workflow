@@ -1,1 +1,26 @@
-<p>specialty-form works!</p>
+<div>
+
+  <h3 class="text-lg font-bold mb-4">
+    {{ isEdit ? 'Edit Specialty' : 'Create Specialty' }}
+  </h3>
+
+  <input class="input input-bordered w-full mb-3"
+    placeholder="Specialty Name"
+    [(ngModel)]="form.specialty_name">
+
+  <textarea class="textarea textarea-bordered w-full mb-3"
+    placeholder="Description"
+    [(ngModel)]="form.description">
+  </textarea>
+
+  <div class="flex justify-end gap-2">
+    <button class="btn" (click)="back()">Back</button>
+    <button class="btn btn-primary" (click)="save()"
+      [disabled]="!canCreateAndUpdate()"
+    >
+      <i class="ti ti-check"></i>
+      Save
+    </button>
+  </div>
+
+</div>

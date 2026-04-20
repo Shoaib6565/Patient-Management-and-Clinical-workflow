@@ -20,7 +20,9 @@
 
       <!-- ACTION BAR -->
       <div class="flex justify-between my-3">
-        <button class="btn btn-primary" (click)="exportCSV()">
+        <button class="btn btn-primary" (click)="exportCSV()"
+         [disabled]="!canExport()">
+          <i class="ti ti-file-export mr-2"></i>
           Export CSV
         </button>
       </div>
@@ -94,24 +96,26 @@
           <ng-template ngx-datatable-cell-template let-row="row">
 
             <!-- EDIT -->
-
-            <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]" title="Edit">
-
+            <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]"
+             title="Edit" [disabled]="!canEdit()">
               <i class="ti ti-edit"></i>
+            </button>
 
+            <!-- View Patient Detail -->
+            <button class="btn btn-xs btn-warning" [routerLink]="['/patient-history', row.id]"
+             title="Patient Detail" [disabled]="!canEdit()">
+             <i class="ti ti-eye"></i>
             </button>
 
             <!-- COMPLETE -->
-
             <button class="btn btn-xs btn-success" (click)="completeAppointment(row.id)"
-              title="Complete">
+              title="Complete" [disabled]="!canComplete() || row.status === 'Completed'">
               <i class="ti ti-check"></i>
             </button>
 
-
             <!-- DELETE -->
-
-            <button class="btn btn-xs btn-error" (click)="delete(row.id)" title="Delete">
+            <button class="btn btn-xs btn-error" (click)="delete(row.id)"
+             title="Delete" [disabled]="!canDelete()">
               <i class="ti ti-trash"></i>
             </button>
           </ng-template>
@@ -126,7 +130,6 @@
 
       <!-- PAGINATION -->
       <div *ngIf="paginationData && paginationData?.last_page > 1" class="mt-4">
-
         <app-pagination [pagination]="paginationData" (pageChange)="onPageChange($event)">
         </app-pagination>
       </div>

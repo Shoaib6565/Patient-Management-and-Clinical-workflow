@@ -17,6 +17,14 @@ export class UserManagementService {
       `${this.apiUrl.baseUrl}${this.apiUrl.users}`,
     );
   }
+
+  // get docotor
+  getDoctors() {
+    return this.http.get<any>(
+      `${this.apiUrl.baseUrl}${this.apiUrl.users}/doctors`,
+    );
+  }
+
   getUserById(userId: string) {
     return this.http.get(
       `${this.apiUrl.baseUrl}${this.apiUrl.users}/${userId}`,
@@ -42,13 +50,7 @@ export class UserManagementService {
   resetPassword(userId: string, newPassword: string) {
     return this.http.post(
       `${this.apiUrl.baseUrl}${this.apiUrl.users}/reset-password/${userId}`,
-      { newPassword },
-    );
-  }
-  restoreUser(userId: string) {
-    return this.http.post(
-      `${this.apiUrl.baseUrl}${this.apiUrl.users}/restore/${userId}`,
-      {},
+      { new_password: newPassword },
     );
   }
   getActiveDoctorCount() {

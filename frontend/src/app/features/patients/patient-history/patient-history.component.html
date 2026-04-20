@@ -1,0 +1,225 @@
+@if (patient) {
+
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+  <div
+    class="relative w-full max-w-6xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
+
+      <div>
+        <h2 class="text-lg font-bold">
+          Patient Clinical Profile
+        </h2>
+
+        <p class="text-xs opacity-60">
+          Patient + Appointment + Visit + Cases
+        </p>
+      </div>
+    </div>
+    <div class="p-5 overflow-y-auto space-y-6">
+
+      <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
+
+        <div class="flex items-center gap-4">
+
+          <div class="avatar placeholder">
+            <div class="bg-primary text-white rounded-full w-16 text-xl">
+              {{ patient.first_name?.charAt(0) || 'P' }}
+            </div>
+          </div>
+
+          <div>
+            <div class="text-lg font-semibold">
+              {{ patient.first_name }}
+              {{ patient.last_name }}
+            </div>
+
+            <div class="text-sm opacity-60">
+              {{ patient.email }}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+          <h3 class="font-semibold text-sm opacity-70">
+            CONTACT
+          </h3>
+
+          <p>
+            <span class="opacity-60">Phone:</span>
+            {{ patient.phone || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Mobile:</span>
+            {{ patient.mobile || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">Email:</span>
+            {{ patient.email || '-' }}
+          </p>
+
+        </div>
+
+
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+
+          <h3 class="font-semibold text-sm opacity-70">
+            PERSONAL
+          </h3>
+
+          <p>
+            <span class="opacity-60">Gender:</span>
+            {{ patient.gender || '-' }}
+          </p>
+
+          <p>
+            <span class="opacity-60">DOB:</span>
+            {{ patient.date_of_birth | date:'mediumDate' }}
+          </p>
+
+        </div>
+
+
+        <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
+
+          <h3 class="font-semibold text-sm opacity-70">
+            ADDRESS
+          </h3>
+
+          <p>{{ patient.city }}, {{ patient.state }}</p>
+
+          <p>{{ patient.country }}</p>
+
+        </div>
+
+      </div>
+
+
+      <h3 class="text-lg font-bold mt-6">
+        Appointment Details
+      </h3>
+
+      @if(patient.Appointments?.length){
+
+      @for(appt of patient.Appointments; track appt.id){
+
+      <div class="border rounded-xl p-4 bg-base-200/20 space-y-4">
+
+        <p>
+          <b>Status:</b>
+          {{ appt.status }}
+        </p>
+
+        <h4 class="font-semibold">
+          Visits
+        </h4>
+
+        @if(appt.Visits?.length){
+
+        @for(visit of appt.Visits; track visit.id){
+
+        <div class="bg-base-100 border rounded-xl p-4 space-y-2">
+
+          <p>
+            <b>Diagnosis:</b>
+            {{ visit.diagnosis }}
+          </p>
+
+          <p>
+            <b>Treatment:</b>
+            {{ visit.treatment }}
+          </p>
+
+          <p>
+            <b>Prescription:</b>
+            {{ visit.prescription }}
+          </p>
+
+          <p>
+            <b>Notes:</b>
+            {{ visit.notes }}
+          </p>
+
+        </div>
+
+        }
+
+        }
+
+        @else {
+
+        <p class="text-gray-400">
+          No visits found
+        </p>
+
+        }
+
+      </div>
+
+      }
+
+      }
+
+      @else {
+
+      <p class="text-gray-400">
+        No appointments found
+      </p>
+
+      }
+
+
+      <h3 class="text-lg font-bold mt-6">
+        Cases
+      </h3>
+
+      @if(patient.Cases?.length){
+
+      @for(item of patient.Cases; track item.id){
+
+      <div class="border rounded-xl p-4 bg-base-200/20">
+
+        <p>
+          <b>Case ID:</b>
+          {{ item.id }}
+        </p>
+
+        <p>
+          <b>Type:</b>
+          {{ item.case_type }}
+        </p>
+
+        <p>
+          <b>Status:</b>
+          {{ item.case_status }}
+        </p>
+
+      </div>
+
+      }
+
+      }
+
+      @else {
+
+      <p class="text-gray-400">
+        No cases found
+      </p>
+
+      }
+
+    </div>
+
+  </div>
+
+</div>
+
+}

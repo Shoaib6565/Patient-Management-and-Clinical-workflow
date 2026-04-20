@@ -1,1 +1,48 @@
-<p>location-form works!</p>
+<div>
+
+  <h3 class="text-lg font-bold mb-4">
+    {{ isEdit ? 'Edit Location' : 'Create Location' }}
+  </h3>
+
+  <div class="grid grid-cols-2 gap-3">
+
+    <input class="input input-bordered"
+      placeholder="Location Name"
+      [(ngModel)]="form.location_name">
+
+    <input class="input input-bordered"
+      placeholder="City"
+      [(ngModel)]="form.city">
+
+    <input class="input input-bordered"
+      placeholder="State"
+      [(ngModel)]="form.state">
+
+    <input class="input input-bordered"
+      placeholder="Zip"
+      [(ngModel)]="form.zip">
+
+    <input class="input input-bordered col-span-2"
+      placeholder="Address"
+      [(ngModel)]="form.address">
+
+    <input class="input input-bordered"
+      placeholder="Phone"
+      [(ngModel)]="form.phone">
+
+    <input class="input input-bordered"
+      placeholder="Email"
+      [(ngModel)]="form.email">
+
+  </div>
+
+  <div class="flex justify-end gap-2 mt-4">
+    <button class="btn" (click)="back()">Back</button>
+    <button class="btn btn-primary" (click)="save()"
+      [disabled]="!canCreateAndUpdate()">
+      <i class="ti ti-check"></i>
+      Save
+    </button>
+  </div>
+
+</div>

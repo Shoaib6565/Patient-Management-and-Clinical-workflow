@@ -40,6 +40,7 @@ export class AuthService {
     this.isLoggedInSubject.next(false);
   }
 
+
   getRole(): string | null {
     const token = this.getToken();
     if (token) {

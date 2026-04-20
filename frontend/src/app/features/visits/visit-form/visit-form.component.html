@@ -154,7 +154,8 @@
       <!-- BUTTONS -->
       <div class="col-span-2 flex justify-end gap-3 mt-4">
         <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="loading">
+        <button type="submit" class="btn btn-primary"
+        [disabled]="loading || !canUpdate()">
           {{ loading ? 'Saving...' : 'Update Visit' }}
         </button>
       </div>

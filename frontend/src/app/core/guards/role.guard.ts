@@ -20,6 +20,6 @@ export const roleGuard: CanActivateFn = (route) => {
 
       router.navigate(['/signin']);
       return false;
-    })
+    }),
   );
 };
