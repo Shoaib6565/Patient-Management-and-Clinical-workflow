@@ -59,6 +59,8 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
       ? res
       : Array.isArray(res?.data)
       ? res.data
+      : Array.isArray(res?.data?.patients)
+      ? res.data.patients
       : [];
   }
 
@@ -89,11 +91,11 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
 
   loadInitialData() {
     forkJoin({
-      specialties: this.specialtyService.getSpecialties(),
+      specialties: this.specialtyService.getSpecialties('', 'all', 1, 1000),
       locations: this.locationService.getAll(),
       doctors: this.userService.getAllUsers(),
-      patients: this.patientService.getAllPatients(),
-      cases: this.casesService.getAllCases()
+      patients: this.patientService.getAllPatients({ limit: 1000 }),
+      cases: this.casesService.getAllCases({ limit: 1000 })
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -184,14 +186,14 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
   searchSpecialties(e: any) {
     const val = e.target?.value?.toLowerCase() || '';
     this.specialties = this.allSpecialties.filter(s =>
-      (s.name || '').toLowerCase().includes(val)
+      (s.specialty_name || s.name || '').toLowerCase().includes(val)
     );
   }
 
   searchLocations(e: any) {
     const val = e.target?.value?.toLowerCase() || '';
     this.locations = this.allLocations.filter(l =>
-      (l.name || '').toLowerCase().includes(val)
+      (l.location_name || l.name || '').toLowerCase().includes(val)
     );
   }
 

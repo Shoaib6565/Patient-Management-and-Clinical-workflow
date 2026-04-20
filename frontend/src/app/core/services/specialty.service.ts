@@ -13,12 +13,13 @@ export class SpecialtyService {
   constructor(private http: HttpClient) {}
 
   // Get all specialties (with search + filter + pagination)
-  getSpecialties(search: string = '', filter: string = 'all', page: number = 1): Observable<any> {
+  getSpecialties(search: string = '', filter: string = 'all', page: number = 1, limit: number = 10): Observable<any> {
 
     let params = new HttpParams()
       .set('search', search)
       .set('filter', filter)
-      .set('page', page);
+      .set('page', page)
+      .set('limit', limit);
 
     return this.http.get(this.apiUrl, { params });
   }

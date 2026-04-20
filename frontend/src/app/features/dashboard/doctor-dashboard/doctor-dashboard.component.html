@@ -1,204 +1,11 @@
-<!-- doctor-dashboard.component.html -->
-<div class="dd-page">
-
-  <!-- TOP BAR -->
-  <div class="dd-topbar">
-    <div>
-      <h1 class="dd-title">Welcome back, {{ doctorName }}</h1>
-      <p class="dd-subtitle">
-        Today is {{ today | date:'EEEE, MMMM d' }}. You have
-        <strong>{{ totalAppts }} appointments</strong> scheduled.
-      </p>
-    </div>
-    <!-- <button class="dd-emergency-btn" (click)="onNewEmergencyCase()">
-      <i class="ti ti-plus"></i>
-      New Emergency Case
-    </button> -->
-  </div>
-
-  <!-- MAIN GRID-->
-  <div class="dd-main-grid">
-
-    <!-- ── LEFT COLUMN ── -->
-    <div class="dd-left-col">
-
-      <!-- Visits Completed Card -->
-      <div class="dd-stat-card dd-stat-card--blue">
-        <div class="dd-stat-card__row">
-          <span class="dd-stat-card__label">VISITS COMPLETED</span>
-          <div class="dd-stat-card__icon dd-icon-blue">
-            <i class="ti ti-circle-check"></i>
-          </div>
-        </div>
-        <div class="dd-stat-card__value">
-          <span class="dd-big-num">{{ visitsCompleted < 10 ? '0' + visitsCompleted : visitsCompleted }}</span>
-          <span class="dd-big-num-sub">/ {{ totalAppts }}</span>
-        </div>
-        <div class="dd-progress-wrap">
-          <progress
-            class="progress progress-primary dd-progress"
-            [value]="visitsProgress"
-            max="100"
-          ></progress>
-        </div>
-      </div>
-
-      <!-- Pending Visits Card -->
-      <div class="dd-stat-card dd-stat-card--orange">
-        <div class="dd-stat-card__row">
-          <span class="dd-stat-card__label">PENDING VISITS</span>
-          <div class="dd-stat-card__icon dd-icon-orange">
-            <i class="ti ti-clipboard-text"></i>
-          </div>
-        </div>
-        <div class="dd-stat-card__value">
-          <span class="dd-big-num">{{ pendingVisits < 10 ? '0' + pendingVisits : pendingVisits }}</span>
-          <span class="dd-pending-label">Active</span>
-        </div>
-      </div>
-
-      <!-- Weekly Schedule Card -->
-      <div class="dd-schedule-card">
-        <div class="dd-schedule-header">
-          <h2 class="dd-section-title">Weekly Schedule</h2>
-          <button class="dd-icon-btn" (click)="onMoreSchedule()" title="More options">
-            <i class="ti ti-dots"></i>
-          </button>
-        </div>
-
-        <div class="dd-schedule-list">
-          <div
-            class="dd-schedule-row"
-            *ngFor="let item of weeklySchedule"
-            [class.dd-schedule-row--empty]="item.isEmpty"
-          >
-            <div class="dd-schedule-day">
-              <span class="dd-day-short">{{ item.dayShort }}</span>
-              <span class="dd-day-num">{{ item.dayNum }}</span>
-            </div>
-            <div class="dd-schedule-divider"></div>
-            <div class="dd-schedule-content">
-              <ng-container *ngIf="!item.isEmpty; else noAppts">
-                <span class="dd-schedule-title">{{ item.title }}</span>
-                <span class="dd-schedule-time">
-                  <i class="ti ti-clock"></i>{{ item.timeRange }}
-                </span>
-              </ng-container>
-              <ng-template #noAppts>
-                <span class="dd-schedule-empty-text">No Appointments</span>
-              </ng-template>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ── RIGHT COLUMN: TODAY'S APPOINTMENTS ── -->
-    <div class="dd-right-col">
-      <div class="dd-appt-card">
-
-        <div class="dd-appt-header">
-          <h2 class="dd-section-title">Today's Appointments</h2>
-          <div class="dd-appt-actions">
-            <button class="btn btn-sm btn-outline dd-action-btn" (click)="onFilter()">
-              <i class="ti ti-filter"></i> FILTER
-            </button>
-            <button class="btn btn-sm btn-outline dd-action-btn" (click)="onPrint()">
-              <i class="ti ti-printer"></i> PRINT LIST
-            </button>
-          </div>
-        </div>
-
-        <!-- Table -->
-        <div class="dd-table-wrap">
-          <table class="table dd-table">
-            <thead>
-              <tr>
-                <th>PATIENT NAME</th>
-                <th>TIME</th>
-                <th>PURPOSE</th>
-                <th>STATUS</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="let appt of appointments"
-                class="dd-table-row"
-                [class.dd-table-row--urgent]="appt.status === 'Urgent'"
-              >
-                <!-- Patient -->
-                <td>
-                  <div class="dd-patient-cell">
-                    <div class="dd-avatar">{{ appt.avatarInitials }}</div>
-                    <div class="dd-patient-info">
-                      <span class="dd-patient-name">{{ appt.patientName }}</span>
-                      <span class="dd-case-id">ID: {{ appt.caseId }}</span>
-                    </div>
-                  </div>
-                </td>
 
-                <!-- Time -->
-                <td>
-                  <span class="dd-time">{{ appt.time }}</span>
-                </td>
 
-                <!-- Purpose -->
-                <td>
-                  <span class="dd-purpose">{{ appt.purpose }}</span>
-                </td>
 
-                <!-- Status -->
-                <td>
-                  <span class="dd-status-badge" [ngClass]="getStatusClass(appt.status)">
-                    {{ getStatusLabel(appt.status) }}
-                  </span>
-                </td>
 
-                <!-- Actions -->
-                <td>
-                  <button
-                    class="dd-action-btn-row"
-                    [class.dd-action-btn-row--primary]="isPrimaryAction(appt.status)"
-                    [class.dd-action-btn-row--outline]="!isPrimaryAction(appt.status)"
-                    (click)="isPrimaryAction(appt.status) ? onStartVisit(appt) : onCheckIn(appt)"
-                  >
-                    <i
-                      class="ti"
-                      [class.ti-player-play]="isPrimaryAction(appt.status)"
-                      [class.ti-user-check]="!isPrimaryAction(appt.status)"
-                    ></i>
-                    {{ getActionLabel(appt.status) }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
-      </div>
-    </div>
 
-  </div>
 
-  <!-- BOTTOM STATS BAR-->
-  <div class="dd-bottom-stats">
-    <div
-      class="dd-bottom-stat"
-      *ngFor="let s of bottomStats"
-    >
-      <div class="dd-bottom-stat__icon" [ngClass]="s.colorClass">
-        <i class="ti" [ngClass]="s.icon"></i>
-      </div>
-      <div class="dd-bottom-stat__text">
-        <span class="dd-bottom-stat__label">{{ s.label }}</span>
-        <span class="dd-bottom-stat__value">{{ s.value }}</span>
-      </div>
-    </div>
-  </div>
 
-</div>
 
 
 
@@ -241,22 +48,15 @@
 
 
 
-
-
-
-
-
-
-
-<!-- <div class="p-4 space-y-4"> -->
+<div class="p-4 space-y-4">
 
   <!-- HEADER -->
-  <!-- <div class="flex justify-between items-center mb-4">
+  <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-bold">My Appointments</h2>
-  </div> -->
+  </div>
 
   <!-- TABLE -->
-  <!-- <div class="card bg-base-100 shadow-md">
+   <div class="card bg-base-100 shadow-md">
     <div class="overflow-x-auto">
       <table class="table">
 
@@ -335,4 +135,4 @@
     </div>
   </div>
 
-</div> -->
+</div> 

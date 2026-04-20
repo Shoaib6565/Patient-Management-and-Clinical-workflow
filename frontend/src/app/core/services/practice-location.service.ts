@@ -24,6 +24,11 @@ export class PracticeLocationService {
       });
     }
 
+    // Default limit to 1000 if not specified
+    if (!httpParams.has('limit')) {
+      httpParams = httpParams.set('limit', '1000');
+    }
+
     return this.http.get(this.apiUrl, { params: httpParams });
   }
 
