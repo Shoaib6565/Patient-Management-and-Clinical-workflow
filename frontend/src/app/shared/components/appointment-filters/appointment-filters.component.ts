@@ -54,8 +54,9 @@ export class AppointmentFilterComponent {
 
   loadSpecialties() {
     this.specialtiesService.getSpecialties().subscribe({
-      next: (data) => {
-        this.specialties = data;
+      next: (res) => {
+        this.specialties = res.data;
+        console.log(this.specialties)
       },
       error: (error) => {
         console.error('Error loading specialties:', error);

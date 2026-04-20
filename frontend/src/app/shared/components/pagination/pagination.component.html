@@ -1,0 +1,72 @@
+<div class="flex justify-center mt-4" *ngIf="pagination">
+
+  <div class="join">
+
+    <!-- Prev -->
+    <button
+      class="join-item btn btn-sm"
+      (click)="goToPage(currentPage - 1)"
+      [disabled]="currentPage === 1">
+      Prev
+    </button>
+
+    <!-- First page -->
+    <button
+      *ngIf="currentPage > 2"
+      class="join-item btn btn-sm"
+      (click)="goToPage(1)">
+      1
+    </button>
+
+    <!-- Dots -->
+    <button class="join-item btn btn-sm btn-disabled"
+            *ngIf="currentPage > 3">
+      ...
+    </button>
+
+    <!-- Current -1 -->
+    <button
+      *ngIf="currentPage > 1"
+      class="join-item btn btn-sm"
+      (click)="goToPage(currentPage - 1)">
+      {{ currentPage - 1 }}
+    </button>
+
+    <!-- Current page -->
+    <button class="join-item btn btn-sm btn-active">
+      {{ currentPage }}
+    </button>
+
+    <!-- Current +1 -->
+    <button
+      *ngIf="currentPage < lastPage"
+      class="join-item btn btn-sm"
+      (click)="goToPage(currentPage + 1)">
+      {{ currentPage + 1 }}
+    </button>
+
+    <!-- Dots -->
+    <button class="join-item btn btn-sm btn-disabled"
+            *ngIf="currentPage < lastPage - 2">
+      ...
+    </button>
+
+    <!-- Last page -->
+    <button
+      *ngIf="currentPage < lastPage - 1"
+      class="join-item btn btn-sm"
+      (click)="goToPage(lastPage)">
+      {{ lastPage }}
+    </button>
+
+    <!-- Next -->
+    <button
+      class="join-item btn btn-sm"
+      (click)="goToPage(currentPage + 1)"
+      [disabled]="currentPage === lastPage">
+      Next
+    </button>
+
+  </div>
+
+</div>

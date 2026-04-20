@@ -6,14 +6,21 @@ use Closure;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
+use Firebase\JWT\BeforeValidException;
 use Exception;
 
 class VerifyNodeJwt
 {
     public function handle(Request $request, Closure $next)
     {
-        try {
+        // Allow preflight request
+        if ($request->isMethod('OPTIONS')) {
+            return response()->json([], 200);
+        }
 
+        try {
             //  Get token from header
             $authHeader = $request->header('Authorization');
 
@@ -26,18 +33,19 @@ class VerifyNodeJwt
             //  Decode token (same secret as Node)
             $decoded = JWT::decode(
                 $token,
-                new Key(env('JWT_NODE_SECRET'), 'HS256')
+                new Key(config('app.jwt_node_secret'), 'HS256')
             );
 
-            //  user data attach kar do request me
-           $request->attributes->set('auth_user', $decoded);;
+            // attach user data  with request
+            $request->attributes->set('auth_user', $decoded);
+            ;
 
+        } catch (ExpiredException $e) {
+            return response()->json(['error' => 'Token expired'], 401);
+        } catch (SignatureInvalidException $e) {
+            return response()->json(['error' => 'Invalid signature'], 401);
         } catch (Exception $e) {
-
-            return response()->json([
-                'error' => 'Invalid token',
-                'message' => $e->getMessage()
-            ], 401);
+            return response()->json(['error' => 'Invalid token'], 401);
         }
 
         return $next($request);

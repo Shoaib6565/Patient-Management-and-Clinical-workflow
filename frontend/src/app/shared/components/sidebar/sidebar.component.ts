@@ -16,7 +16,6 @@ export class SidebarComponent {
   @Input() isOpen: boolean = true;
 
   // Replace with real role from AuthService
-  // e.g. this.authService.currentUser.role
   role: UserRole = localStorage.getItem('role') as UserRole || 'Admin';
 
   isSettingsOpen = false;
@@ -24,24 +23,22 @@ export class SidebarComponent {
   get isAdmin(): boolean {
     return this.role === 'Admin';
   }
+  get isAdminAndFDO() : boolean{
+    return this.role === "Admin" || this.role === "FDO"
+  }
+   get isAdminAndDoctor() : boolean{
+    return this.role === "Admin" || this.role === "Doctor"
+  }
 
   get dashboardRoute(): string {
     const routes: Record<UserRole, string> = {
       Admin:  '/dashboard/admin',
       Doctor: '/dashboard/doctor',
-      FDO:    '/dashboard/frontdesk'
+      FDO:    '/dashboard/fdo'
     };
     return routes[this.role];
   }
 
-  get appointmentsRoute(): string {
-    const routes: Record<UserRole, string> = {
-      Admin:  '/appointments',
-      Doctor: '/appointments',
-      FDO:    '/appointments'
-    };
-    return routes[this.role];
-  }
 
   toggleSettings(): void {
     this.isSettingsOpen = !this.isSettingsOpen;

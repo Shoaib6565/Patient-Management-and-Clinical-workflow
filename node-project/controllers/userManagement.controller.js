@@ -10,7 +10,7 @@ export const getAllUsers = async (req, res) => {
              include: [
                 {
                     model: Role,
-                    as: "roles",   // IMPORTANT (must match association)
+                    as: "roles",   
                     attributes: ['id', 'name'],
                     through: { attributes: [] } // hides pivot table
                 }

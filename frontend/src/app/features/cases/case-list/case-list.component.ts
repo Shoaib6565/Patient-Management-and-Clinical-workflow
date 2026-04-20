@@ -8,7 +8,7 @@ import { CasesService } from '../../../core/services/Cases.service';
 @Component({
   selector: 'app-case-list',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterOutlet],
+  imports: [CommonModule, FormsModule, RouterOutlet],
   templateUrl: './case-list.component.html',
   styleUrl: './case-list.component.css',
 })
@@ -25,16 +25,13 @@ export class CaseListComponent {
   public caseToDelete: any = null;
 
   public isEditMode: boolean = false;
-public editCase: any = null;
+  public editCase: any = null;
 
   public filters = {
     patientName: '',
     caseNumber: '',
     caseType: '',
-    categoryId: '',
     caseStatus: '',
-    practiceLocationId: '',
-    insuranceProviderId: '',
     startDate: '',
     endDate: '',
     page: 1,
@@ -46,35 +43,35 @@ public editCase: any = null;
   }
 
   loadCases() {
+    console.log('Filters sent:', this.filters);
+
     this.caseService.getAllCases(this.filters).subscribe({
       next: (res: any) => {
         this.cases = res?.data || [];
-        console.log(res?.data)
+
         this.pagination = {
           page: res?.page,
           limit: res?.limit,
           hasNextPage: res?.hasNextPage,
           hasPrevPage: res?.hasPrevPage,
         };
+
         this.pages = Array.from(
           { length: res?.page + (res?.hasNextPage ? 1 : 0) },
-          (_, i) => i + 1
+          (_, i) => i + 1,
         );
       },
       error: (err) => {
         console.error('Error loading cases:', err);
-        if (err.status === 401) {
-          this.router.navigateByUrl('');
-        }
       },
     });
   }
 
   applyFilters() {
-    console.log("filers")
+    console.log('filers');
     this.filters.page = 1;
-    // this.loadCases();
-    console.log(this.filters)
+    this.loadCases();
+    console.log(this.filters);
   }
 
   resetFilters() {
@@ -82,10 +79,8 @@ public editCase: any = null;
       patientName: '',
       caseNumber: '',
       caseType: '',
-      categoryId: '',
       caseStatus: '',
-      practiceLocationId: '',
-      insuranceProviderId: '',
+
       startDate: '',
       endDate: '',
       page: 1,
@@ -110,7 +105,7 @@ public editCase: any = null;
 
   openDeleteModal(caseItem: any) {
     this.showDeleteModal = true;
-    console.log(this.caseToDelete)
+    console.log(this.caseToDelete);
   }
 
   closeDeleteModal() {
@@ -140,35 +135,35 @@ public editCase: any = null;
   }
 
   openEdit(caseItem: any) {
-  this.editCase = JSON.parse(JSON.stringify(caseItem));
-  this.isEditMode = true;
-}
+    this.editCase = JSON.parse(JSON.stringify(caseItem));
+    this.isEditMode = true;
+  }
 
-closeEdit() {
-  this.isEditMode = false;
-  this.editCase = null;
-}
+  closeEdit() {
+    this.isEditMode = false;
+    this.editCase = null;
+  }
   updateCase() {
-  if (!this.editCase?.id) return;
+    if (!this.editCase?.id) return;
 
-  const payload = {
-    case_number: this.editCase.case_number,
-    case_type: this.editCase.case_type,
-    case_status: this.editCase.case_status,
-    priority: this.editCase.priority,
-    purpose_of_visit: this.editCase.purpose_of_visit,
-    referred_by: this.editCase.referred_by,
-    referred_doctor_name: this.editCase.referred_doctor_name,
-  };
+    const payload = {
+      case_number: this.editCase.case_number,
+      case_type: this.editCase.case_type,
+      case_status: this.editCase.case_status,
+      priority: this.editCase.priority,
+      purpose_of_visit: this.editCase.purpose_of_visit,
+      referred_by: this.editCase.referred_by,
+      referred_doctor_name: this.editCase.referred_doctor_name,
+    };
 
-  this.caseService.updateCase(this.editCase.id, payload).subscribe({
-    next: () => {
-      this.loadCases();
-      this.closeEdit();
-    },
-    error: (err) => console.error('Update failed:', err),
-  });
-}
+    this.caseService.updateCase(this.editCase.id, payload).subscribe({
+      next: () => {
+        this.loadCases();
+        this.closeEdit();
+      },
+      error: (err) => console.error('Update failed:', err),
+    });
+  }
   exportCsv() {
     this.caseService.exportCasesCSV().subscribe({
       next: (blob: Blob) => {
@@ -189,11 +184,15 @@ closeEdit() {
   }
 
   registerCase() {
-    // this.router.navigateByUrl('cases/case-form');
+    this.router.navigateByUrl('cases/case-form');
   }
 
   allowFeatures(input: string[]) {
     const role = localStorage.getItem('role');
     return role ? input.includes(role) : false;
+  }
+  isAdminAndFDO() {
+    const role = localStorage.getItem('role');
+    return role;
   }
 }

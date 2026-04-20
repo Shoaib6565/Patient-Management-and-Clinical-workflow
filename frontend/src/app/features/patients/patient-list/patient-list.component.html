@@ -85,7 +85,7 @@
 
             @if(this.allowFeatures(['Admin']))
             {
-                <td>
+            <td>
               <button class="btn btn-xs btn-error" (click)="openDeleteModal(patient); $event.stopPropagation()">
                 Delete
               </button>
@@ -204,19 +204,19 @@
           </div>
 
         </div>
-         @if(this.allowFeatures(['Admin','FDO']))
-         {
+        @if(this.allowFeatures(['Admin','FDO']))
+        {
         <button class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold
                  hover:bg-blue-700 transition shadow-md hover:shadow-lg
                   gap-6" (click)="openEdit(selectedPatient)">
           Update
         </button>
-         <button class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold
+        <button class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold
                  hover:bg-blue-700 transition shadow-md hover:shadow-lg
                   gap-2" (click)="registerCase()">
-    Create Case
-  </button>
-      }
+          Create Case
+        </button>
+        }
 
       </div>
     </div>
@@ -263,120 +263,85 @@
 
     <h2 class="text-xl font-bold">Update Patient</h2>
 
-    <!-- NAME -->
     <div class="grid grid-cols-3 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.first_name"
-        placeholder="First Name" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.first_name" placeholder="First Name" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.middle_name"
-        placeholder="Middle Name" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.middle_name" placeholder="Middle Name" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.last_name"
-        placeholder="Last Name" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.last_name" placeholder="Last Name" />
 
     </div>
 
-    <!-- CONTACT -->
+
     <div class="grid grid-cols-3 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.phone"
-        placeholder="Phone" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.phone" placeholder="Phone" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.mobile"
-        placeholder="Mobile" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.mobile" placeholder="Mobile" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.email"
-        placeholder="Email" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.email" placeholder="Email" />
 
     </div>
 
-    <!-- PERSONAL INFO -->
     <div class="grid grid-cols-3 gap-3">
 
-      <select class="select select-bordered"
-        [(ngModel)]="editPatient.gender">
+      <select class="select select-bordered" [(ngModel)]="editPatient.gender">
         <option>Male</option>
         <option>Female</option>
       </select>
 
-      <input type="date" class="input input-bordered"
-        [(ngModel)]="editPatient.date_of_birth" />
+      <input type="date" class="input input-bordered" [(ngModel)]="editPatient.date_of_birth" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.preferred_language"
-        placeholder="Language" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.preferred_language" placeholder="Language" />
 
     </div>
 
-    <!-- ADDRESS -->
+
     <div class="grid grid-cols-2 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.address"
-        placeholder="Address" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.address" placeholder="Address" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.city"
-        placeholder="City" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.city" placeholder="City" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.state"
-        placeholder="State" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.state" placeholder="State" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.country"
-        placeholder="Country" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.country" placeholder="Country" />
 
     </div>
 
-    <input class="input input-bordered w-full"
-      [(ngModel)]="editPatient.zip_code"
-      placeholder="Zip Code" />
+    <input class="input input-bordered w-full" [(ngModel)]="editPatient.zip_code" placeholder="Zip Code" />
 
-    <!-- MEDICAL -->
+
     <div class="grid grid-cols-2 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.primary_physician"
-        placeholder="Physician" />
+      <input class="input input-bordered" [(ngModel)]="editPatient.primary_physician" placeholder="Physician" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.insurance_provider"
+      <input class="input input-bordered" [(ngModel)]="editPatient.insurance_provider"
         placeholder="Insurance Provider" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.insurance_policy_number"
+      <input class="input input-bordered" [(ngModel)]="editPatient.insurance_policy_number"
         placeholder="Policy Number" />
 
-      <select class="select select-bordered"
-        [(ngModel)]="editPatient.patient_status">
+      <select class="select select-bordered" [(ngModel)]="editPatient.patient_status">
         <option>Active</option>
         <option>Inactive</option>
       </select>
 
     </div>
 
-    <!-- EMERGENCY -->
+
     <div class="grid grid-cols-2 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.emergency_contact_name"
+      <input class="input input-bordered" [(ngModel)]="editPatient.emergency_contact_name"
         placeholder="Emergency Contact Name" />
 
-      <input class="input input-bordered"
-        [(ngModel)]="editPatient.emergency_contact_phone"
+      <input class="input input-bordered" [(ngModel)]="editPatient.emergency_contact_phone"
         placeholder="Emergency Contact Phone" />
 
     </div>
 
-    <!-- ACTIONS -->
+
     <div class="flex justify-end gap-2 pt-4">
 
       <button class="btn btn-outline" (click)="closeEdit()">

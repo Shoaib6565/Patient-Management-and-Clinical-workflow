@@ -31,7 +31,7 @@
 
     <!-- Admin only -->
     <ng-container *ngIf="isAdmin">
-      <a class="nav-item" routerLink="/settings/doctors" routerLinkActive="active">
+      <a class="nav-item" routerLink="/doctor-list" routerLinkActive="active">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -45,7 +45,7 @@
         <span class="nav-tooltip">Manage Doctors</span>
       </a>
 
-      <a class="nav-item" routerLink="/settings/users/fdo" routerLinkActive="active">
+      <a class="nav-item" routerLink="/fdo-list" routerLinkActive="active">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -58,6 +58,7 @@
       </a>
     </ng-container>
 
+    <ng-container *ngIf="isAdminAndFDO">
     <div class="nav-section-label">Patient care</div>
 
     <a class="nav-item" routerLink="/patients" routerLinkActive="active">
@@ -73,7 +74,9 @@
       <span class="nav-label">Manage Patients</span>
       <span class="nav-tooltip">Manage Patients</span>
     </a>
+    </ng-container>
 
+    <ng-container *ngIf="isAdminAndFDO">
     <a class="nav-item" routerLink="/cases" routerLinkActive="active">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -87,8 +90,9 @@
       <span class="nav-label">Case List</span>
       <span class="nav-tooltip">Case List</span>
     </a>
+    </ng-container>
 
-    <a class="nav-item" [routerLink]="appointmentsRoute" routerLinkActive="active">
+    <a class="nav-item" routerLink="/appointments" routerLinkActive="active">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -102,6 +106,7 @@
       <span class="nav-tooltip">Appointments</span>
     </a>
 
+    <ng-container *ngIf="isAdminAndDoctor">
     <a class="nav-item" routerLink="/visits" routerLinkActive="active">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -112,6 +117,7 @@
       <span class="nav-label">Visit List</span>
       <span class="nav-tooltip">Visit List</span>
     </a>
+    </ng-container>
 
   </nav>
 
@@ -137,19 +143,19 @@
     </div>
 
     <div class="sub-menu" [class.open]="isSettingsOpen">
-      <a class="sub-item" routerLink="/settings/specialties" routerLinkActive="sub-active">
+      <a class="sub-item" routerLink="/specialties" routerLinkActive="sub-active">
         <span class="sub-dot"></span>Manage Specialties
       </a>
-      <a class="sub-item" routerLink="/settings/locations" routerLinkActive="sub-active">
+      <a class="sub-item" routerLink="/locations" routerLinkActive="sub-active">
         <span class="sub-dot"></span>Manage Practice Locations
       </a>
-      <a class="sub-item" routerLink="/settings/firms" routerLinkActive="sub-active">
+      <a class="sub-item" routerLink="/firms" routerLinkActive="sub-active">
         <span class="sub-dot"></span>Manage Firms
       </a>
-      <a class="sub-item" routerLink="/settings/insurance" routerLinkActive="sub-active">
+      <a class="sub-item" routerLink="/insurances" routerLinkActive="sub-active">
         <span class="sub-dot"></span>Manage Insurance
       </a>
-      <a class="sub-item" routerLink="/settings/categories" routerLinkActive="sub-active">
+      <a class="sub-item" routerLink="/categories" routerLinkActive="sub-active">
         <span class="sub-dot"></span>Manage Categories
       </a>
     </div>

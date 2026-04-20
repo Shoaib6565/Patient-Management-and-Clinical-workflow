@@ -1,56 +1,18 @@
-<div class="filter-container">
+<div class="flex gap-3 items-end mb-4">
 
-  <div class="filter-grid">
+  <input type="text"
+    class="input input-bordered w-full max-w-xs"
+    placeholder="Search..."
+    [(ngModel)]="search" />
 
-    <!-- Loop filters -->
-    <div *ngFor="let field of fields" class="filter-item">
+  <select class="select select-bordered"
+    [(ngModel)]="status">
+    <option value="all">All</option>
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+  </select>
 
-      <!-- TEXT -->
-      <input
-        *ngIf="field.type === 'text'"
-        type="text"
-        [placeholder]="field.label"
-        [(ngModel)]="filterValues[field.key]"
-        (ngModelChange)="onChange()"
-      />
-
-      <!-- SELECT -->
-      <select
-        *ngIf="field.type === 'select'"
-        [(ngModel)]="filterValues[field.key]"
-        (change)="onChange()">
-
-        <option value="">All {{ field.label }}</option>
-
-        <option *ngFor="let opt of field.options" [value]="opt">
-          {{ opt }}
-        </option>
-      </select>
-
-      <!-- DATE RANGE -->
-      <div *ngIf="field.type === 'dateRange'" class="date-range">
-
-        <input
-          type="date"
-          [(ngModel)]="filterValues[field.key + '_from']"
-          (change)="onChange()"
-        />
-
-        <input
-          type="date"
-          [(ngModel)]="filterValues[field.key + '_to']"
-          (change)="onChange()"
-        />
-
-      </div>
-
-    </div>
-
-    <!-- Reset Button -->
-    <button class="reset-btn" (click)="reset()">
-      Reset
-    </button>
-
-  </div>
+  <button class="btn btn-primary" (click)="onApply()">Apply</button>
+  <button class="btn" (click)="onReset()">Reset</button>
 
 </div>

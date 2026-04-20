@@ -70,5 +70,6 @@ export class UserFormComponent {
 
     this.successMessage = '';
     this.errorMessage = '';
+    this.router.navigateByUrl
   }
 }

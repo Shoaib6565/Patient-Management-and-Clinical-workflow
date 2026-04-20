@@ -12,6 +12,7 @@ class PracticeLocationController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $filter = $request->filter; // active, inactive, all
 
         $locations = PracticeLocation::query()
             ->when($search, function ($query) use ($search) {
@@ -19,6 +20,12 @@ class PracticeLocationController extends Controller
                     $q->where('location_name', 'like', "%$search%")
                       ->orWhere('email', 'like', "%$search%");
                 });
+            })
+            ->when($filter === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($filter === 'inactive', function ($query) {
+                $query->where('is_active', false);
             })
             ->orderBy('location_name')
             ->paginate(10);
@@ -75,29 +82,31 @@ class PracticeLocationController extends Controller
         ]);
     }
 
-    // Get Active Locations
-    public function active()
-    {
-        $data = PracticeLocation::where('is_active', true)->get();
+    // // Get Active Locations
+    // public function active()
+    // {
+    //     $data = PracticeLocation::where('is_active', true)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Active locations fetched successfully',
-            'data' => $data
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Active locations fetched successfully',
+    //         'data' => $data
+    //     ]);
+    // }
 
-    // Get Inactive Locations
-    public function inactive()
-    {
-        $data = PracticeLocation::where('is_active', false)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Inactive locations fetched successfully',
-            'data' => $data
-        ]);
-    }
+
+    // //Get Inactive Locations
+    // public function inactive()
+    // {
+    //     $data = PracticeLocation::where('is_active', false)->get();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Inactive locations fetched successfully',
+    //         'data' => $data
+    //     ]);
+    // }
 
     // Update
     public function update(Request $request, $id)

@@ -1,0 +1,35 @@
+/* Blur effect when form is open */
+:host ::ng-deep .blur-sm {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Modal styling with high z-index to appear above navbar */
+:host ::ng-deep .modal-overlay {
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:host ::ng-deep .modal-overlay .bg-white {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

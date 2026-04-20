@@ -1,5 +1,10 @@
+/* @import "~@tabler/icons-webfont/tabler-icons.min.css"; */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @plugin "daisyui";
+
+
+/* @import "lucide-static/font/lucide.css"; */

@@ -1,6 +1,4 @@
 <div class="p-4 space-y-4">
-
-  <!-- HEADER -->
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-bold">Cases</h2>
 
@@ -8,10 +6,11 @@
       <button class="btn btn-outline btn-sm" (click)="exportCsv()">
         Export CSV
       </button>
+      <button *ngIf="isAdminAndFDO() === 'Admin' || isAdminAndFDO() === 'FDO'"  class="btn btn-outline btn-sm" (click)="registerCase()">
+        Create Case
+      </button>
     </div>
   </div>
-
-  <!-- FILTERS -->
   <div class="card bg-base-100 shadow-md p-4">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
@@ -65,7 +64,6 @@
     </div>
   </div>
 
-  <!-- TABLE -->
   <div class="card bg-base-100 shadow-md">
     <div class="overflow-x-auto">
 
@@ -113,14 +111,17 @@
             <td>{{ caseItem.case_type }}</td>
 
             <td>
-              <span class="badge"
-                [ngClass]="{
-                  'badge-success': caseItem.case_status === 'Open',
-                  'badge-error': caseItem.case_status === 'Closed',
-                  'badge-warning': caseItem.case_status === 'Pending'
-                }">
-                {{ caseItem.case_status }}
-              </span>
+             <span
+  class="badge px-2 py-1"
+  [ngClass]="{
+    'badge-success': caseItem.case_status === 'Open' || selectedCase?.case_status === 'Open',
+    'badge-error': caseItem.case_status === 'Closed' || selectedCase?.case_status === 'Closed',
+    'badge-warning': caseItem.case_status === 'Pending' || selectedCase?.case_status === 'Pending',
+    'badge-info': caseItem.case_status === 'Active' || selectedCase?.case_status === 'Active'
+  }"
+>
+  {{ caseItem?.case_status || selectedCase?.case_status }}
+</span>
             </td>
 
             <td>{{ caseItem.priority }}</td>
@@ -149,7 +150,6 @@
 
     </div>
   </div>
-<!-- DELETE CONFIRM MODAL -->
 @if (showDeleteModal) {
   <div class="fixed inset-0 z-[9999] flex items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
@@ -179,7 +179,6 @@
   </div>
 
 }
-  <!-- DETAILS MODAL -->
   @if (selectedCase) {
   <div class="fixed inset-0 z-50 flex items-center justify-center">
 
@@ -194,7 +193,6 @@
     flex flex-col overflow-hidden"
   >
 
-    <!-- HEADER -->
     <div class="flex items-center justify-between px-6 py-4 border-b bg-base-200/40">
 
       <div>
@@ -217,8 +215,6 @@
     </div>
 
     <div class="p-5 overflow-y-auto space-y-6">
-
-      <!-- TOP PROFILE -->
       <div class="flex items-center justify-between bg-base-200/40 rounded-xl p-4">
 
         <div class="flex items-center gap-4">
@@ -253,11 +249,7 @@
         </span>
 
       </div>
-
-      <!-- GRID -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-        <!-- CASE INFO -->
         <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
           <h3 class="font-semibold text-sm opacity-70">
             CASE INFO
@@ -279,7 +271,6 @@
           </p>
         </div>
 
-        <!-- PATIENT -->
         <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
           <h3 class="font-semibold text-sm opacity-70">
             PATIENT
@@ -305,7 +296,6 @@
           </p>
         </div>
 
-        <!-- REFERRAL -->
         <div class="bg-base-200/30 p-4 rounded-xl space-y-2">
           <h3 class="font-semibold text-sm opacity-70">
             REFERRAL
@@ -323,7 +313,6 @@
 
         </div>
 
-        <!-- MEDICAL NOTES -->
         <div class="bg-base-200/30 p-4 rounded-xl md:col-span-2 space-y-2">
 
           <h3 class="font-semibold text-sm opacity-70">
@@ -355,7 +344,6 @@
           </p>
         </div>
 
-        <!-- CLINICAL NOTES -->
         <div class="bg-red-50/10 border border-red-200/20 p-4 rounded-xl space-y-2">
 
           <h3 class="font-semibold text-sm text-red-400">
@@ -397,8 +385,6 @@
   <div class="relative w-full max-w-5xl max-h-[85vh] bg-base-100 rounded-2xl shadow-2xl overflow-y-auto p-6 space-y-4">
 
     <h2 class="text-xl font-bold">Update Case</h2>
-
-    <!-- CASE INFO -->
     <div class="grid grid-cols-2 gap-3">
 
       <input class="input input-bordered"
@@ -428,28 +414,7 @@
 
     </div>
 
-    <!-- PATIENT INFO (optional editable if needed) -->
-    <div class="grid grid-cols-2 gap-3">
 
-      <input class="input input-bordered"
-        [(ngModel)]="editCase.Patient.first_name"
-        placeholder="First Name" />
-
-      <input class="input input-bordered"
-        [(ngModel)]="editCase.Patient.last_name"
-        placeholder="Last Name" />
-
-      <input class="input input-bordered"
-        [(ngModel)]="editCase.Patient.phone"
-        placeholder="Phone" />
-
-      <input class="input input-bordered"
-        [(ngModel)]="editCase.Patient.email"
-        placeholder="Email" />
-
-    </div>
-
-    <!-- REFERRAL -->
     <div class="grid grid-cols-2 gap-3">
 
       <input class="input input-bordered"
@@ -462,7 +427,6 @@
 
     </div>
 
-    <!-- MEDICAL INFO -->
     <textarea class="textarea textarea-bordered w-full"
       [(ngModel)]="editCase.purpose_of_visit"
       placeholder="Purpose of Visit"></textarea>
@@ -471,7 +435,7 @@
       [(ngModel)]="editCase.clinical_notes"
       placeholder="Clinical Notes"></textarea>
 
-    <!-- ACTIONS -->
+
     <div class="flex justify-end gap-2 pt-4">
 
       <button class="btn btn-outline" (click)="closeEdit()">

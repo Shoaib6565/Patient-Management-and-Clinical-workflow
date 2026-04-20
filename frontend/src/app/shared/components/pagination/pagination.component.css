@@ -1,0 +1,5 @@
+/* optional override if needed */
+.btn-active {
+  background-color: #3b82f6 !important; /* tailwind blue */
+  color: white !important;
+}

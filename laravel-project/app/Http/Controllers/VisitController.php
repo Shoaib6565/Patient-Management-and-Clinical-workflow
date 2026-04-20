@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use  App\Jobs\ExportVisitsCsvJob;
 use App\Services\VisitService;
 use App\Models\Export;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class VisitController extends Controller
 {
@@ -33,77 +35,81 @@ class VisitController extends Controller
     }
 
 
-    // export to csv
-    // public function export(Request $request)
-    // {
-    //     $query = $this->getFilteredVisits($request);
-
-    //     $visits = $query->get(); // no pagination
-
-    //     $fileName = "visits_" . now()->format('Ymd_His') . ".csv";
-
-    //     $headers = [
-    //         "Content-Type" => "text/csv",
-    //         "Content-Disposition" => "attachment; filename=$fileName",
-    //     ];
-
-    //     $callback = function () use ($visits) {
-
-    //         $file = fopen('php://output', 'w');
-
-    //         // CSV Header
-    //         fputcsv($file, [
-    //             'Visit Number',
-    //             'Patient Name',
-    //             'Doctor Name',
-    //             'Visit Date',
-    //             'Visit Time',
-    //             'Diagnosis',
-    //             'Treatment',
-    //             'Status',
-    //             'Follow Up Required',
-    //             'Follow Up Date'
-    //         ]);
-
-    //         foreach ($visits as $v) {
-    //             fputcsv($file, [
-    //                 $v->visit_number,
-    //                 $v->patient->first_name . ' ' . $v->patient->last_name,
-    //                 $v->doctor->name,
-    //                 $v->visit_date,
-    //                 $v->visit_time,
-    //                 $v->diagnosis,
-    //                 $v->treatment,
-    //                 $v->visit_status,
-    //                 $v->follow_up_required ? 'Yes' : 'No',
-    //                 $v->follow_up_date
-    //             ]);
-    //         }
-
-    //         fclose($file);
-    //     };
-
-    //     return response()->stream($callback, 200, $headers);
-    // }
-
+    // // export to csv
     public function export(Request $request)
-{
-    $user = $request->attributes->get('auth_user') ?? null;
+    {
+        $query = $this->visitService
+        ->getFilteredVisits($request->all());
 
-    //  create export record
-    $export = Export::create([
-        'user_id' => $user->id,
-        'type' => 'visit',
-        'status' => 'processing'
-    ]);
+        $visits = $query->get(); // no pagination
 
-    //  dispatch job
-    ExportVisitsCsvJob::dispatch($request->all(), $export->id);
+        $fileName = "visits_" . now()->format('Ymd_His') . ".csv";
 
-    return response()->json([
-        'message' => 'Visit export started'
-    ]);
-}
+        $headers = [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+        ];
+
+        $callback = function () use ($visits) {
+
+            $file = fopen('php://output', 'w');
+
+            // CSV Header
+            fputcsv($file, [
+                'Visit Number',
+                'Patient Name',
+                'Doctor Name',
+                'Visit Date',
+                'Visit Time',
+                'Diagnosis',
+                'Treatment',
+                'Status',
+                'Follow Up Required',
+                'Follow Up Date'
+            ]);
+
+            foreach ($visits as $v) {
+                fputcsv($file, [
+                    $v->visit_number,
+                    $v->patient->first_name . ' ' . $v->patient->last_name,
+                    $v->doctor->name,
+                    $v->visit_date,
+                    $v->visit_time,
+                    $v->diagnosis,
+                    $v->treatment,
+                    $v->visit_status,
+                    $v->follow_up_required ? 'Yes' : 'No',
+                    $v->follow_up_date
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+
+    //// //  with job and queue
+//     public function export(Request $request)
+// {
+//     $user = $request->attributes->get('auth_user') ?? null;
+
+//     //  create export record
+//     $export = Export::create([
+//         'user_id' => $user->id,
+//         'type' => 'visit',
+//         'status' => 'processing'
+//     ]);
+
+//     //  dispatch job
+//     ExportVisitsCsvJob::dispatch($request->all(), $export->id);
+
+//     return response()->json([
+//         'message' => 'Visit export started'
+//     ]);
+// }
 
     // show all list
 
@@ -144,14 +150,14 @@ class VisitController extends Controller
         }
 
         // Only doctor allowed
-        $user = $request->attributes->get('auth_user');
+        // $user = $request->attributes->get('auth_user');
 
-        if ($user->role !== 'Doctor') {
-            return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized'
-            ], 403);
-        }
+        // if ($user->role !== 'Doctor') {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Unauthorized'
+        //     ], 403);
+        // }
 
         $visit->update([
 

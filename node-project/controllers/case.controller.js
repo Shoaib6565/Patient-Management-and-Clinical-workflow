@@ -3,189 +3,136 @@ import { Parser } from "json2csv";
 import { Op } from "sequelize";
 const { Case, Patient, PracticeLocation, Category, Insurance, Firm } = db;
 
-export const getAll = async (req,res)=>{
+export const getAll = async (req, res) => {
+  try {
+    const {
+      patientName,
+      caseNumber,
+      caseType,
+      caseStatus,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    console.log("QUERY:", req.query);
+
+    const pageNumber = Number(page);
+    const pageSize = Number(limit);
+
+    const offset = (pageNumber - 1) * pageSize;
+
+    let where = {
+      deleted_at: null,
+    };
+
+    let patientWhere = {};
+
+    if (patientName) {
+      patientWhere[Op.or] = [
+        {
+          first_name: {
+            [Op.like]: `%${patientName}%`,
+          },
+        },
+
+        {
+          middle_name: {
+            [Op.like]: `%${patientName}%`,
+          },
+        },
+
+        {
+          last_name: {
+            [Op.like]: `%${patientName}%`,
+          },
+        },
+      ];
+    }
+
+    if (caseNumber)
+      where.case_number = {
+        [Op.like]: `%${caseNumber}%`,
+      };
+
+    if (caseType)
+      where.case_type = {
+        [Op.like]: `%${caseType}%`,
+      };
+    if (caseStatus) where.case_status = caseStatus;
+
+    console.log(caseType)
+
+    if (startDate || endDate) {
+      where.opening_date = {};
+
+      if (startDate) where.opening_date[Op.gte] = startDate;
+
+      if (endDate) where.opening_date[Op.lte] = endDate;
+    }
+
+    const { count, rows } = await Case.findAndCountAll({
+      where,
+
+      include: [
+        {
+          model: Patient,
+          where: Object.keys(patientWhere).length ? patientWhere : {},
+          required: !!patientName,
+        },
+
+        {
+          model: Category,
+          attributes: ["id", "name"],
+        },
+
+        {
+          model: Insurance,
+          attributes: ["id", "insurance_name"],
+          required: false,
+        },
+
+        {
+          model: Firm,
+          attributes: ["id", "firm_name"],
+          required: false,
+        },
+
+        {
+          model: PracticeLocation,
+          attributes: ["id", "location_name"],
+        },
+      ],
+
+      limit: pageSize,
+      offset,
 
-try{
+      order: [["created_at", "DESC"]],
+    });
 
-const {
-patientName,
-caseNumber,
-caseType,
-categoryId,
-caseStatus,
-practiceLocationId,
-insuranceProviderId,
-startDate,
-endDate,
-page=1,
-limit=10
+    return res.status(200).json({
+      success: true,
 
-}=req.query;
+      page: pageNumber,
 
+      limit: pageSize,
 
-const pageNumber=Number(page);
-const pageSize=Number(limit);
+      total: count,
 
-const offset=(pageNumber-1)*pageSize;
+      hasNextPage: offset + pageSize < count,
 
+      hasPrevPage: pageNumber > 1,
 
-let where={
-deleted_at:null
-};
+      data: rows,
+    });
+  } catch (error) {
+    console.error(error);
 
-let patientWhere={};
-
-
-if(patientName){
-
-patientWhere[Op.or]=[
-{
-first_name:{
-[Op.like]:`%${patientName}%`
-}
-},
-
-{
-middle_name:{
-[Op.like]:`%${patientName}%`
-}
-},
-
-{
-last_name:{
-[Op.like]:`%${patientName}%`
-}
-}
-
-];
-
-}
-
-
-
-if(caseNumber)
-where.case_number={
-[Op.like]:`%${caseNumber}%`
-};
-
-
-if(caseType)
-where.case_type={
-[Op.like]:`%${caseType}%`
-};
-
-
-if(categoryId)
-where.category_id=categoryId;
-
-
-if(caseStatus)
-where.case_status=caseStatus;
-
-
-if(practiceLocationId)
-where.practice_location_id=practiceLocationId;
-
-
-if(insuranceProviderId)
-where.insurance_id=insuranceProviderId;
-
-
-
-if(startDate || endDate){
-
-where.opening_date={};
-
-if(startDate)
-where.opening_date[Op.gte]=startDate;
-
-if(endDate)
-where.opening_date[Op.lte]=endDate;
-
-}
-
-
-
-const {count,rows}=await Case.findAndCountAll({
-
-where,
-
-include:[
-
-{
-model:Patient,
-where:Object.keys(patientWhere).length ? patientWhere : {},
-required:!!patientName
-},
-
-{
-model:Category,
-attributes:["id","name"]
-},
-
-{
-model:Insurance,
-attributes:["id","insurance_name"],
-required:false
-},
-
-{
-model:Firm,
-attributes:["id","firm_name"],
-required:false
-},
-
-{
-model:PracticeLocation,
-attributes:["id","location_name"]
-}
-
-],
-
-limit:pageSize,
-offset,
-
-order:[
-["created_at","DESC"]
-]
-
-});
-
-
-return res.status(200).json({
-
-success:true,
-
-page:pageNumber,
-
-limit:pageSize,
-
-total:count,
-
-hasNextPage:
-offset+pageSize<count,
-
-hasPrevPage:
-pageNumber>1,
-
-data:rows
-
-});
-
-
-}
-
-catch(error){
-
-console.error(error);
-
-return res.status(500).json({
-success:false,
-message:error.message
-});
-
-}
-
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 export const getById = async (req, res) => {
@@ -217,7 +164,6 @@ export const getById = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-
     const {
       patient_id,
       practice_location_id,
@@ -236,28 +182,25 @@ export const create = async (req, res) => {
 
       referred_by,
       referred_doctor_name,
-      clinical_notes
-
+      clinical_notes,
     } = req.body;
-
 
     if (!patient_id || !practice_location_id) {
       return res.status(400).json({
         success: false,
-        message: "patient_id and practice_location_id are required"
+        message: "patient_id and practice_location_id are required",
       });
     }
-
 
     const currentYear = new Date().getFullYear();
 
     const lastCase = await Case.findOne({
       where: {
         case_number: {
-          [Op.like]: `CASE-${currentYear}-%`
-        }
+          [Op.like]: `CASE-${currentYear}-%`,
+        },
       },
-      order: [["id", "DESC"]]
+      order: [["id", "DESC"]],
     });
 
     let next = 1;
@@ -269,9 +212,7 @@ export const create = async (req, res) => {
 
     const case_number = `CASE-${currentYear}-${String(next).padStart(5, "0")}`;
 
-
     const newCase = await Case.create({
-
       case_number,
 
       patient_id,
@@ -291,10 +232,8 @@ export const create = async (req, res) => {
 
       referred_by,
       referred_doctor_name,
-      clinical_notes
-
+      clinical_notes,
     });
-
 
     const createdCase = await Case.findByPk(newCase.id, {
       include: [
@@ -302,26 +241,22 @@ export const create = async (req, res) => {
         { model: Category },
         { model: Insurance },
         { model: Firm },
-        { model: PracticeLocation }
-      ]
+        { model: PracticeLocation },
+      ],
     });
-
 
     return res.status(201).json({
       success: true,
       message: "Case created successfully",
-      data: createdCase
+      data: createdCase,
     });
-
-  }
-
-  catch (error) {
+  } catch (error) {
     console.error(error);
 
     return res.status(500).json({
       success: false,
       message: "Something went wrong",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -346,15 +281,14 @@ export const update = async (req, res) => {
       message: "Case updated successfully",
       data: caseData,
     });
-    } catch (error) {
+  } catch (error) {
     console.error("Update Error:", error); // Log the error to see what went wrong
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
-      error: error.message
+      error: error.message,
     });
   }
-
 };
 
 export const Delete = async (req, res) => {

@@ -1,72 +1,116 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { VisitService } from '../../../core/services/visit.service';
+
 @Component({
   selector: 'app-doctor-dashboard',
- imports: [CommonModule, FormsModule],
- templateUrl: './doctor-dashboard.component.html',
-  styleUrl: './doctor-dashboard.component.css'
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './doctor-dashboard.component.html',
+  styleUrls: ['./doctor-dashboard.component.css'],
 })
-export class DoctorDashboardComponent {
+export class DoctorDashboardComponent implements OnInit {
 
-private readonly appointmentService = inject(AppointmentService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly visitService = inject(VisitService);
   private readonly router = inject(Router);
 
+  // ================= APPOINTMENTS =================
   public appointments: any[] = [];
   public pagination: any;
   public pages: number[] = [];
 
   public selectedAppointment: any = null;
-
   public showStatusModal: boolean = false;
   public appointmentToUpdate: any = null;
 
- public currentDoctorId: number = 0;
+  // ================= DOCTOR =================
+  public currentDoctorId: number = 0;
 
-constructor() {
-  this.getCurrentDoctor();
-}
-ngOnInit() {
-  this.loadAppointments();
-}
-getCurrentDoctor() {
-  const user = localStorage.getItem('user');
+  // ================= VISITS =================
+  public visits: any[] = [];
+  public doctorVisits: any[] = [];
 
-  console.log('RAW USER:', user);
+  // ================= STATS =================
+  public completedCount: number = 0;
+  public pendingCount: number = 0;
+  public totalCount: number = 0;
 
-  if (user) {
-    const parsedUser = JSON.parse(user);
-    console.log('PARSED USER:', parsedUser);
-  }
-}
+  constructor() {}
 
-loadAppointments() {
-  this.appointmentService.getAppointments({}).subscribe({
-    next: (res: any) => {
+  ngOnInit(): void {
+    const storedId = localStorage.getItem('userId');
 
-      const data = res?.data ?? res ?? [];
-
-      this.pagination = res?.pagination || {};
-
-      this.appointments = data.filter((app: any) =>
-        Number(app.doctor_id) === Number(this.currentDoctorId)
-      );
-     
-      this.pages = Array.from(
-        { length: this.pagination?.totalPages || 0 },
-        (_, i) => i + 1
-      );
-    },
-    error: (err) => {
-      console.error('Error loading appointments:', err);
-      if (err.status === 401) {
-        this.router.navigateByUrl('');
-      }
+    if (!storedId) {
+      console.error('No userId found');
+      return;
     }
-  });
-}
+
+    this.currentDoctorId = Number(storedId);
+
+    this.loadAppointments();
+    this.loadVisits();
+  }
+
+  // ================= APPOINTMENTS =================
+  loadAppointments(): void {
+    this.appointmentService.getAppointments({}).subscribe({
+      next: (res: any) => {
+        const data = res?.data || [];
+
+        this.pagination = res?.pagination || {};
+
+        this.appointments = data.filter(
+          (a: any) => Number(a.doctor_id) === this.currentDoctorId
+        );
+
+        this.pages = Array.from(
+          { length: this.pagination?.totalPages || 0 },
+          (_, i) => i + 1
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        if (err.status === 401) this.router.navigateByUrl('');
+      },
+    });
+  }
+
+  // ================= VISITS =================
+  loadVisits(): void {
+    this.visitService.getVisits().subscribe({
+      next: (res: any) => {
+        const data = res?.data || res || [];
+
+        this.visits = data;
+
+        this.doctorVisits = data.filter(
+          (v: any) => Number(v.doctor_id) === this.currentDoctorId
+        );
+
+        this.calculateStats();
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+  // ================= STATS =================
+  calculateStats(): void {
+    this.totalCount = this.doctorVisits.length;
+
+    this.completedCount = this.doctorVisits.filter(
+      v => v.visit_status === 'Completed'
+    ).length;
+
+    this.pendingCount = this.doctorVisits.filter(
+      v => v.visit_status === 'Draft'
+    ).length;
+  }
+
+  // ================= UI ACTIONS =================
   selectAppointment(app: any) {
     this.selectedAppointment = app;
   }
@@ -94,12 +138,11 @@ loadAppointments() {
     ).subscribe({
       next: () => {
         this.loadAppointments();
+        this.loadVisits();
         this.closeStatusModal();
         this.closeDetails();
       },
-      error: (err) => {
-        console.error('Status update failed:', err);
-      }
+      error: (err) => console.error(err),
     });
   }
 
@@ -107,4 +150,3 @@ loadAppointments() {
     this.loadAppointments();
   }
 }
-

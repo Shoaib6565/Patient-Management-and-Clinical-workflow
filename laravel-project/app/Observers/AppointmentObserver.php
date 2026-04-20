@@ -26,6 +26,7 @@ class AppointmentObserver
 
                 $appointment->visit()->create([
                     'visit_number' => 'VISIT-' . now()->year . '-' . str_pad($appointment->id, 5, '0', STR_PAD_LEFT),
+                    'appointment_id' => $appointment->id,
                     'case_id'      => $appointment->case_id,
                     'patient_id'   => $appointment->patient_id,
                     'doctor_id'    => $appointment->doctor_id,

@@ -19,6 +19,7 @@ import { PatientManagementService } from '../../../core/services/PatientManageme
 })
 export class PatientFormComponent {
   private readonly patientService = inject(PatientManagementService);
+  private readonly router = inject(Router);
 
   public loading = false;
   public successMessage = '';
@@ -126,5 +127,7 @@ export class PatientFormComponent {
 
     this.successMessage = '';
     this.errorMessage = '';
+
+    this.router.navigate(['/patients']);
   }
 }
