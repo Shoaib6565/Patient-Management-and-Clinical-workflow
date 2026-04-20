@@ -97,7 +97,6 @@ export class CaseFormComponent implements OnInit {
     this.caseForm.reset();
     this.successMessage = '';
     this.errorMessage = '';
-
     this.router.navigate(['/cases']);
   }
 }

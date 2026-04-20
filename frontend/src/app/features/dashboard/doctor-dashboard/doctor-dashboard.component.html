@@ -1,70 +1,118 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4">
+  <div class="space-y-6">
 
-<div class="p-4 space-y-4">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold">My Appointments</h2>
+    <div class="bg-white shadow rounded-xl p-5 border-l-4 border-blue-600">
+
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase">
+          Visits Completed
+        </h3>
+        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">✔</div>
+      </div>
+
+      <div class="mt-4 text-3xl font-bold">
+        {{ completedCount }} <span class="text-gray-400 text-lg">/ {{ totalCount }}</span>
+      </div>
+
+      <div class="w-full bg-gray-200 h-2 rounded-full mt-4">
+        <div class="bg-blue-600 h-2 rounded-full"
+          [style.width.%]="totalCount ? (completedCount / totalCount) * 100 : 0">
+        </div>
+      </div>
+
+    </div>
+    <div class="bg-white shadow rounded-xl p-5 border-l-4 border-orange-500">
+
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase">
+          Pending Visits
+        </h3>
+        <div class="bg-orange-100 p-2 rounded-lg text-orange-500">🕒</div>
+      </div>
+
+      <div class="mt-4 text-3xl font-bold">
+        {{ pendingCount }} <span class="text-gray-400 text-lg">Active</span>
+      </div>
+
+    </div>
+
   </div>
-  <div class="card bg-base-100 shadow-md">
-    <div class="overflow-x-auto">
-      <table class="table">
 
-        <thead>
+  <div class="lg:col-span-2 bg-white shadow rounded-xl">
+    <div class="flex justify-between items-center p-4 border-b">
+      <div class="flex gap-2">
+      <h2 class="text-lg font-bold">Today’s Appointments</h2>
+
+
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+
+      <table class="table w-full">
+
+        <thead class="bg-gray-100 text-xs uppercase">
           <tr>
-            <th>Patient</th>
-            <th>Location</th>
-            <th>Date</th>
+            <th>Patient Name</th>
             <th>Time</th>
+            <th>Purpose</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-            <tr *ngIf="appointments.length === 0">
-              <td colspan="6" class="text-center py-6 text-gray-400">
-                No appointments found
-              </td>
-            </tr>
-
-            <tr *ngFor="let app of appointments; trackBy: trackByAppointment" (click)="selectAppointment(app)" class="hover:bg-base-200 cursor-pointer">
-              <td>
-                {{ app.patient.first_name }} {{ app.patient?.last_name }}
-              </td>
-
+          @if (appointments.length === 0) {
+          <tr>
+            <td colspan="5" class="text-center py-6 text-gray-400">
+              No appointments found
+            </td>
+          </tr>
+          }
+          @for (app of appointments; track app.id) {
+          <tr class="hover:bg-gray-50">
 
             <td>
-              {{ app.practice_location?.location_name }}
+              <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+
+                <div>
+                  <div class="font-semibold">
+                    {{ app.patient?.first_name }} {{ app.patient?.last_name }}
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    ID: #{{ app.patient?.id }}
+                  </div>
+                </div>
+
+              </div>
+            </td>
+
+            <td class="text-blue-600 font-medium">
+              {{ app.appointment_time }}
             </td>
 
             <td>
-              {{ app.appointment_date | date:'mediumDate' }}
+              {{ app.notes || 'General Consultation' }}
             </td>
 
             <td>
-              {{ app.appointment_time }} - {{ app.end_time }}
-            </td>
-
-            <td>
-              <span class="badge" [ngClass]="{
-                'badge-success': app.status === 'Confirmed',
-                'badge-warning': app.status === 'Pending',
-                'badge-error': app.status === 'Cancelled'
-              }">
+              <span class="px-3 py-1 rounded-full text-xs" [ngClass]="{
+                    'bg-blue-100 text-blue-600': app.status === 'Checked In',
+                    'bg-gray-200 text-gray-600': app.status === 'Waiting',
+                    'bg-green-100 text-green-600': app.status === 'Completed',
+                    'bg-red-100 text-red-600': app.status === 'Urgent'
+                  }">
                 {{ app.status }}
               </span>
-            </td>
-
-            <td>
-              <button class="btn btn-xs btn-primary"
-                (click)="openStatusModal(app); $event.stopPropagation()">
-                Update
-              </button>
             </td>
 
           </tr>
 
         </tbody>
       </table>
+
     </div>
   </div>
 
-</div> 
+</div>

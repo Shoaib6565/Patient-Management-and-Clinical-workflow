@@ -17,7 +17,18 @@
       <!-- FILTER COMPONENT -->
       <app-appointment-filter (applyFilter)="onApplyFilter($event)" (resetFilter)="onResetFilter()">
       </app-appointment-filter>
+      <!-- FILTER COMPONENT -->
+      <app-appointment-filter (applyFilter)="onApplyFilter($event)" (resetFilter)="onResetFilter()">
+      </app-appointment-filter>
 
+      <!-- ACTION BAR -->
+      <div class="flex justify-between my-3">
+        <button class="btn btn-primary" (click)="exportCSV()"
+         [disabled]="!canExport()">
+          <i class="ti ti-file-export mr-2"></i>
+          Export CSV
+        </button>
+      </div>
       <!-- ACTION BAR -->
       <div class="flex justify-between my-3">
         <button class="btn btn-primary" (click)="exportCSV()"
@@ -32,7 +43,21 @@
         <span class="loading loading-spinner loading-lg"></span>
         <p class="mt-2">Loading appointments...</p>
       </div>
+      <!-- LOADING -->
+      <div *ngIf="loading" class="text-center py-6">
+        <span class="loading loading-spinner loading-lg"></span>
+        <p class="mt-2">Loading appointments...</p>
+      </div>
 
+      <!-- TABLE -->
+      <ngx-datatable *ngIf="!loading" class="material" [rows]="appointments" [columnMode]="'force'" [headerHeight]="50"
+        [rowHeight]="'auto'">
+        <!-- PATIENT -->
+        <ngx-datatable-column name="Patient">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.patient?.first_name }} {{ row.patient?.last_name }}
+          </ng-template>
+        </ngx-datatable-column>
       <!-- TABLE -->
       <ngx-datatable *ngIf="!loading" class="material" [rows]="appointments" [columnMode]="'force'" [headerHeight]="50"
         [rowHeight]="'auto'">
@@ -49,7 +74,44 @@
             {{ row.doctor?.name }}
           </ng-template>
         </ngx-datatable-column>
+        <!-- DOCTOR -->
+        <ngx-datatable-column name="Doctor">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.doctor?.name }}
+          </ng-template>
+        </ngx-datatable-column>
 
+        <ngx-datatable-column name="Practice Location">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.practice_location?.location_name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Created-by">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.created_by?.name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Appointment Type">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row?.appointment_type }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="specialty">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.specialty?.specialty_name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- DATE -->
+        <ngx-datatable-column name="Date&Time">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{ row.appointment_date | date: "dd-MM-yyyy" }}
+            {{ row.appointment_time }}
+          </ng-template>
+        </ngx-datatable-column>
         <ngx-datatable-column name="Practice Location">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{ row.practice_location?.location_name }}
@@ -90,11 +152,30 @@
             </span>
           </ng-template>
         </ngx-datatable-column>
+        <!-- STATUS -->
+        <ngx-datatable-column name="Status">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span class="badge badge-info">
+              {{ row.status }}
+            </span>
+          </ng-template>
+        </ngx-datatable-column>
 
         <!-- ACTIONS -->
         <ngx-datatable-column name="Actions">
           <ng-template ngx-datatable-cell-template let-row="row">
+        <!-- ACTIONS -->
+        <ngx-datatable-column name="Actions">
+          <ng-template ngx-datatable-cell-template let-row="row">
 
+            <!-- EDIT -->
+
+            <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]"
+             title="Edit" [disabled]="!canEdit()">
+
+              <i class="ti ti-edit"></i>
+
+            </button>
             <!-- EDIT -->
 
             <button class="btn btn-xs btn-warning" [routerLink]="['/appointments/edit', row.id]"
@@ -148,8 +229,43 @@
         No appointments found.
       </div>
     </div>
+      <div class="text-sm mt-4 text-gray-600">
+        Showing {{ (paginationData?.current_page - 1) * paginationData?.per_page + 1 }}
+        to {{ Math.min(paginationData?.current_page * paginationData?.per_page, paginationData?.total) }}
+        of {{ paginationData?.total }} patients
+      </div>
+
+      <!-- PAGINATION -->
+      <div *ngIf="paginationData && paginationData?.last_page > 1" class="mt-4">
+
+        <app-pagination [pagination]="paginationData" (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div *ngIf="!loading && appointments.length === 0" class="text-center py-8 text-gray-500">
+        No appointments found.
+      </div>
+    </div>
   </div>
 
+  <!-- Modal Overlay for Form -->
+  <div *ngIf="isFormOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <!-- Router outlet for appointment form -->
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirm-dialog
+    [visible]="confirmDialog.visible"
+    [title]="confirmDialog.title"
+    [message]="confirmDialog.message"
+    [buttonName]="confirmDialog.buttonName"
+    (onConfirm)="onConfirmDialog()"
+    (onCancel)="onCancelDialog()">
+  </app-confirm-dialog>
   <!-- Modal Overlay for Form -->
   <div *ngIf="isFormOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-overlay">
     <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">

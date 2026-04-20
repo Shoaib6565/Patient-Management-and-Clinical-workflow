@@ -1,75 +1,116 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { VisitService } from '../../../core/services/visit.service';
+
 @Component({
   selector: 'app-doctor-dashboard',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './doctor-dashboard.component.html',
-  styleUrls: ['./doctor-dashboard.component.css']
+  styleUrls: ['./doctor-dashboard.component.css'],
 })
-export class DoctorDashboardComponent {
+export class DoctorDashboardComponent implements OnInit {
 
-private readonly appointmentService = inject(AppointmentService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly visitService = inject(VisitService);
   private readonly router = inject(Router);
 
+  // ================= APPOINTMENTS =================
   public appointments: any[] = [];
   public pagination: any;
   public pages: number[] = [];
 
   public selectedAppointment: any = null;
-
   public showStatusModal: boolean = false;
   public appointmentToUpdate: any = null;
 
- public currentDoctorId: number = 0;
+  // ================= DOCTOR =================
+  public currentDoctorId: number = 0;
 
-constructor() {
-  this.getCurrentDoctor();
-}
-ngOnInit() {
-  this.loadAppointments();
-}
-getCurrentDoctor() {
-  const userString = localStorage.getItem('user') || localStorage.getItem('currentUser');
-  if (!userString) {
-    return;
-  }
+  // ================= VISITS =================
+  public visits: any[] = [];
+  public doctorVisits: any[] = [];
 
-  try {
-    const parsedUser = JSON.parse(userString);
-    this.currentDoctorId = parsedUser.id ?? parsedUser.userId ?? 0;
-  } catch {
-    this.currentDoctorId = 0;
-  }
-}
+  // ================= STATS =================
+  public completedCount: number = 0;
+  public pendingCount: number = 0;
+  public totalCount: number = 0;
 
-loadAppointments() {
-  this.appointmentService.getAppointments({}).subscribe({
-    next: (res: any) => {
+  constructor() {}
 
-      const data = res?.data ?? res ?? [];
+  ngOnInit(): void {
+    const storedId = localStorage.getItem('userId');
 
-      this.pagination = res?.pagination || {};
-
-      this.appointments = data.filter((app: any) =>
-        Number(app.doctor_id) === Number(this.currentDoctorId)
-      );
-     
-      this.pages = Array.from(
-        { length: this.pagination?.totalPages || 0 },
-        (_, i) => i + 1
-      );
-    },
-    error: (err) => {
-      console.error('Error loading appointments:', err);
-      if (err.status === 401) {
-        this.router.navigateByUrl('');
-      }
+    if (!storedId) {
+      console.error('No userId found');
+      return;
     }
-  });
-}
+
+    this.currentDoctorId = Number(storedId);
+
+    this.loadAppointments();
+    this.loadVisits();
+  }
+
+  // ================= APPOINTMENTS =================
+  loadAppointments(): void {
+    this.appointmentService.getAppointments({}).subscribe({
+      next: (res: any) => {
+        const data = res?.data || [];
+
+        this.pagination = res?.pagination || {};
+
+        this.appointments = data.filter(
+          (a: any) => Number(a.doctor_id) === this.currentDoctorId
+        );
+
+        this.pages = Array.from(
+          { length: this.pagination?.totalPages || 0 },
+          (_, i) => i + 1
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        if (err.status === 401) this.router.navigateByUrl('');
+      },
+    });
+  }
+
+  // ================= VISITS =================
+  loadVisits(): void {
+    this.visitService.getVisits().subscribe({
+      next: (res: any) => {
+        const data = res?.data || res || [];
+
+        this.visits = data;
+
+        this.doctorVisits = data.filter(
+          (v: any) => Number(v.doctor_id) === this.currentDoctorId
+        );
+
+        this.calculateStats();
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+  // ================= STATS =================
+  calculateStats(): void {
+    this.totalCount = this.doctorVisits.length;
+
+    this.completedCount = this.doctorVisits.filter(
+      v => v.visit_status === 'Completed'
+    ).length;
+
+    this.pendingCount = this.doctorVisits.filter(
+      v => v.visit_status === 'Draft'
+    ).length;
+  }
+
+  // ================= UI ACTIONS =================
   selectAppointment(app: any) {
     this.selectedAppointment = app;
   }
@@ -101,12 +142,11 @@ loadAppointments() {
     ).subscribe({
       next: () => {
         this.loadAppointments();
+        this.loadVisits();
         this.closeStatusModal();
         this.closeDetails();
       },
-      error: (err) => {
-        console.error('Status update failed:', err);
-      }
+      error: (err) => console.error(err),
     });
   }
 
@@ -114,225 +154,3 @@ loadAppointments() {
     this.loadAppointments();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // src/app/features/dashboard/doctor-dashboard/doctor-dashboard.component.ts
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-
-// export type AppointmentStatus = 'CheckedIn' | 'Waiting' | 'Scheduled' | 'Urgent' | 'Completed';
-
-// export interface TodayAppointment {
-//   id: string;
-//   patientName: string;
-//   caseId: string;
-//   time: string;
-//   purpose: string;
-//   status: AppointmentStatus;
-//   avatarInitials: string;
-// }
-
-// export interface ScheduleItem {
-//   dayShort: string;
-//   dayNum: number;
-//   title: string;
-//   timeRange: string;
-//   isEmpty?: boolean;
-// }
-
-// export interface BottomStat {
-//   icon: string;
-//   label: string;
-//   value: string;
-//   colorClass: string;
-// }
-
-// @Component({
-//   selector: 'app-doctor-dashboard',
-//   standalone: true,
-//   imports: [CommonModule],
-//   templateUrl: './doctor-dashboard.component.html',
-//   styleUrls: ['./doctor-dashboard.component.css'],
-// })
-// export class DoctorDashboardComponent implements OnInit {
-//   userName = localStorage.getItem('userName') || 'Dr. Smith';
-
-//   doctorName     = this.userName;
-//   today          = new Date();
-//   totalAppts     = 12;
-//   visitsCompleted = 8;
-//   pendingVisits  = 4;
-
-//   get visitsProgress(): number {
-//     return Math.round((this.visitsCompleted / this.totalAppts) * 100);
-//   }
-
-//   // ── Today's Appointments 
-//   appointments: TodayAppointment[] = [
-//     {
-//       id: '1', patientName: 'Elena Rodriguez', caseId: '#CS-8892',
-//       time: '09:15 AM', purpose: 'Post-Op Consultation',
-//       status: 'CheckedIn', avatarInitials: 'ER',
-//     },
-//     {
-//       id: '2', patientName: 'Marcus Thorne', caseId: '#CS-9120',
-//       time: '10:30 AM', purpose: 'Routine Cardiac Check',
-//       status: 'Waiting', avatarInitials: 'MT',
-//     },
-//     {
-//       id: '3', patientName: 'Sarah Jenkins', caseId: '#CS-7721',
-//       time: '11:45 AM', purpose: 'Blood Work Review',
-//       status: 'Scheduled', avatarInitials: 'SJ',
-//     },
-//     {
-//       id: '4', patientName: 'Julian Voss', caseId: '#CS-6543',
-//       time: '02:15 PM', purpose: 'General Health Screen',
-//       status: 'Urgent', avatarInitials: 'JV',
-//     },
-//   ];
-
-//   // ── Weekly Schedule 
-//   weeklySchedule: ScheduleItem[] = [
-//     { dayShort: 'TUE', dayNum: 24, title: 'Cardiology Review',  timeRange: '09:00 AM – 11:30 AM' },
-//     { dayShort: 'WED', dayNum: 25, title: 'Department Seminar', timeRange: '02:00 PM – 04:00 PM' },
-//     { dayShort: 'THU', dayNum: 26, title: '',                   timeRange: '',                    isEmpty: true },
-//   ];
-
-//   // ── Bottom Stats
-//   bottomStats: BottomStat[] = [
-//     { icon: 'ti-chart-bar',     label: 'PATIENT VELOCITY',  value: '+12% from last week',  colorClass: 'stat-blue'   },
-//     { icon: 'ti-shield-check',  label: 'SATISFACTION RATE', value: '98.4% Exceptional',    colorClass: 'stat-teal'   },
-//     { icon: 'ti-clipboard-list',label: 'PENDING CHARTS',    value: '3 records required',   colorClass: 'stat-orange' },
-//   ];
-
-//   ngOnInit(): void {}
-
-//   // ── Helpers
-//   getStatusLabel(status: AppointmentStatus): string {
-//     const map: Record<AppointmentStatus, string> = {
-//       CheckedIn: 'Checked In', Waiting: 'Waiting',
-//       Scheduled: 'Scheduled',  Urgent: 'Urgent', Completed: 'Completed',
-//     };
-//     return map[status];
-//   }
-
-//   getStatusClass(status: AppointmentStatus): string {
-//     const map: Record<AppointmentStatus, string> = {
-//       CheckedIn: 'badge-checkedin',
-//       Waiting:   'badge-waiting',
-//       Scheduled: 'badge-scheduled',
-//       Urgent:    'badge-urgent',
-//       Completed: 'badge-completed',
-//     };
-//     return map[status];
-//   }
-
-//   isPrimaryAction(status: AppointmentStatus): boolean {
-//     return status === 'CheckedIn';
-//   }
-
-//   getActionLabel(status: AppointmentStatus): string {
-//     return status === 'CheckedIn' ? 'Start Visit' : 'Check-in';
-//   }
-
-//   onNewEmergencyCase(): void {
-//     console.log('New emergency case clicked');
-//     // this.router.navigate(['/cases/new-emergency']);
-//   }
-
-//   onStartVisit(appt: TodayAppointment): void {
-//     console.log('Start visit for', appt.patientName);
-//     // open visit form
-//   }
-
-//   onCheckIn(appt: TodayAppointment): void {
-//     console.log('Check in', appt.patientName);
-//   }
-
-//   onFilter(): void   { console.log('Filter appointments'); }
-//   onPrint(): void    { window.print(); }
-//   onMoreSchedule(): void { console.log('More schedule options'); }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

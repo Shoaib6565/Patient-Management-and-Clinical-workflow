@@ -7,7 +7,38 @@
         <h2 class="text-2xl font-bold">
           {{ isEdit ? "Update Appointment" : "Create Appointment" }}
         </h2>
+<div class="max-w-5xl mx-auto p-6">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
 
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">
+          {{ isEdit ? "Update Appointment" : "Create Appointment" }}
+        </h2>
+
+        <button
+          type="button"
+          class="btn btn-ghost btn-circle"
+          (click)="onCancel()"
+          [disabled]="isLoading"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Form -->
+      <form
+        *ngIf="!isLoading"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="grid grid-cols-2 gap-4"
+      >
         <button
           type="button"
           class="btn btn-ghost btn-circle"

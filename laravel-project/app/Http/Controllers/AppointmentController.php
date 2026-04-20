@@ -102,6 +102,7 @@ class AppointmentController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+
     //  2. Create Appointment (FDO)
     public function store(Request $request)
     {

@@ -15,8 +15,10 @@ export class CasesService {
     let params = new HttpParams();
 
     Object.keys(filters).forEach((key) => {
-      if (filters[key]) {
-        params = params.set(key, filters[key]);
+      const value = filters[key];
+
+      if (value !== null && value !== undefined && value !== '') {
+        params = params.set(key, String(value));
       }
     });
 

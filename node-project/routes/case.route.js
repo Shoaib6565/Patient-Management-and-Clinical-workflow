@@ -10,13 +10,15 @@ import {
     getCaseCount
 } from "../controllers/case.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
+import { roleMiddleware } from "../middlewares/role.middleware.js";
+
 export default router;
 
-router.post("/", auth, create);
-router.get("/export", auth, exportCasesCSV);
+router.post("/", auth, roleMiddleware("FDO", "Admin"), create);
+router.get("/export", auth, roleMiddleware("Admin"), exportCasesCSV);
 router.get("/count", getCaseCount);
-router.get("/", auth, getAll);
-router.get("/:id", auth, getById);
-router.put("/:id", auth, update);
-router.delete("/:id", auth, Delete);
+router.get("/", auth, roleMiddleware("FDO", "Admin"), getAll);
+router.get("/:id", roleMiddleware("FDO", "Admin"), auth, getById);
+router.put("/:id", roleMiddleware("FDO", "Admin"), auth, update);
+router.delete("/:id", roleMiddleware("Admin"), auth, Delete);
 
