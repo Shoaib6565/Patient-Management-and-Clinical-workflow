@@ -59,6 +59,9 @@
               <button class="btn btn-xs btn-error" (click)="openDeleteModal(user); $event.stopPropagation()">
                 Delete
               </button>
+              <button class="btn btn-xs btn-secondary" (click)="openSpecialtyDropdown(user); $event.stopPropagation()">
+                Specialties
+              </button>
 
             </td>
 
@@ -158,6 +161,48 @@
     <div class="flex justify-center gap-2">
       <button class="btn" (click)="closeDeleteModal()">Cancel</button>
       <button class="btn btn-error" (click)="confirmDelete()">Delete</button>
+    </div>
+
+  </div>
+</div>
+}
+
+@if (showSpecialtyDropdown) {
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <div class="absolute inset-0 bg-black/50" (click)="showSpecialtyDropdown = false"></div>
+
+  <div class="relative w-full max-w-md bg-base-100 p-6 rounded-xl space-y-4">
+
+    <div class="flex justify-between items-center">
+      <h2 class="font-bold text-lg">Assign Specialties</h2>
+      <button class="btn btn-sm btn-circle" (click)="showSpecialtyDropdown = false">✕</button>
+    </div>
+
+    <p class="text-sm text-gray-500">
+      Doctor: <b>{{ selectedDoctor?.name }}</b>
+    </p>
+
+    <div class="max-h-60 overflow-y-auto space-y-2 border rounded p-3">
+
+      <select class="select select-bordered w-full h-48" multiple [(ngModel)]="selectedSpecialties">
+        @for (spec of specialties; track spec.id) {
+        <option [ngValue]="spec.id">
+          {{ spec.specialty_name }}
+        </option>
+        }
+      </select>
+
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <button class="btn" (click)="showSpecialtyDropdown = false">
+        Cancel
+      </button>
+
+      <button class="btn btn-primary" (click)="saveSpecialties(selectedDoctor)">
+        Save
+      </button>
     </div>
 
   </div>
