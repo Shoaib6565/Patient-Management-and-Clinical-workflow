@@ -23,6 +23,12 @@ export class SidebarComponent {
   get isAdmin(): boolean {
     return this.role === 'Admin';
   }
+  get isAdminAndFDO() : boolean{
+    return this.role === "Admin" || this.role === "FDO"
+  }
+   get isAdminAndDoctor() : boolean{
+    return this.role === "Admin" || this.role === "Doctor"
+  }
 
   get dashboardRoute(): string {
     const routes: Record<UserRole, string> = {

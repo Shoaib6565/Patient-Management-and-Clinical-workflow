@@ -73,14 +73,14 @@ export class DoctorDashboardComponent implements OnInit {
     },
   ];
 
-  // ── Weekly Schedule ───────────────────────────────────────────────────────
+  // ── Weekly Schedule 
   weeklySchedule: ScheduleItem[] = [
     { dayShort: 'TUE', dayNum: 24, title: 'Cardiology Review',  timeRange: '09:00 AM – 11:30 AM' },
     { dayShort: 'WED', dayNum: 25, title: 'Department Seminar', timeRange: '02:00 PM – 04:00 PM' },
     { dayShort: 'THU', dayNum: 26, title: '',                   timeRange: '',                    isEmpty: true },
   ];
 
-  // ── Bottom Stats ──────────────────────────────────────────────────────────
+  // ── Bottom Stats
   bottomStats: BottomStat[] = [
     { icon: 'ti-chart-bar',     label: 'PATIENT VELOCITY',  value: '+12% from last week',  colorClass: 'stat-blue'   },
     { icon: 'ti-shield-check',  label: 'SATISFACTION RATE', value: '98.4% Exceptional',    colorClass: 'stat-teal'   },
@@ -89,7 +89,7 @@ export class DoctorDashboardComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers
   getStatusLabel(status: AppointmentStatus): string {
     const map: Record<AppointmentStatus, string> = {
       CheckedIn: 'Checked In', Waiting: 'Waiting',

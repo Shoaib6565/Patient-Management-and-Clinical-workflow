@@ -8,6 +8,9 @@
       <button class="btn btn-outline btn-sm" (click)="exportCsv()">
         Export CSV
       </button>
+      <button *ngIf="isAdminAndFDO() === 'Admin' || isAdminAndFDO() === 'FDO'"  class="btn btn-outline btn-sm" (click)="registerCase()">
+        Create Case
+      </button>
     </div>
   </div>
 

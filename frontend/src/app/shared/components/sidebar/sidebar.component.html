@@ -58,6 +58,7 @@
       </a>
     </ng-container>
 
+    <ng-container *ngIf="isAdminAndFDO">
     <div class="nav-section-label">Patient care</div>
 
     <a class="nav-item" routerLink="/patients" routerLinkActive="active">
@@ -73,7 +74,9 @@
       <span class="nav-label">Manage Patients</span>
       <span class="nav-tooltip">Manage Patients</span>
     </a>
+    </ng-container>
 
+    <ng-container *ngIf="isAdminAndFDO">
     <a class="nav-item" routerLink="/cases" routerLinkActive="active">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -87,6 +90,7 @@
       <span class="nav-label">Case List</span>
       <span class="nav-tooltip">Case List</span>
     </a>
+    </ng-container>
 
     <a class="nav-item" routerLink="/appointments" routerLinkActive="active">
       <span class="nav-icon">
@@ -102,6 +106,7 @@
       <span class="nav-tooltip">Appointments</span>
     </a>
 
+    <ng-container *ngIf="isAdminAndDoctor">
     <a class="nav-item" routerLink="/visits" routerLinkActive="active">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -112,6 +117,7 @@
       <span class="nav-label">Visit List</span>
       <span class="nav-tooltip">Visit List</span>
     </a>
+    </ng-container>
 
   </nav>
 

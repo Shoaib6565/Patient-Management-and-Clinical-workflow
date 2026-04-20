@@ -189,11 +189,16 @@ closeEdit() {
   }
 
   registerCase() {
-    // this.router.navigateByUrl('cases/case-form');
+    this.router.navigateByUrl('cases/case-form');
   }
 
   allowFeatures(input: string[]) {
     const role = localStorage.getItem('role');
     return role ? input.includes(role) : false;
   }
+  isAdminAndFDO(){
+    const role = localStorage.getItem('role');
+    return role;
+  }
+
 }
