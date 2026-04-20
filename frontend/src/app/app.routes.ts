@@ -12,7 +12,7 @@ import { AppointmentFormComponent } from './features/appointments/appointment-fo
 import { CalendarViewComponent } from './features/appointments/calendar-view/calendar-view.component';
 import { PatientFormComponent } from './features/patients/patient-form/patient-form.component';
 import { UserFormComponent } from './features/userManagement/user-form/user-form/user-form.component';
-import { PatientHistoryComponent  } from "./features/patients/patient-history/patient-history.component"
+import { PatientHistoryComponent } from './features/patients/patient-history/patient-history.component';
 import { roleGuard } from './core/guards/role.guard';
 import { VisitFormComponent } from './features/visits/visit-form/visit-form.component';
 import { SpecialtyFormComponent } from './features/settings/specialties/specialty-form/specialty-form.component';
@@ -20,15 +20,14 @@ import { FirmFormComponent } from './features/settings/firms/firm-form/firm-form
 import { InsuranceFormComponent } from './features/settings/insurance/insurance-form/insurance-form.component';
 import { CategoryFormComponent } from './features/settings/categories/category-form/category-form.component';
 import { LocationFormComponent } from './features/settings/locations/location-form/location-form.component';
+import { CaseFormComponent } from './features/cases/case-form/case-form.component';
 
 export const routes: Routes = [
-
   // Public
 
   // Public
   { path: '', component: HomeComponent, canActivate: [guestGuard] },
   { path: 'signin', component: SigninComponent, canActivate: [guestGuard] },
-
 
   // Dashboard
   {
@@ -64,45 +63,53 @@ export const routes: Routes = [
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
     children: [
-
       //  APPOINTMENTS
       {
         path: 'appointments',
         loadComponent: () =>
-          import('./features/appointments/appointment-list/appointment-list.component')
-            .then(m => m.AppointmentListComponent),
+          import('./features/appointments/appointment-list/appointment-list.component').then(
+            (m) => m.AppointmentListComponent,
+          ),
       },
       { path: 'appointments/create', component: AppointmentFormComponent },
       { path: 'appointments/edit/:id', component: AppointmentFormComponent },
-      { path: 'appointments/appointment-calendar-view', component: CalendarViewComponent },
+      {
+        path: 'appointments/appointment-calendar-view',
+        component: CalendarViewComponent,
+      },
 
       //  VISITS
       {
         path: 'visits',
         loadComponent: () =>
-          import('./features/visits/visit-list/visit-list.component')
-            .then(m => m.VisitListComponent),
+          import('./features/visits/visit-list/visit-list.component').then(
+            (m) => m.VisitListComponent,
+          ),
       },
       { path: 'visits/edit/:id', component: VisitFormComponent },
       { path: 'visits/create/:appointmentId', component: VisitFormComponent },
 
       //  CASES
       {
+        path: 'cases',
         loadComponent: () =>
-          import('./features/appointments/appointment-list/appointment-list.component')
-            .then(m => m.AppointmentListComponent),
+          import('./features/cases/case-list/case-list.component').then(
+            (m) => m.CaseListComponent,
+          ),
       },
-      { path: 'appointments/create', component: AppointmentFormComponent },
-      { path: 'appointments/edit/:id', component: AppointmentFormComponent },
-      { path: 'appointments/appointment-calendar-view', component: CalendarViewComponent },
-
+      { path: 'cases/case-form', component: CaseFormComponent },
+      {
+        path: 'appointments/appointment-calendar-view',
+        component: CalendarViewComponent,
+      },
 
       //  PATIENTS
       {
         path: 'patients',
         loadComponent: () =>
-          import('./features/patients/patient-list/patient-list.component')
-            .then(m => m.PatientListComponent),
+          import('./features/patients/patient-list/patient-list.component').then(
+            (m) => m.PatientListComponent,
+          ),
       },
       { path: 'patients/patient-form', component: PatientFormComponent },
       { path: 'patient-history/:id', component: PatientHistoryComponent },
@@ -111,8 +118,9 @@ export const routes: Routes = [
       {
         path: 'specialties',
         loadComponent: () =>
-          import('./features/settings/specialties/specialty-list/specialty-list.component')
-            .then(m => m.SpecialtyListComponent),
+          import('./features/settings/specialties/specialty-list/specialty-list.component').then(
+            (m) => m.SpecialtyListComponent,
+          ),
       },
       { path: 'specialties/create', component: SpecialtyFormComponent },
       { path: 'specialties/edit/:id', component: SpecialtyFormComponent },
@@ -121,8 +129,9 @@ export const routes: Routes = [
       {
         path: 'firms',
         loadComponent: () =>
-          import('./features/settings/firms/firm-list/firm-list.component')
-            .then(m => m.FirmListComponent),
+          import('./features/settings/firms/firm-list/firm-list.component').then(
+            (m) => m.FirmListComponent,
+          ),
       },
       { path: 'firms/create', component: FirmFormComponent },
       { path: 'firms/edit/:id', component: FirmFormComponent },
@@ -131,8 +140,9 @@ export const routes: Routes = [
       {
         path: 'insurances',
         loadComponent: () =>
-          import('./features/settings/insurance/insurance-list/insurance-list.component')
-            .then(m => m.InsuranceListComponent),
+          import('./features/settings/insurance/insurance-list/insurance-list.component').then(
+            (m) => m.InsuranceListComponent,
+          ),
       },
       { path: 'insurances/create', component: InsuranceFormComponent },
       { path: 'insurances/edit/:id', component: InsuranceFormComponent },
@@ -141,8 +151,9 @@ export const routes: Routes = [
       {
         path: 'categories',
         loadComponent: () =>
-          import('./features/settings/categories/category-list/category-list.component')
-            .then(m => m.CategoryListComponent),
+          import('./features/settings/categories/category-list/category-list.component').then(
+            (m) => m.CategoryListComponent,
+          ),
       },
       { path: 'categories/create', component: CategoryFormComponent },
       { path: 'categories/edit/:id', component: CategoryFormComponent },
@@ -151,8 +162,9 @@ export const routes: Routes = [
       {
         path: 'locations',
         loadComponent: () =>
-          import('./features/settings/locations/location-list/location-list.component')
-            .then(m => m.LocationListComponent),
+          import('./features/settings/locations/location-list/location-list.component').then(
+            (m) => m.LocationListComponent,
+          ),
       },
       { path: 'locations/create', component: LocationFormComponent },
       { path: 'locations/edit/:id', component: LocationFormComponent },
@@ -167,16 +179,17 @@ export const routes: Routes = [
       {
         path: 'fdo-list',
         loadComponent: () =>
-          import('./features/userManagement/fdo-list/fdo-list.component')
-            .then(m => m.FdoListComponent),
+          import('./features/userManagement/fdo-list/fdo-list.component').then(
+            (m) => m.FdoListComponent,
+          ),
       },
       {
         path: 'doctor-list',
         loadComponent: () =>
-          import('./features/userManagement/doctor-list/doctor-list.component')
-            .then(m => m.DoctorListComponent),
+          import('./features/userManagement/doctor-list/doctor-list.component').then(
+            (m) => m.DoctorListComponent,
+          ),
       },
-
     ],
   },
 

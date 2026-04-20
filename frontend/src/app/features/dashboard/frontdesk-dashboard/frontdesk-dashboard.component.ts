@@ -59,10 +59,7 @@ export interface Document {
   selector: 'app-frontdesk-dashboard',
   standalone: true,
   imports: [CommonModule],
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './frontdesk-dashboard.component.html',
-  styleUrls: ['./frontdesk-dashboard.component.css'],
   styleUrls: ['./frontdesk-dashboard.component.css'],
 })
 export class FrontdeskDashboardComponent implements OnInit {

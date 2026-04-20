@@ -24,6 +24,7 @@ import { AuthService } from '../../../core/services/auth-service.service';
   styleUrls: ['./appointment-list.component.css'],
 })
 // RouterModule is already imported, so router-outlet will work
+// RouterModule is already imported, so router-outlet will work
 export class AppointmentListComponent implements OnInit {
   authService = inject(AuthService);
   appointments: any[] = [];
